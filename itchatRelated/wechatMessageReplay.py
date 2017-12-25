@@ -1,4 +1,5 @@
 # coding:utf-8
+# 将撤回信息发送给文件助手
 import itchat
 from itchat.content import TEXT
 from itchat.content import *
