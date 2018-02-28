@@ -1,5 +1,7 @@
 #requirement: linux based system
 #requirement: scapy
+#使用scapy伪造arp数据包造成中间人攻击或者断网攻击
+
 import os    
 import sys
 from scapy.layers.l2 import getmacbyip
