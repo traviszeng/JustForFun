@@ -29,20 +29,25 @@ def check():
 
     #获取内容并用html的方式返回
     gf=BeautifulSoup(rb.content,'html.parser')
-    print('[+]IP解析记录')  #读取内容里的p标签
-    for x in gf.find_all('p'):    #使用text的内容返回
+    print('[+]IP解析记录')
+    #读取内容里的p标签
+    for x in gf.find_all('p'):
+        #使用text的内容返回
         link=x.get_text()
         print(link)
+        
     gf1=BeautifulSoup(rb1.content,'html.parser')
     print('[+]子域名查询')
     for v in gf1.find_all('p'):
         link2=v.get_text()
         print(link2)
+        
     gf2=BeautifulSoup(rb2.content,'html.parser')
     print('[+]备案查询')
     for s  in gf2.find_all('p'):
         link3=s.get_text()
         print(link3)
+        
     gf3=BeautifulSoup(rb3.content,'html.parser')
     print('[+]whois查询')
     for k in gf3.find_all('p'):
