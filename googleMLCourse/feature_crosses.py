@@ -147,13 +147,20 @@ def construct_feature_columns():
     rooms_per_person, boundaries=get_quantile_based_boundaries(
       training_examples["rooms_per_person"], 7))
 
+  #Make a feature column for the long_x_lat feature cross (longitude and latitude)
+  #添加经纬度的混合feature
+  long_x_lat = tf.feature_column.crossed_column(
+      set([bucketized_longitude,bucketized_latitude]),
+      hash_bucket_size = 1000)
+
   feature_columns = set([
       bucketized_longitude,
       bucketized_latitude,
       bucketized_housing_median_age,
       bucketized_households,
       bucketized_median_income,
-      bucketized_rooms_per_person])
+      bucketized_rooms_per_person,
+      long_x_lat])
 
   return feature_columns
   
