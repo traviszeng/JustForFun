@@ -92,7 +92,7 @@ def my_input_fn(features, targets, batch_size=1, shuffle=True, num_epochs=None):
     features, labels = ds.make_one_shot_iterator().get_next()
     return features, labels
 
-def construct_feature_columns(input_features):
+def construct_feature_columns():
   """Construct the TensorFlow Feature Columns.
 
   Args:
@@ -100,6 +100,63 @@ def construct_feature_columns(input_features):
   Returns:
     A set of feature columns
   """
+  """
+    将我们示例中的所有实值特征进行分桶，训练模型，然后查看结果是否有所改善。
+    
+  """
+  households = tf.feature_column.numeric_column("households")
+  longitude = tf.feature_column.numeric_column("longitude")
+  latitude = tf.feature_column.numeric_column("latitude")
+  housing_median_age = tf.feature_column.numeric_column("housing_median_age")
+  median_income = tf.feature_column.numeric_column("median_income")
+  rooms_per_person = tf.feature_column.numeric_column("rooms_per_person")
+
+  """
+    要为分桶特征定义特征列，我们可以使用 bucketized_column（而不是使用 numeric_column），
+    该列将数字列作为输入，并使用 boundardies 参数中指定的分桶边界将其转换为分桶特征。
+    以下代码为 households 和 longitude 定义了分桶特征列；
+    get_quantile_based_boundaries 函数会根据分位数计算边界，以便每个分桶包含相同数量的元素。
+  """
+  # Divide households into 7 buckets.
+  bucketized_households = tf.feature_column.bucketized_column(
+    households, boundaries=get_quantile_based_boundaries(
+      training_examples["households"], 7))
+
+  # Divide longitude into 10 buckets.
+  bucketized_longitude = tf.feature_column.bucketized_column(
+    longitude, boundaries=get_quantile_based_boundaries(
+      training_examples["longitude"], 10))
+
+  # Divide latitude into 10 buckets.
+  bucketized_latitude = tf.feature_column.bucketized_column(
+    latitude, boundaries=get_quantile_based_boundaries(
+      training_examples["latitude"], 10))
+
+  # Divide housing_median_age into 7 buckets.
+  bucketized_housing_median_age = tf.feature_column.bucketized_column(
+    housing_median_age, boundaries=get_quantile_based_boundaries(
+      training_examples["housing_median_age"], 7))
+  
+  # Divide median_income into 7 buckets.
+  bucketized_median_income = tf.feature_column.bucketized_column(
+    median_income, boundaries=get_quantile_based_boundaries(
+      training_examples["median_income"], 7))
+  
+  # Divide rooms_per_person into 7 buckets.
+  bucketized_rooms_per_person = tf.feature_column.bucketized_column(
+    rooms_per_person, boundaries=get_quantile_based_boundaries(
+      training_examples["rooms_per_person"], 7))
+
+  feature_columns = set([
+      bucketized_longitude,
+      bucketized_latitude,
+      bucketized_housing_median_age,
+      bucketized_households,
+      bucketized_median_income,
+      bucketized_rooms_per_person])
+
+  return feature_columns
+  
   #return set([tf.feature_column.numeric_column(my_feature)
               #for my_feature in input_features])
 
@@ -206,22 +263,13 @@ def train_model(
   return linear_regressor
 
 
+#确定分箱索引
 def get_quantile_based_boundaries(feature_values, num_buckets):
   boundaries = np.arange(1.0, num_buckets) / num_buckets
   quantiles = feature_values.quantile(boundaries)
   return [quantiles[q] for q in quantiles.keys()]
 
-# Divide households into 7 buckets.
-households = tf.feature_column.numeric_column("households")
-bucketized_households = tf.feature_column.bucketized_column(
-  households, boundaries=get_quantile_based_boundaries(
-    california_housing_dataframe["households"], 7))
 
-# Divide longitude into 10 buckets.
-longitude = tf.feature_column.numeric_column("longitude")
-bucketized_longitude = tf.feature_column.bucketized_column(
-  longitude, boundaries=get_quantile_based_boundaries(
-    california_housing_dataframe["longitude"], 10))
 
 if __name__=='__main__':
 
@@ -252,7 +300,8 @@ if __name__=='__main__':
     learning_rate=1.0,
     steps=500,
     batch_size=100,
-    feature_columns=construct_feature_columns(training_examples),
+    #利用分箱后的特征列有助于提升训练效果
+    feature_columns=construct_feature_columns(),
     training_examples=training_examples,
     training_targets=training_targets,
     validation_examples=validation_examples,
