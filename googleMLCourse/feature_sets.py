@@ -245,6 +245,7 @@ display.display(validation_targets.describe())
 
 #构建相关系数矩阵
 #相关矩阵展现了两两比较的相关性，既包括每个特征与目标特征之间的比较，也包括每个特征与其他特征之间的比较
+#找到与target相关的特征
 correlation_dataframe = training_examples.copy()
 correlation_dataframe["target"] = training_targets["median_house_value"]
 
@@ -269,7 +270,7 @@ plt.scatter(training_examples["latitude"], training_targets["median_house_value"
 
 
 #分箱合成特征
-LATITUDE_RANGES = zip(range(32,44),range(33,45))
+LATITUDE_RANGES = zip(list(range(32,44)),list(range(33,45)))
 
 def select_and_transform_features(source_df):
   selected_examples = pd.DataFrame()
@@ -283,6 +284,7 @@ selected_training_examples = select_and_transform_features(training_examples)
 selected_validation_examples = select_and_transform_features(validation_examples)
 
 
+print("分箱特征进行训练:")
 _ = train_model(
     learning_rate=0.01,
     steps=500,
