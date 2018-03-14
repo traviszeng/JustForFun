@@ -208,6 +208,104 @@ def train_linear_regressor_model(
 
   return linear_regressor
 
+
+#logistic regression
+def train_linear_classifier_model(
+    learning_rate,
+    steps,
+    batch_size,
+    training_examples,
+    training_targets,
+    validation_examples,
+    validation_targets):
+  """Trains a linear regression model of one feature.
+  
+  In addition to training, this function also prints training progress information,
+  as well as a plot of the training and validation loss over time.
+  
+  Args:
+    learning_rate: A `float`, the learning rate.
+    steps: A non-zero `int`, the total number of training steps. A training step
+      consists of a forward and backward pass using a single batch.
+    batch_size: A non-zero `int`, the batch size.
+    training_examples: A `DataFrame` containing one or more columns from
+      `california_housing_dataframe` to use as input features for training.
+    training_targets: A `DataFrame` containing exactly one column from
+      `california_housing_dataframe` to use as target for training.
+    validation_examples: A `DataFrame` containing one or more columns from
+      `california_housing_dataframe` to use as input features for validation.
+    validation_targets: A `DataFrame` containing exactly one column from
+      `california_housing_dataframe` to use as target for validation.
+      
+  Returns:
+    A `LinearClassifier` object trained on the training data.
+  """
+
+  periods = 10
+  steps_per_period = steps / periods
+  
+  # Create a linear classifier object.
+  my_optimizer = tf.train.GradientDescentOptimizer(learning_rate=learning_rate)
+  my_optimizer = tf.contrib.estimator.clip_gradients_by_norm(my_optimizer, 5.0)
+
+  # YOUR CODE HERE: Construct the linear classifier.
+  linear_classifier = tf.estimator.LinearClassifier(
+      feature_columns = construct_feature_columns(training_examples),
+      optimizer = my_optimizer)
+  
+  # Create input functions
+  training_input_fn = lambda: my_input_fn(training_examples, 
+                                          training_targets["median_house_value_is_high"], 
+                                          batch_size=batch_size)
+  predict_training_input_fn = lambda: my_input_fn(training_examples, 
+                                                  training_targets["median_house_value_is_high"], 
+                                                  num_epochs=1, 
+                                                  shuffle=False)
+  predict_validation_input_fn = lambda: my_input_fn(validation_examples, 
+                                                    validation_targets["median_house_value_is_high"], 
+                                                    num_epochs=1, 
+                                                    shuffle=False)
+  
+  # Train the model, but do so inside a loop so that we can periodically assess
+  # loss metrics.
+  print("Training model...")
+  print("LogLoss (on training data):")
+  training_log_losses = []
+  validation_log_losses = []
+  for period in range (0, periods):
+    # Train the model, starting from the prior state.
+    linear_classifier.train(
+        input_fn=training_input_fn,
+        steps=steps_per_period
+    )
+    # Take a break and compute predictions.    
+    training_probabilities = linear_classifier.predict(input_fn=predict_training_input_fn)
+    training_probabilities = np.array([item['probabilities'] for item in training_probabilities])
+    
+    validation_probabilities = linear_classifier.predict(input_fn=predict_validation_input_fn)
+    validation_probabilities = np.array([item['probabilities'] for item in validation_probabilities])
+    
+    training_log_loss = metrics.log_loss(training_targets, training_probabilities)
+    validation_log_loss = metrics.log_loss(validation_targets, validation_probabilities)
+    # Occasionally print the current loss.
+    print("  period %02d : %0.2f" % (period, training_log_loss))
+    # Add the loss metrics from this period to our list.
+    training_log_losses.append(training_log_loss)
+    validation_log_losses.append(validation_log_loss)
+  print("Model training finished.")
+  
+  # Output a graph of loss metrics over periods.
+  plt.ylabel("LogLoss")
+  plt.xlabel("Periods")
+  plt.title("LogLoss vs. Periods")
+  plt.tight_layout()
+  plt.plot(training_log_losses, label="training")
+  plt.plot(validation_log_losses, label="validation")
+  plt.legend()
+
+  return linear_classifier
+
+
 if __name__=="__main__":
     
     tf.logging.set_verbosity(tf.logging.ERROR)
@@ -237,10 +335,23 @@ if __name__=="__main__":
     """
     LinearRegressor 使用的是 L2 损失，在将输出解读为概率时，它并不能有效地惩罚误分类。
     例如，对于概率分别为 0.9 和 0.9999 的负分类样本是否被分类为正分类，二者之间的差异应该很大，但 L2 损失并不会明显区分这些情况。
-    """
+    
     linear_regressor = train_linear_regressor_model(
         learning_rate=0.000001,
         steps=200,
+        batch_size=20,
+        training_examples=training_examples,
+        training_targets=training_targets,
+        validation_examples=validation_examples,
+        validation_targets=validation_targets)
+    """
+
+    """
+    logistic  regression test
+    """
+    linear_classifier = train_linear_classifier_model(
+        learning_rate=0.000005,
+        steps=500,
         batch_size=20,
         training_examples=training_examples,
         training_targets=training_targets,
