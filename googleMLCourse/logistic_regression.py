@@ -302,6 +302,8 @@ def train_linear_classifier_model(
   plt.plot(training_log_losses, label="training")
   plt.plot(validation_log_losses, label="validation")
   plt.legend()
+  plt.show()
+
 
   return linear_classifier
 
@@ -349,6 +351,12 @@ if __name__=="__main__":
     """
     logistic  regression test
     """
+    predict_validation_input_fn = lambda: my_input_fn(validation_examples, 
+                                                  validation_targets["median_house_value_is_high"], 
+                                                  num_epochs=1, 
+                                                  shuffle=False)
+
+    
     linear_classifier = train_linear_classifier_model(
         learning_rate=0.000005,
         steps=500,
@@ -357,3 +365,22 @@ if __name__=="__main__":
         training_targets=training_targets,
         validation_examples=validation_examples,
         validation_targets=validation_targets)
+
+
+    #计算准确率并为验证集绘制ROC曲线
+    evaluation_metrics = linear_classifier.evaluate(input_fn=predict_validation_input_fn)
+
+    print("AUC on the validation set: %0.2f" % evaluation_metrics['auc'])
+    print("Accuracy on the validation set: %0.2f" % evaluation_metrics['accuracy'])
+
+    validation_probabilities = linear_classifier.predict(input_fn=predict_validation_input_fn)
+    # Get just the probabilities for the positive class
+    validation_probabilities = np.array([item['probabilities'][1] for item in validation_probabilities])
+
+    false_positive_rate, true_positive_rate, thresholds = metrics.roc_curve(
+        validation_targets, validation_probabilities)
+    plt.plot(false_positive_rate, true_positive_rate, label="our model")
+    plt.plot([0, 1], [0, 1], label="random classifier")
+    _ = plt.legend(loc=2)
+    plt.show()
+    
