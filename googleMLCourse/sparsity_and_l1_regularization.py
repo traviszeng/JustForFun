@@ -210,6 +210,9 @@ def train_linear_classifier_model(
   steps_per_period = steps / periods
 
   # Create a linear classifier object.
+  """
+  我们选择使用 FtrlOptimizer 来应用正则化。FtrlOptimizer 是一种设计成使用 L1 正则化比标准梯度下降法得到更好结果的方法。
+  """
   my_optimizer = tf.train.FtrlOptimizer(learning_rate=learning_rate, l1_regularization_strength=regularization_strength)
   my_optimizer = tf.contrib.estimator.clip_gradients_by_norm(my_optimizer, 5.0)
   linear_classifier = tf.estimator.LinearClassifier(
@@ -299,7 +302,8 @@ if __name__=="__main__":
     linear_classifier = train_linear_classifier_model(
         learning_rate=0.1,
         # TWEAK THE REGULARIZATION VALUE BELOW
-        regularization_strength=0.1,
+        #改变L1正则化强度可以改变模型复杂度，但需要平衡training loss 和模型大小的关系
+        regularization_strength=1.0,
         steps=300,
         batch_size=100,
         feature_columns=construct_feature_columns(),
