@@ -244,11 +244,11 @@ if __name__=='__main__':
 
 
     # Choose the first 12000 (out of 17000) examples for training.
-    #training_examples = preprocess_features(california_housing_dataframe.head(12000))
+    training_examples = preprocess_features(california_housing_dataframe.head(12000))
     training_targets = preprocess_targets(california_housing_dataframe.head(12000))
 
     # Choose the last 5000 (out of 17000) examples for validation.
-    #validation_examples = preprocess_features(california_housing_dataframe.tail(5000))
+    validation_examples = preprocess_features(california_housing_dataframe.tail(5000))
     validation_targets = preprocess_targets(california_housing_dataframe.tail(5000))
 
 
@@ -280,3 +280,48 @@ if __name__=='__main__':
     training_targets=training_targets,
     validation_examples=normalized_validation_examples,
     validation_targets=validation_targets)
+
+    """
+    尝试使用其他优化器并对比效果
+
+    AdaGrad 优化器是一种备选方案。AdaGrad 的核心是灵活地修改模型中每个系数的学习率，从而单调降低有效的学习率。
+    该优化器对于凸优化问题非常有效，但不一定适合非凸优化问题的神经网络训练。
+    您可以通过指定 AdagradOptimizer（而不是 GradientDescentOptimizer）来使用 AdaGrad。
+    请注意，对于 AdaGrad，您可能需要使用较大的学习率。
+
+    对于非凸优化问题，Adam 有时比 AdaGrad 更有效。
+    要使用 Adam，请调用 tf.train.AdamOptimizer 方法。
+    此方法将几个可选超参数作为参数，但我们的解决方案仅指定其中一个 (learning_rate)。
+    在应用设置中，您应该谨慎指定和调整可选超参数。
+    """
+
+    #首先尝试adaGrad优化器
+    _, adagrad_training_losses, adagrad_validation_losses = train_nn_regression_model(
+    my_optimizer=tf.train.AdagradOptimizer(learning_rate=0.5),
+    steps=500,
+    batch_size=100,
+    hidden_units=[10, 10],
+    training_examples=normalized_training_examples,
+    training_targets=training_targets,
+    validation_examples=normalized_validation_examples,
+    validation_targets=validation_targets)
+
+    #尝试adam优化器
+    _, adam_training_losses, adam_validation_losses = train_nn_regression_model(
+    my_optimizer=tf.train.AdamOptimizer(learning_rate=0.009),
+    steps=500,
+    batch_size=100,
+    hidden_units=[10, 10],
+    training_examples=normalized_training_examples,
+    training_targets=training_targets,
+    validation_examples=normalized_validation_examples,
+    validation_targets=validation_targets)
+
+    plt.ylabel("RMSE")
+    plt.xlabel("Periods")
+    plt.title("Root Mean Squared Error vs. Periods")
+    plt.plot(adagrad_training_losses, label='Adagrad training')
+    plt.plot(adagrad_validation_losses, label='Adagrad validation')
+    plt.plot(adam_training_losses, label='Adam training')
+    plt.plot(adam_validation_losses, label='Adam validation')
+    _ = plt.legend()
