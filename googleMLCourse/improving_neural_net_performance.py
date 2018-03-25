@@ -211,6 +211,29 @@ def linear_scale(series):
     return series.apply(lambda x:((x - min_val) / scale) - 1.0)
 
 """
+使用其他特征化的方法来标准化特征
+
+"""
+#对数缩放
+def log_normalize(series):
+  return series.apply(lambda x:math.log(x+1.0))
+
+#截断
+def clip(series, clip_to_min, clip_to_max):
+  return series.apply(lambda x:(
+    min(max(x, clip_to_min), clip_to_max)))
+
+def z_score_normalize(series):
+  mean = series.mean()
+  std_dv = series.std()
+  return series.apply(lambda x:(x - mean) / std_dv)
+
+#二元阈值截断
+def binary_threshold(series, threshold):
+  return series.apply(lambda x:(1 if x > threshold else 0))
+
+
+"""
 使用线性缩放将特征标准化
 一般来说，当输入特征大致位于相同范围时，神经网络的训练效果最好。
 """
@@ -228,6 +251,32 @@ def normalize_linear_scale(examples_dataframe):
   processed_features["rooms_per_person"] = linear_scale(examples_dataframe["rooms_per_person"])
   return processed_features
 
+
+"""
+    households、median_income 和 total_bedrooms 在对数空间内均呈现为正态分布。
+
+    如果 latitude、longitude 和 housing_median_age 像之前一样进行线性缩放，效果可能会更好。
+
+    population、totalRooms 和 rooms_per_person 具有几个极端离群值。
+    这些值似乎过于极端，以至于我们无法利用对数标准化处理这些离群值。因此，我们直接截取掉这些值。
+"""
+def normalize(examples_dataframe):
+  """Returns a version of the input `DataFrame` that has all its features normalized."""
+  processed_features = pd.DataFrame()
+
+  processed_features["households"] = log_normalize(examples_dataframe["households"])
+  processed_features["median_income"] = log_normalize(examples_dataframe["median_income"])
+  processed_features["total_bedrooms"] = log_normalize(examples_dataframe["total_bedrooms"])
+  
+  processed_features["latitude"] = linear_scale(examples_dataframe["latitude"])
+  processed_features["longitude"] = linear_scale(examples_dataframe["longitude"])
+  processed_features["housing_median_age"] = linear_scale(examples_dataframe["housing_median_age"])
+
+  processed_features["population"] = linear_scale(clip(examples_dataframe["population"], 0, 5000))
+  processed_features["rooms_per_person"] = linear_scale(clip(examples_dataframe["rooms_per_person"], 0, 5))
+  processed_features["total_rooms"] = linear_scale(clip(examples_dataframe["total_rooms"], 0, 10000))
+
+  return processed_features
 
 
 
@@ -325,3 +374,28 @@ if __name__=='__main__':
     plt.plot(adam_training_losses, label='Adam training')
     plt.plot(adam_validation_losses, label='Adam validation')
     _ = plt.legend()
+
+
+
+    _ = training_examples.hist(bins=20, figsize=(18, 12), xlabelsize=2)
+    """
+    households、median_income 和 total_bedrooms 在对数空间内均呈现为正态分布。
+
+    如果 latitude、longitude 和 housing_median_age 像之前一样进行线性缩放，效果可能会更好。
+
+    population、totalRooms 和 rooms_per_person 具有几个极端离群值。
+    这些值似乎过于极端，以至于我们无法利用对数标准化处理这些离群值。因此，我们直接截取掉这些值。
+    """
+    normalized_dataframe = normalize_linear_scale(preprocess_features(california_housing_dataframe))
+    normalized_training_examples = normalized_dataframe.head(12000)
+    normalized_validation_examples = normalized_dataframe.tail(5000)
+
+    _ = train_nn_regression_model(
+    my_optimizer=tf.train.AdagradOptimizer(learning_rate=0.15),
+    steps=1000,
+    batch_size=50,
+    hidden_units=[10, 10],
+    training_examples=normalized_training_examples,
+    training_targets=training_targets,
+    validation_examples=normalized_validation_examples,
+    validation_targets=validation_targets)
