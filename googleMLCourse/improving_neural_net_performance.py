@@ -278,6 +278,13 @@ def normalize(examples_dataframe):
 
   return processed_features
 
+def location_location_location(examples_dataframe):
+  """Returns a version of the input `DataFrame` that keeps only the latitude and longitude."""
+  processed_features = pd.DataFrame()
+  processed_features["latitude"] = linear_scale(examples_dataframe["latitude"])
+  processed_features["longitude"] = linear_scale(examples_dataframe["longitude"])
+  return processed_features
+
 
 
 if __name__=='__main__':
@@ -399,3 +406,20 @@ if __name__=='__main__':
     training_targets=training_targets,
     validation_examples=normalized_validation_examples,
     validation_targets=validation_targets)
+
+
+    #若仅适用经纬度作为特征
+    lll_dataframe = location_location_location(preprocess_features(california_housing_dataframe))
+    lll_training_examples = lll_dataframe.head(12000)
+    lll_validation_examples = lll_dataframe.tail(5000)
+
+    _ = train_nn_regression_model(
+    my_optimizer=tf.train.AdagradOptimizer(learning_rate=0.05),
+    steps=500,
+    batch_size=50,
+    hidden_units=[10, 10, 5, 5, 5],
+    training_examples=lll_training_examples,
+    training_targets=training_targets,
+    validation_examples=lll_validation_examples,
+    validation_targets=validation_targets)
+    
