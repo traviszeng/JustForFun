@@ -197,6 +197,40 @@ def train_nn_regression_model(
 
   return dnn_regressor, training_rmse, validation_rmse
 
+
+"""
+
+将输入线性放缩到(-1,1)的区间内
+这样一来，SGD 在一个维度中采用很大步长（或者在另一维度中采用很小步长）时不会受阻。
+
+"""
+def linear_scale(series):
+    min_val = series.min()
+    max_val = series.max()
+    scale = (max_val - min_val) / 2.0
+    return series.apply(lambda x:((x - min_val) / scale) - 1.0)
+
+"""
+使用线性缩放将特征标准化
+一般来说，当输入特征大致位于相同范围时，神经网络的训练效果最好。
+"""
+def normalize_linear_scale(examples_dataframe):
+  """Returns a version of the input `DataFrame` that has all its features normalized linearly."""
+  processed_features = pd.DataFrame()
+  processed_features["latitude"] = linear_scale(examples_dataframe["latitude"])
+  processed_features["longitude"] = linear_scale(examples_dataframe["longitude"])
+  processed_features["housing_median_age"] = linear_scale(examples_dataframe["housing_median_age"])
+  processed_features["total_rooms"] = linear_scale(examples_dataframe["total_rooms"])
+  processed_features["total_bedrooms"] = linear_scale(examples_dataframe["total_bedrooms"])
+  processed_features["population"] = linear_scale(examples_dataframe["population"])
+  processed_features["households"] = linear_scale(examples_dataframe["households"])
+  processed_features["median_income"] = linear_scale(examples_dataframe["median_income"])
+  processed_features["rooms_per_person"] = linear_scale(examples_dataframe["rooms_per_person"])
+  return processed_features
+
+
+
+
 if __name__=='__main__':
     
     tf.logging.set_verbosity(tf.logging.ERROR)
@@ -210,18 +244,25 @@ if __name__=='__main__':
 
 
     # Choose the first 12000 (out of 17000) examples for training.
-    training_examples = preprocess_features(california_housing_dataframe.head(12000))
+    #training_examples = preprocess_features(california_housing_dataframe.head(12000))
     training_targets = preprocess_targets(california_housing_dataframe.head(12000))
 
     # Choose the last 5000 (out of 17000) examples for validation.
-    validation_examples = preprocess_features(california_housing_dataframe.tail(5000))
+    #validation_examples = preprocess_features(california_housing_dataframe.tail(5000))
     validation_targets = preprocess_targets(california_housing_dataframe.tail(5000))
+
+
+
+    #调用normalize_linear_scale将特征标准化
+    normalized_dataframe = normalize_linear_scale(preprocess_features(california_housing_dataframe))
+    normalized_training_examples = normalized_dataframe.head(12000)
+    normalized_validation_examples = normalized_dataframe.tail(5000)
 
     # Double-check that we've done the right thing.
     print("Training examples summary:")
-    display.display(training_examples.describe())
+    display.display(normalized_training_examples.describe())
     print("Validation examples summary:")
-    display.display(validation_examples.describe())
+    display.display(normalized_validation_examples.describe())
 
     print("Training targets summary:")
     display.display(training_targets.describe())
@@ -229,12 +270,13 @@ if __name__=='__main__':
     display.display(validation_targets.describe())
 
 
+    
     _ = train_nn_regression_model(
-    my_optimizer=tf.train.GradientDescentOptimizer(learning_rate=0.0007),
-    steps=5000,
-    batch_size=70,
+    my_optimizer=tf.train.GradientDescentOptimizer(learning_rate=0.005),
+    steps=2000,
+    batch_size=50,
     hidden_units=[10, 10],
-    training_examples=training_examples,
+    training_examples=normalized_training_examples,
     training_targets=training_targets,
-    validation_examples=validation_examples,
+    validation_examples=normalized_validation_examples,
     validation_targets=validation_targets)
