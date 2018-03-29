@@ -63,24 +63,22 @@ def _parse_function(record):
 # Create an input_fn that parses the tf.Examples from the given files,
 # and split them into features and targets.
 def _input_fn(input_filenames, num_epochs=None, shuffle=True):
-  
-  # Same code as above; create a dataset and map features and labels
-  ds = tf.data.TFRecordDataset(input_filenames)
-  ds = ds.map(_parse_function)
+    # Same code as above; create a dataset and map features and labels
+    ds = tf.data.TFRecordDataset(input_filenames)
+    ds = ds.map(_parse_function)
 
-  if shuffle:
-    ds = ds.shuffle(10000)
+    if shuffle:
+        ds = ds.shuffle(10000)
 
-  # Our feature data is variable-length, so we pad and batch
-  # each field of the dataset structure to whatever size is necessary     
-  ds = ds.padded_batch(25, ds.output_shapes)
-  
-  ds = ds.repeat(num_epochs)
+    # Our feature data is variable-length, so we pad and batch
+    # each field of the dataset structure to whatever size is necessary
+    ds = ds.padded_batch(25, ds.output_shapes)
 
-  
-  # Return the next batch of data
-  features, labels = ds.make_one_shot_iterator().get_next()
-  return features, labels
+    ds = ds.repeat(num_epochs)
+
+    # Return the next batch of data
+    features, labels = ds.make_one_shot_iterator().get_next()
+    return features, labels
 
 
 #使用LinearClassifier来评估
@@ -109,39 +107,81 @@ def useLinearClassifier():
     my_optimizer = tf.contrib.estimator.clip_gradients_by_norm(my_optimizer, 5.0)
 
     feature_columns = [terms_feature_column]
+    print(feature_columns)
 
     classifier = tf.estimator.LinearClassifier(
-        feature_columns = feature_columns,
-        optimizer = my_optimizer
-        )
+        feature_columns=feature_columns,
+        optimizer=my_optimizer,
+    )
 
     classifier.train(
-        input_fn = lambda:_input_fn([train_path]),
-        step = 1000
-        )
+        input_fn=lambda: _input_fn([train_path]),
+        steps=1000)
 
     evaluation_metrics = classifier.evaluate(
-        input_fn = lambda:_input_fn([train_path]),
-        step = 1000
-        )
+        input_fn=lambda: _input_fn([train_path]),
+        steps=1000)
     print("Training set metrics:")
-
     for m in evaluation_metrics:
-        print(m,evaluation_metrics[m])
-
-    print("---------------------")
+        print(m, evaluation_metrics[m])
+    print("---")
 
     evaluation_metrics = classifier.evaluate(
-        input_fn = lambda:_input_fn([test_path]),
-        step = 1000
-        )
+        input_fn=lambda: _input_fn([test_path]),
+        steps=1000)
+
     print("Test set metrics:")
-
     for m in evaluation_metrics:
-        print(m,evaluation_metrics[m])
+        print(m, evaluation_metrics[m])
+    print("---")
 
-    print("---------------------")
+#使用深度神经网络 (DNN) 模型
+def useDNNClassifier():
+    # 为我们的术语构建特征列。categorical_column_with_vocabulary_list 函数可使用“字符串-特征矢量”映射来创建特征列。
+    # 54 informative terms that compose our model vocabulary
+    informative_terms = ("bad", "great", "best", "worst", "fun", "beautiful",
+                         "excellent", "poor", "boring", "awful", "terrible",
+                         "definitely", "perfect", "liked", "worse", "waste",
+                         "entertaining", "loved", "unfortunately", "amazing",
+                         "enjoyed", "favorite", "horrible", "brilliant", "highly",
+                         "simple", "annoying", "today", "hilarious", "enjoyable",
+                         "dull", "fantastic", "poorly", "fails", "disappointing",
+                         "disappointment", "not", "him", "her", "good", "time",
+                         "?", ".", "!", "movie", "film", "action", "comedy",
+                         "drama", "family", "man", "woman", "boy", "girl")
 
+    terms_feature_column = tf.feature_column.categorical_column_with_vocabulary_list(key="terms",
+                                                                                     vocabulary_list=informative_terms)
+
+    my_optimizer = tf.train.AdagradOptimizer(learning_rate=0.1)
+    my_optimizer = tf.contrib.estimator.clip_gradients_by_norm(my_optimizer, 5.0)
+
+    classifier = tf.estimator.DNNClassifier(  #
+        feature_columns=[tf.feature_column.indicator_column(terms_feature_column)],  #
+        hidden_units=[20, 20],  #
+        optimizer=my_optimizer,  #
+    )
+
+    classifier.train(
+        input_fn=lambda: _input_fn([train_path]),
+        steps=1000)
+
+    evaluation_metrics = classifier.evaluate(
+        input_fn=lambda: _input_fn([train_path]),
+        steps=1000)
+    print("Training set metrics:")
+    for m in evaluation_metrics:
+        print(m, evaluation_metrics[m])
+    print("---")
+
+    evaluation_metrics = classifier.evaluate(
+        input_fn=lambda: _input_fn([test_path]),
+        steps=1000)
+
+    print("Test set metrics:")
+    for m in evaluation_metrics:
+        print(m, evaluation_metrics[m])
+    print("---")
 
 
 if __name__=='__main__':
@@ -155,19 +195,19 @@ if __name__=='__main__':
 
     #为了确认函数是否能正常运行，我们为训练数据构建一个 TFRecordDataset，并使用上述函数将数据映射到特征和标签。
 
+    # Create the Dataset object
     ds = tf.data.TFRecordDataset(train_path)
+    # Map features and labels with the parse function
     ds = ds.map(_parse_function)
 
     #从训练集中获取第一个样本
     n = ds.make_one_shot_iterator().get_next()
     sess = tf.Session()
-    sess.run(n)
+    print(sess.run(n))
 
+    #用LinearClassifier尝试
+    #useLinearClassifier()
 
-    
-    
-    
-    
-    
+    #用DNNClassifier尝试
+    #useDNNClassifier()
 
-    
