@@ -33,6 +33,7 @@ from IPython import display
 from sklearn import metrics
 
 
+
 """"
 配置输入管道，以将数据导入 TensorFlow 模型中。
 我们可以使用以下函数来解析训练数据和测试数据（格式为 TFRecord），然后返回一个由特征和相应标签组成的字典。
@@ -156,10 +157,115 @@ def useDNNClassifier():
     my_optimizer = tf.train.AdagradOptimizer(learning_rate=0.1)
     my_optimizer = tf.contrib.estimator.clip_gradients_by_norm(my_optimizer, 5.0)
 
-    classifier = tf.estimator.DNNClassifier(  #
+    """
+    将使用嵌入列来实现 DNN 模型。嵌入列会将稀疏数据作为输入，并返回一个低维度密集矢量作为输出
+    通过将数据投射到二维空间的 embedding_column 来为模型定义特征列（如需详细了解 embedding_column 的函数签名，请参阅相关 TF 文档）。
+    定义符合以下规范的 DNNClassifier：
+        具有两个隐藏层，每个包含 20 个单元
+        采用学习速率为 0.1 的 AdaGrad 优化方法
+        gradient_clip_norm 值为 5.0
+    """
+    terms_embedding_column = tf.feature_column.embedding_column(terms_feature_column, dimension=2)
+    feature_columns = [terms_embedding_column]
+    classifier = tf.estimator.DNNClassifier(
+        feature_columns=feature_columns,
+        hidden_units=[10, 10],
+        optimizer=my_optimizer
+    )
+
+    """classifier = tf.estimator.DNNClassifier(  #
         feature_columns=[tf.feature_column.indicator_column(terms_feature_column)],  #
         hidden_units=[20, 20],  #
         optimizer=my_optimizer,  #
+    )"""
+
+    classifier.train(
+        input_fn=lambda: _input_fn([train_path]),
+        steps=1000)
+
+    evaluation_metrics = classifier.evaluate(
+        input_fn=lambda: _input_fn([train_path]),
+        steps=1000)
+    print("Training set metrics:")
+    for m in evaluation_metrics:
+        print(m, evaluation_metrics[m])
+    print("---")
+
+    evaluation_metrics = classifier.evaluate(
+        input_fn=lambda: _input_fn([test_path]),
+        steps=1000)
+
+    print("Test set metrics:")
+    for m in evaluation_metrics:
+        print(m, evaluation_metrics[m])
+    print("---")
+
+    #该模型中的张量
+    print(classifier.get_variable_names())
+    """
+    ['dnn/hiddenlayer_0/bias',
+    'dnn/hiddenlayer_0/bias/t_0/Adagrad',
+    'dnn/hiddenlayer_0/kernel',
+     'dnn/hiddenlayer_0/kernel/t_0/Adagrad',
+     'dnn/hiddenlayer_1/bias',
+     'dnn/hiddenlayer_1/bias/t_0/Adagrad',
+     'dnn/hiddenlayer_1/kernel',
+     'dnn/hiddenlayer_1/kernel/t_0/Adagrad',
+     'dnn/input_from_feature_columns/input_layer/terms_embedding/embedding_weights',
+     'dnn/input_from_feature_columns/input_layer/terms_embedding/embedding_weights/t_0/Adagrad',
+     'dnn/logits/bias',
+     'dnn/logits/bias/t_0/Adagrad',
+     'dnn/logits/kernel',
+     'dnn/logits/kernel/t_0/Adagrad',
+     'global_step']
+     
+     我们可以看到这里有一个嵌入层：'dnn/input_from_feature_columns/input_layer/terms_embedding/...'。（顺便说一下，有趣的是，该层可以与模型的其他层一起训练，就像所有隐藏层一样。）
+    """
+    embedding_matrix = classifier.get_variable_value(
+        'dnn/input_from_feature_columns/input_layer/terms_embedding/embedding_weights')
+
+    for term_index in range(len(informative_terms)):
+        # Create a one-hot encoding for our term.  It has 0's everywhere, except for
+        # a single 1 in the coordinate that corresponds to that term.
+        term_vector = np.zeros(len(informative_terms))
+        term_vector[term_index] = 1
+        # We'll now project that one-hot vector into the embedding space.
+        embedding_xy = np.matmul(term_vector, embedding_matrix)
+        plt.text(embedding_xy[0],
+                 embedding_xy[1],
+                 informative_terms[term_index])
+
+    # Do a little set-up to make sure the plot displays nicely.
+    plt.rcParams["figure.figsize"] = (12, 12)
+    plt.xlim(1.2 * embedding_matrix.min(), 1.2 * embedding_matrix.max())
+    plt.ylim(1.2 * embedding_matrix.min(), 1.2 * embedding_matrix.max())
+    plt.show()
+
+"""
+更改超参数或使用其他优化工具，比如 Adam（通过遵循这些策略，您的准确率可能只会提高一两个百分点）。
+向 informative_terms 中添加其他术语。此数据集有一个完整的词汇表文件，其中包含 30716 个术语，您可以在以下位置找到该文件：https://storage.googleapis.com/mledu-datasets/sparse-data-embedding/terms.txt 您可以从该词汇表文件中挑选出其他术语，
+也可以通过 categorical_column_with_vocabulary_file 特征列使用整个词汇表文件。
+"""
+def inprovementOfDNN():
+    # Create a feature column from "terms", using a full vocabulary file.
+    informative_terms = None
+    with open("https://storage.googleapis.com/mledu-datasets/sparse-data-embedding/terms.txt", 'r') as f:
+        # Convert it to set first to remove duplicates.
+        informative_terms = list(set(f.read().split()))
+
+    terms_feature_column = tf.feature_column.categorical_column_with_vocabulary_list(key="terms",
+                                                                                     vocabulary_list=informative_terms)
+
+    terms_embedding_column = tf.feature_column.embedding_column(terms_feature_column, dimension=2)
+    feature_columns = [terms_embedding_column]
+
+    my_optimizer = tf.train.AdagradOptimizer(learning_rate=0.1)
+    my_optimizer = tf.contrib.estimator.clip_gradients_by_norm(my_optimizer, 5.0)
+
+    classifier = tf.estimator.DNNClassifier(
+        feature_columns=feature_columns,
+        hidden_units=[10, 10],
+        optimizer=my_optimizer
     )
 
     classifier.train(
@@ -182,6 +288,7 @@ def useDNNClassifier():
     for m in evaluation_metrics:
         print(m, evaluation_metrics[m])
     print("---")
+
 
 
 if __name__=='__main__':
@@ -210,4 +317,10 @@ if __name__=='__main__':
 
     #用DNNClassifier尝试
     #useDNNClassifier()
+
+    #改进模型的效果
+    inprovementOfDNN()
+
+
+
 
