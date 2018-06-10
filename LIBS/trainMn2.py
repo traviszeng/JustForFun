@@ -24,6 +24,7 @@ import numpy as np
 from numpy.random import seed
 from sklearn import datasets
 from tensorflow.python.framework import ops
+from SBS import SBS
 
 
 """
@@ -603,6 +604,8 @@ def normalize_cols(m):
 if __name__=='__main__':
 
 
+
+
     elementList = ['Pb']
     for element in elementList:
         minRMSE = 99999
@@ -615,6 +618,17 @@ if __name__=='__main__':
             @Todo:
                 Apply fast forward selection or GA select proper line intensity
         """
+        """
+        Using SBS to select features
+        """
+        """
+        
+        from sklearn.neighbors import KNeighborsClassifier
+        knn = KNeighborsClassifier(n_neighbors=2)
+        sbs = SBS(knn,k_features = 1)
+        sbs.fit([oldCP],OldcpImportanceList)
+        """
+
 
         CP = []
         cpImportanceList = []

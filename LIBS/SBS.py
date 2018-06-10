@@ -7,6 +7,7 @@ from itertools import combinations
 import numpy as np
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error
 
 class SBS():
     """
@@ -15,7 +16,8 @@ class SBS():
     def __init__(self,
                  estimator,
                  k_features,
-                 scoring = accuracy_score,
+                 #scoring = accuracy_score,#todo 此处的accuracy_score函数用于classification 需要重新写一个评估函数 https://www.cnblogs.com/harvey888/p/6964741.html
+                 scoring = mean_squared_error,
                  test_size = 0.25,
                  random_state = 1):
 
