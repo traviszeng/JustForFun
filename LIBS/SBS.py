@@ -17,21 +17,21 @@ class SBS():
                  estimator,
                  k_features,
                  #scoring = accuracy_score,#todo 此处的accuracy_score函数用于classification 需要重新写一个评估函数 https://www.cnblogs.com/harvey888/p/6964741.html
-                 scoring = mean_squared_error,
+                 scoring = mean_squared_error, #MSE 均方误差
                  test_size = 0.25,
                  random_state = 1):
 
         self.scoring = scoring
-        self.estimator = clone(estimator)
+        self.estimator = estimator #在计算score的时候使用estimator来predict
         self.k_features = k_features
         self.random_state = random_state
         self.test_size = test_size
 
-    def fit(self, X, y):
+    def fit(self, X_train, y_train,X_test,y_test):
 
         #仅使用原来的test set再进一步划分
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=self.test_size,
-                                                            random_state=self.random_state)
+        #X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=self.test_size,
+        #                                                    random_state=self.random_state)
 
         dim = X_train.shape[1]
         self.indices_ = tuple(range(dim))

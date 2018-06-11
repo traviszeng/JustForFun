@@ -24,6 +24,7 @@ import numpy as np
 from numpy.random import seed
 from sklearn import datasets
 from tensorflow.python.framework import ops
+from SBS import SBS
 
 
 """
@@ -366,6 +367,40 @@ def findBenchmarkWave():#tenmaxList,twemaxList,fifmaxList,tenwaveList,twewaveLis
     return 0
 
 
+
+
+"""
+获取真实测试数据
+"""
+def getRealTestData(maxList,minList,flag):
+    real_predict_data = []
+    if flag==1:
+        TZF = TZFList1
+    elif flag ==2:
+        TZF = TZFList2
+    else:
+        TZF =TZFList5
+
+    for t in TZF:
+        real_predict_data.append(t[2])
+    # real_predict_data.append(10)
+
+    """for i in range(0,len(real_predict_data)):
+        real_predict_data[i] = (real_predict_data[i]-minStrength[i])/(maxStrength[i]-minStrength[i])"""
+    real_predict_data = np.array(real_predict_data)
+    print(real_predict_data)
+    # real_predict_data = np.nan_to_num(normalize_cols(real_predict_data))
+    for i in range(len(CP)):
+        real_predict_data[i] = (real_predict_data[i] - minList[i]) / (maxList[i] - minList[i])
+        if real_predict_data[i] < 0:
+            real_predict_data[i] = 0
+        elif real_predict_data[i] > 1:
+            real_predict_data[i] = 1
+    real_predict_data = np.nan_to_num(real_predict_data)
+    print(real_predict_data)
+
+    return real_predict_data
+
 """
 神经网络训练方法
 """
@@ -383,7 +418,7 @@ def trainANN(element,HIDDEN_NUM, LEARNING_RATE, BATCH_SIZE, Data,isShowFigure):
     LEN = len(data[0]) - 1
     print(LEN)
 
-    x_vals = np.array([x[0:(LEN-1)] for x in data])
+    x_vals = np.array([x[0:(LEN)] for x in data])
     #print(x_vals)
     y_vals = (np.array([x[LEN] for x in data]))
     #print(y_vals)
@@ -423,11 +458,11 @@ def trainANN(element,HIDDEN_NUM, LEARNING_RATE, BATCH_SIZE, Data,isShowFigure):
     batch_size = BATCH_SIZE
 
     # 声明占位符，input是LEN，traget是1
-    x_data = tf.placeholder(shape=[None, LEN-1], dtype=tf.float32)
+    x_data = tf.placeholder(shape=[None, LEN], dtype=tf.float32)
     y_target = tf.placeholder(shape=[None, 1], dtype=tf.float32)
 
     hidden_layer_nodes = HIDDEN_NUM
-    A1 = tf.Variable(tf.random_normal(shape=[LEN-1, hidden_layer_nodes]))  # inputs -> hidden nodes
+    A1 = tf.Variable(tf.random_normal(shape=[LEN, hidden_layer_nodes]))  # inputs -> hidden nodes
     b1 = tf.Variable(tf.random_normal(shape=[hidden_layer_nodes]))  # one biases for each hidden node
     A2 = tf.Variable(tf.random_normal(shape=[hidden_layer_nodes, 1]))  # hidden inputs -> 1 output
     b2 = tf.Variable(tf.random_normal(shape=[1]))  # 1 bias for the output
@@ -497,80 +532,30 @@ def trainANN(element,HIDDEN_NUM, LEARNING_RATE, BATCH_SIZE, Data,isShowFigure):
         plt.show()
     """if isShowFigure==0:
         return 0"""
-    real_predict_data = []
-    for t in TZFList1:
-        real_predict_data.append(t[2])
-    # real_predict_data.append(10)
-
-    """for i in range(0,len(real_predict_data)):
-        real_predict_data[i] = (real_predict_data[i]-minStrength[i])/(maxStrength[i]-minStrength[i])"""
-    real_predict_data = np.array(real_predict_data)
-    print(real_predict_data)
-    # real_predict_data = np.nan_to_num(normalize_cols(real_predict_data))
-    for i in range(len(CP)):
-        real_predict_data[i] = (real_predict_data[i] - minList[i]) / (maxList[i] - minList[i])
-        if real_predict_data[i] < 0:
-            real_predict_data[i] = 0
-        elif real_predict_data[i]>1:
-            real_predict_data[i]=1
-    real_predict_data = np.nan_to_num(real_predict_data)
-    print(real_predict_data)
+    real_predict_data = getRealTestData(maxList,minList,1)
 
     hidden = session.run(hidden_output, feed_dict={x_data: [real_predict_data]})
     final1 = session.run(final_output, feed_dict={hidden_output: hidden})
     print(str(final1[0][0]) + '\n')
-    file.write(str(final1[0][0]) + '\n')
+    #file.write(str(final1[0][0]) + '\n')
 
 
-    real_predict_data = []
-    for t in TZFList2:
-        real_predict_data.append(t[2])
-    #real_predict_data.append(10)
-
-    """for i in range(0,len(real_predict_data)):
-        real_predict_data[i] = (real_predict_data[i]-minStrength[i])/(maxStrength[i]-minStrength[i])"""
-    real_predict_data = np.array(real_predict_data)
-    print(real_predict_data)
-    #real_predict_data = np.nan_to_num(normalize_cols(real_predict_data))
-    for i in range(len(CP)):
-        real_predict_data[i] = (real_predict_data[i]-minList[i])/(maxList[i]-minList[i])
-        if real_predict_data[i]<0:
-            real_predict_data[i]=0
-        elif real_predict_data[i]>1:
-            real_predict_data[i]=1
-    real_predict_data = np.nan_to_num(real_predict_data)
-    print(real_predict_data)
-
+    real_predict_data = getRealTestData(maxList,minList,2)
 
     hidden = session.run(hidden_output,feed_dict = {x_data:[real_predict_data]})
     final2 = session.run(final_output, feed_dict={hidden_output: hidden})
     print(str(final2[0][0])+'\n')
-    file.write(str(final2[0][0])+'\n')
+    #file.write(str(final2[0][0])+'\n')
 
-    real_predict_data = []
-    for t in TZFList5:
-        real_predict_data.append(t[2])
-    # real_predict_data.append(10)
-
-    real_predict_data = np.array(real_predict_data)
-    #real_predict_data = np.nan_to_num(normalize_cols(real_predict_data))
-    print(real_predict_data)
-    for i in range(len(CP)):
-        real_predict_data[i] = (real_predict_data[i]-minList[i])/(maxList[i]-minList[i])
-        if real_predict_data[i]<0:
-            real_predict_data[i]=0
-        elif real_predict_data[i]>1:
-            real_predict_data[i]=1
-    real_predict_data = np.nan_to_num(real_predict_data)
-    print(real_predict_data)
+    real_predict_data = getRealTestData(maxList, minList, 5)
 
     hidden = session.run(hidden_output, feed_dict={x_data: [real_predict_data]})
     final5 = session.run(final_output, feed_dict={hidden_output: hidden})
     print(str(final5[0][0])+'\n')
-    file.write(str(final5[0][0])+'\n')
+    #file.write(str(final5[0][0])+'\n')
 
 
-    RMSE = (final5-50)*(final5-50)+(final2-20)*(final2-20)
+    """RMSE = (final5-50)*(final5-50)+(final2-20)*(final2-20)
     global minRMSE
     if RMSE < minRMSE and flag ==1:
 
@@ -578,14 +563,14 @@ def trainANN(element,HIDDEN_NUM, LEARNING_RATE, BATCH_SIZE, Data,isShowFigure):
         # file = open('E:\\ANN_TRAIN\\LIBS_ANN v3' + element + '.txt', 'a')
         file.write("RMSE=" + str(RMSE) + '\n')
         file.write("best learning rate is:" + str(LEARNING_RATE) + '\n')
-        file.write("best LAYER NUM is:" + str(HIDDEN_NUM) + '\n')
+        file.write("best LAYER NUM is:" + str(HIDDEN_NUM) + '\n')"""
         #file.close()
 
-    file.close()
 
 
 
-    return maxList,minList
+
+    return [final1[0][0],final2[0][0],final5[0][0]]
 
 """
 使用min-max将特征向量放缩到0-1之间
@@ -611,10 +596,7 @@ if __name__=='__main__':
         # 特征谱线和重要系数的列表
         OldcpImportanceList = getCPandImportance(element)
 
-        """
-            @Todo:
-                Apply fast forward selection or GA select proper line intensity
-        """
+
 
         CP = []
         cpImportanceList = []
@@ -708,12 +690,29 @@ if __name__=='__main__':
 
             trainingData.append(oneData1)
 
+    """
+        使用SBS筛选出更好的特征集合
+    """
+    sbs = SBS(trainANN,k_features = 1)
+    X_train  = np.array([x[0:(len(CP))] for x in trainingData])
+    y_train = np.array(x[len(CP)] for x in trainingData)
+
+    X_test_val = []
+    for nu in [1,2,5]:
+        X_test_val.append(getRealTestData(X_train.max(axis=0),X_train.min(axis=0),nu))
+
+    X_test = np.array(X_test_val)
+    y_test = np.array([10,20,50])
+    sbs.fit(X_train,y_train,X_test,y_test)
+
+
+
     #trainingDatat = np.array([x[0:11] for x in trainingData])
     #maxList1 = trainingDatat.max(axis=0)
     #minList1 = trainingDatat.min(axis=0)
     #Ba
-
-    maxList, minList = trainANN(element, 7, 0.0001, 5, trainingData, 0)
+    resultList = trainANN(element, 7, 0.0001, 5, trainingData, 0)
+    print(resultList)
     #Cu
     #maxList, minList = trainANN(element, 10, 0.0001, 5, trainingData, 0)
     #Cd
