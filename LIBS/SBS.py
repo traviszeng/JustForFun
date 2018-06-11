@@ -15,6 +15,7 @@ class SBS():
     """
     def __init__(self,
                  estimator,
+                 element,
                  k_features,
                  #scoring = accuracy_score,#todo 此处的accuracy_score函数用于classification 需要重新写一个评估函数 https://www.cnblogs.com/harvey888/p/6964741.html
                  scoring = mean_squared_error, #MSE 均方误差
@@ -26,18 +27,19 @@ class SBS():
         self.k_features = k_features
         self.random_state = random_state
         self.test_size = test_size
+        self.element = element
 
-    def fit(self, X_train, y_train,X_test,y_test):
+    def fit(self, X_train, y_train,y_test):
 
         #仅使用原来的test set再进一步划分
         #X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=self.test_size,
         #                                                    random_state=self.random_state)
-
+        print(X_train.shape[1])
         dim = X_train.shape[1]
         self.indices_ = tuple(range(dim))
         self.subsets_ = [self.indices_]
         score = self._calc_score(X_train, y_train,
-                                 X_test, y_test, self.indices_)
+                                 y_test, self.indices_)
         self.scores_ = [score]
 
         while dim > self.k_features:
@@ -46,11 +48,11 @@ class SBS():
 
             for p in combinations(self.indices_, r=dim - 1):
                 score = self._calc_score(X_train, y_train,
-                                         X_test, y_test, p)
+                                          y_test, p)
                 scores.append(score)
                 subsets.append(p)
 
-            best = np.argmax(scores)
+            best = np.argmin(scores)
             self.indices_ = subsets[best]
             self.subsets_.append(self.indices_)
             dim -= 1
@@ -63,13 +65,21 @@ class SBS():
     def transform(self, X):
         return X[:, self.indices_]
 
-    def _calc_score(self, X_train, y_train, X_test, y_test, indices):
-        self.estimator.fit(X_train[:, indices], y_train)
-        y_pred = self.estimator.predict(X_test[:, indices])
+    def _calc_score(self, X_train, y_train, y_test, indices):
+        """self.estimator.fit(X_train[:, indices], y_train)
+        y_pred = self.estimator.predict(X_test[:, indices])"""
+        #print("X_train indices:")
+        #print(X_train[:,indices])
+        trainDataTemp = []
+        #X_traintemp = X_train[:,indices]
+        """for u in range(0,len(X_train)):
+            temp = X_train[u].tolist()
+            temp.append(y_train[u])
+            trainDataTemp.append(temp)"""
+
+        y_pred =  self.estimator(self.element,7,0.0001,5,X_train,y_train,0,indices)
         score = self.scoring(y_test, y_pred)
         return score
-
-
 """
 usage eg.
 

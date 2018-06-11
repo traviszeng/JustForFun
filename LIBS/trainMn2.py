@@ -372,8 +372,9 @@ def findBenchmarkWave():#tenmaxList,twemaxList,fifmaxList,tenwaveList,twewaveLis
 """
 获取真实测试数据
 """
-def getRealTestData(maxList,minList,flag):
+def getRealTestData(maxList,minList,flag,indices):
     real_predict_data = []
+
     if flag==1:
         TZF = TZFList1
     elif flag ==2:
@@ -381,16 +382,20 @@ def getRealTestData(maxList,minList,flag):
     else:
         TZF =TZFList5
 
-    for t in TZF:
-        real_predict_data.append(t[2])
+    for i in range(0,len(TZF)):
+        if i in indices:
+            real_predict_data.append(TZF[i][2])
     # real_predict_data.append(10)
 
     """for i in range(0,len(real_predict_data)):
         real_predict_data[i] = (real_predict_data[i]-minStrength[i])/(maxStrength[i]-minStrength[i])"""
     real_predict_data = np.array(real_predict_data)
+    print("getRealTestData::")
+    print(maxList)
+    print(minList)
     print(real_predict_data)
     # real_predict_data = np.nan_to_num(normalize_cols(real_predict_data))
-    for i in range(len(CP)):
+    for i in range(len(maxList)):
         real_predict_data[i] = (real_predict_data[i] - minList[i]) / (maxList[i] - minList[i])
         if real_predict_data[i] < 0:
             real_predict_data[i] = 0
@@ -404,18 +409,31 @@ def getRealTestData(maxList,minList,flag):
 """
 神经网络训练方法
 """
-def trainANN(element,HIDDEN_NUM, LEARNING_RATE, BATCH_SIZE, Data,isShowFigure):
+def trainANN(element,HIDDEN_NUM, LEARNING_RATE, BATCH_SIZE, Data,y_train,isShowFigure,indices):
     ops.reset_default_graph()
 
     # 假定数据集合为data，前LEN项为LEN个特征谱线的光强，最后一项为铁元素浓度
     file = open('E:\\ANN_TRAIN\\LIBS_ANN v3 ' + element + '3.txt', 'a')
     #print(Data)
-    data = Data
+    print("indices is ")
+    print(indices)
+    datatemp = Data[:,indices]
+    data = []
+
+    for u in range(0, len(datatemp)):
+        temp = datatemp[u].tolist()
+        temp.append(y_train[u])
+        data.append(temp)
+
+    print("data is")
+    #print(data)
+    print("len of data is :")
+    print(len(data))
 
     # for dat in data:
     # print(dat)
 
-    LEN = len(data[0]) - 1
+    LEN = len(data[0])-1
     print(LEN)
 
     x_vals = np.array([x[0:(LEN)] for x in data])
@@ -532,7 +550,9 @@ def trainANN(element,HIDDEN_NUM, LEARNING_RATE, BATCH_SIZE, Data,isShowFigure):
         plt.show()
     """if isShowFigure==0:
         return 0"""
-    real_predict_data = getRealTestData(maxList,minList,1)
+    real_predict_data = getRealTestData(maxList,minList,1,indices)
+    print("real predict data")
+    print(real_predict_data)
 
     hidden = session.run(hidden_output, feed_dict={x_data: [real_predict_data]})
     final1 = session.run(final_output, feed_dict={hidden_output: hidden})
@@ -540,14 +560,14 @@ def trainANN(element,HIDDEN_NUM, LEARNING_RATE, BATCH_SIZE, Data,isShowFigure):
     #file.write(str(final1[0][0]) + '\n')
 
 
-    real_predict_data = getRealTestData(maxList,minList,2)
+    real_predict_data = getRealTestData(maxList,minList,2,indices)
 
     hidden = session.run(hidden_output,feed_dict = {x_data:[real_predict_data]})
     final2 = session.run(final_output, feed_dict={hidden_output: hidden})
     print(str(final2[0][0])+'\n')
     #file.write(str(final2[0][0])+'\n')
 
-    real_predict_data = getRealTestData(maxList, minList, 5)
+    real_predict_data = getRealTestData(maxList, minList, 5,indices)
 
     hidden = session.run(hidden_output, feed_dict={x_data: [real_predict_data]})
     final5 = session.run(final_output, feed_dict={hidden_output: hidden})
@@ -693,17 +713,17 @@ if __name__=='__main__':
     """
         使用SBS筛选出更好的特征集合
     """
-    sbs = SBS(trainANN,k_features = 1)
+    sbs = SBS(trainANN,element,k_features = 1)
     X_train  = np.array([x[0:(len(CP))] for x in trainingData])
-    y_train = np.array(x[len(CP)] for x in trainingData)
+    y_train = np.array([x[len(CP)] for x in trainingData])
 
     X_test_val = []
-    for nu in [1,2,5]:
+    """for nu in [1,2,5]:
         X_test_val.append(getRealTestData(X_train.max(axis=0),X_train.min(axis=0),nu))
 
-    X_test = np.array(X_test_val)
+    X_test = np.array(X_test_val)"""
     y_test = np.array([10,20,50])
-    sbs.fit(X_train,y_train,X_test,y_test)
+    sbs.fit(X_train,y_train,y_test)
 
 
 
