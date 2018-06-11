@@ -24,7 +24,6 @@ import numpy as np
 from numpy.random import seed
 from sklearn import datasets
 from tensorflow.python.framework import ops
-from SBS import SBS
 
 
 """
@@ -384,7 +383,7 @@ def trainANN(element,HIDDEN_NUM, LEARNING_RATE, BATCH_SIZE, Data,isShowFigure):
     LEN = len(data[0]) - 1
     print(LEN)
 
-    x_vals = np.array([x[0:LEN] for x in data])
+    x_vals = np.array([x[0:(LEN-1)] for x in data])
     #print(x_vals)
     y_vals = (np.array([x[LEN] for x in data]))
     #print(y_vals)
@@ -424,11 +423,11 @@ def trainANN(element,HIDDEN_NUM, LEARNING_RATE, BATCH_SIZE, Data,isShowFigure):
     batch_size = BATCH_SIZE
 
     # 声明占位符，input是LEN，traget是1
-    x_data = tf.placeholder(shape=[None, LEN], dtype=tf.float32)
+    x_data = tf.placeholder(shape=[None, LEN-1], dtype=tf.float32)
     y_target = tf.placeholder(shape=[None, 1], dtype=tf.float32)
 
     hidden_layer_nodes = HIDDEN_NUM
-    A1 = tf.Variable(tf.random_normal(shape=[LEN, hidden_layer_nodes]))  # inputs -> hidden nodes
+    A1 = tf.Variable(tf.random_normal(shape=[LEN-1, hidden_layer_nodes]))  # inputs -> hidden nodes
     b1 = tf.Variable(tf.random_normal(shape=[hidden_layer_nodes]))  # one biases for each hidden node
     A2 = tf.Variable(tf.random_normal(shape=[hidden_layer_nodes, 1]))  # hidden inputs -> 1 output
     b2 = tf.Variable(tf.random_normal(shape=[1]))  # 1 bias for the output
@@ -465,7 +464,7 @@ def trainANN(element,HIDDEN_NUM, LEARNING_RATE, BATCH_SIZE, Data,isShowFigure):
 
     loss_vec = []
     test_loss = []
-    for i in range(5000):
+    for i in range(1000):
         rand_index = np.random.choice(len(x_vals_train), size=batch_size)
         rand_x = x_vals_train[rand_index]
         rand_y = np.transpose([y_vals_train[rand_index]])
@@ -481,8 +480,8 @@ def trainANN(element,HIDDEN_NUM, LEARNING_RATE, BATCH_SIZE, Data,isShowFigure):
             file.write('Generation: ' + str(i + 1) + '. Loss = ' + str(temp_loss)+'\n')
             print('Generation: ' + str(i + 1) + '. Loss = ' + str(temp_loss)+'\n')
     flag = 1
-    if not (loss_vec[4999]<1 and loss_vec[4900]<1 and loss_vec[4950]<1):
-        flag = 0
+    """if not (loss_vec[4999]<1 and loss_vec[4900]<1 and loss_vec[4950]<1):
+        flag = 0"""
 
     #打印权值
     session.run(tf.Print(A1,[A1],summarize = LEN*HIDDEN_NUM))
@@ -604,9 +603,7 @@ def normalize_cols(m):
 if __name__=='__main__':
 
 
-
-
-    elementList = ['Pb']
+    elementList = ['Ba']
     for element in elementList:
         minRMSE = 99999
         # 特征谱线集
@@ -618,22 +615,11 @@ if __name__=='__main__':
             @Todo:
                 Apply fast forward selection or GA select proper line intensity
         """
-        """
-        Using SBS to select features
-        """
-        """
-        
-        from sklearn.neighbors import KNeighborsClassifier
-        knn = KNeighborsClassifier(n_neighbors=2)
-        sbs = SBS(knn,k_features = 1)
-        sbs.fit([oldCP],OldcpImportanceList)
-        """
-
 
         CP = []
         cpImportanceList = []
         for i in range(0,len(oldCP)):
-            if element=='Al':
+            """if element=='Al':
                 if i!=4 and i!=10 and i!=8:
                     CP.append(oldCP[i])
                     cpImportanceList.append(OldcpImportanceList[i])
@@ -649,9 +635,9 @@ if __name__=='__main__':
                 if i==2:  #or i==7 or i==8  or i==10 :
                     CP.append(oldCP[i])
                     cpImportanceList.append(OldcpImportanceList[i])
-            else:
-                CP.append(oldCP[i])
-                cpImportanceList.append(OldcpImportanceList[i])
+            else:"""
+            CP.append(oldCP[i])
+            cpImportanceList.append(OldcpImportanceList[i])
 
         """"
         加载模拟的NIST数据
@@ -726,13 +712,14 @@ if __name__=='__main__':
     #maxList1 = trainingDatat.max(axis=0)
     #minList1 = trainingDatat.min(axis=0)
     #Ba
-    #maxList, minList = trainANN(element, 7, 0.0001, 5, trainingData, 0)
+
+    maxList, minList = trainANN(element, 7, 0.0001, 5, trainingData, 0)
     #Cu
     #maxList, minList = trainANN(element, 10, 0.0001, 5, trainingData, 0)
     #Cd
     ##maxList,minList = trainANN(element,18, 0.0001, 5, trainingData,0)
     #Pb
-    maxList, minList = trainANN(element, 18, 0.0001, 5, trainingData, 0)
+    #maxList, minList = trainANN(element, 18, 0.0001, 5, trainingData, 0)
     """for learningRate in [0.00001,0.00002,0.00003,0.00005,0.0001,0.0002,0.0003,0.0005,0.001,0.002,0.003,0.005,0.01,0.02,0.03,0.05,0.1,0.2,0.5,1,0.3]:
         for i in range(len(CP), 50):
             trainANN(element,i,learningRate,5,trainingData,0)"""
