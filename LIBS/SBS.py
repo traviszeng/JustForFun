@@ -77,7 +77,7 @@ class SBS():
             temp.append(y_train[u])
             trainDataTemp.append(temp)"""
 
-        y_pred =  self.estimator(self.element,7,0.0001,5,X_train,y_train,0,indices)
+        y_pred =  self.estimator(self.element,10,0.0001,5,X_train,y_train,0,indices)
         score = self.scoring(y_test, y_pred)
         return score
 """

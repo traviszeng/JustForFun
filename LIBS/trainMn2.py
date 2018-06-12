@@ -540,12 +540,12 @@ def trainANN(element,HIDDEN_NUM, LEARNING_RATE, BATCH_SIZE, Data,y_train,isShowF
     session.run(tf.Print(A1,[A1],summarize = LEN*HIDDEN_NUM))
     session.run(tf.Print(A2, [A2], summarize=HIDDEN_NUM))
     # 可视化loss
-    plt.plot(loss_vec, 'k-', label='Train Loss')
+    """plt.plot(loss_vec, 'k-', label='Train Loss')
     plt.plot(test_loss, 'r--', label='Test Loss')
     plt.title('Loss (MSE) per Generation')
     plt.legend(loc='upper right')
     plt.xlabel('Generation')
-    plt.ylabel('Loss')
+    plt.ylabel('Loss')"""
     if isShowFigure==1:
         plt.show()
     """if isShowFigure==0:
@@ -608,7 +608,7 @@ def normalize_cols(m):
 if __name__=='__main__':
 
 
-    elementList = ['Ba']
+    elementList = ['Cu']
     for element in elementList:
         minRMSE = 99999
         # 特征谱线集
@@ -731,8 +731,8 @@ if __name__=='__main__':
     #maxList1 = trainingDatat.max(axis=0)
     #minList1 = trainingDatat.min(axis=0)
     #Ba
-    resultList = trainANN(element, 7, 0.0001, 5, trainingData, 0)
-    print(resultList)
+    #resultList = trainANN(element, 7, 0.0001, 5, trainingData, 0)
+    #print(resultList)
     #Cu
     #maxList, minList = trainANN(element, 10, 0.0001, 5, trainingData, 0)
     #Cd
@@ -742,10 +742,27 @@ if __name__=='__main__':
     """for learningRate in [0.00001,0.00002,0.00003,0.00005,0.0001,0.0002,0.0003,0.0005,0.001,0.002,0.003,0.005,0.01,0.02,0.03,0.05,0.1,0.2,0.5,1,0.3]:
         for i in range(len(CP), 50):
             trainANN(element,i,learningRate,5,trainingData,0)"""
+    k_feat = [len(k) for k in sbs.subsets_]
+    plt.plot(k_feat, sbs.scores_, marker='o')
+    plt.xlim([0,20])
+    plt.xlabel('Number of features')
+    plt.grid()
+    plt.tight_layout()
+    
+    
+    
+    for TZF in TZFList1:
+            print(TZF)
+
+    print()
+    for TZF in TZFList2:
+            print(TZF)
+    print()
+    for TZF in TZFList5:
+            print(TZF)
 
 
-
-
+    plt.show()
 
     """"[94370860.92715232, 74355971.8969555, 392.3635511829468, 321.4634146341464, 5.642718026401211, 0.3425428719902997, 1.7219195305951387, 5.2931675242996, 1.7454860252287945]
     [129635761.58940399, 107307551.9803229, 316.39379386487155, 235.4878048780488, 4.505937655302278, 0.25687749660121045, 1.7411630059736414, 5.472877358490566, 1.6498544259938954]
