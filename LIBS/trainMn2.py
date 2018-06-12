@@ -390,10 +390,10 @@ def getRealTestData(maxList,minList,flag,indices):
     """for i in range(0,len(real_predict_data)):
         real_predict_data[i] = (real_predict_data[i]-minStrength[i])/(maxStrength[i]-minStrength[i])"""
     real_predict_data = np.array(real_predict_data)
-    print("getRealTestData::")
+    """print("getRealTestData::")
     print(maxList)
     print(minList)
-    print(real_predict_data)
+    print(real_predict_data)"""
     # real_predict_data = np.nan_to_num(normalize_cols(real_predict_data))
     for i in range(len(maxList)):
         real_predict_data[i] = (real_predict_data[i] - minList[i]) / (maxList[i] - minList[i])
@@ -607,8 +607,8 @@ def normalize_cols(m):
 
 if __name__=='__main__':
 
-
     elementList = ['Cu']
+    HIDDEN_LAYER = 10
     for element in elementList:
         minRMSE = 99999
         # 特征谱线集
@@ -680,8 +680,8 @@ if __name__=='__main__':
 
         timesList = []
         for i in range(0, len(CP)):
-            #timesList.append(((TZFList1[i][2] / tenppmData[i][2])+(TZFList2[i][2]/tweppmData[i][2])+(TZFList5[i][2]/fifppmData[i][2]))/3)
-            timesList.append(TZFList1[i][2] / tenppmData[i][2])
+            timesList.append(((TZFList1[i][2] / tenppmData[i][2])+(TZFList2[i][2]/tweppmData[i][2])+(TZFList5[i][2]/fifppmData[i][2]))/3)
+            #timesList.append(TZFList1[i][2] / tenppmData[i][2])
             #timesList.append(((TZFList1[i][2] / tenppmData[i][2])+(TZFList2[i][2]/tweppmData[i][2]))/2)
 
         print(timesList)
@@ -713,7 +713,7 @@ if __name__=='__main__':
     """
         使用SBS筛选出更好的特征集合
     """
-    sbs = SBS(trainANN,element,k_features = 1)
+    sbs = SBS(trainANN,element,1,HIDDEN_LAYER,learning_rate=0.0001)
     X_train  = np.array([x[0:(len(CP))] for x in trainingData])
     y_train = np.array([x[len(CP)] for x in trainingData])
 

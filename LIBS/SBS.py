@@ -2,11 +2,9 @@
 序列后向选择算法（SBS）
 created by Travis on 2018/6/8
 """
-from sklearn.base import clone
+
 from itertools import combinations
 import numpy as np
-from sklearn.metrics import accuracy_score
-from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 
 class SBS():
@@ -18,9 +16,12 @@ class SBS():
                  element,
                  k_features,
                  #scoring = accuracy_score,#todo 此处的accuracy_score函数用于classification 需要重新写一个评估函数 https://www.cnblogs.com/harvey888/p/6964741.html
+                 hidden_layer,
+                 learning_rate,
                  scoring = mean_squared_error, #MSE 均方误差
                  test_size = 0.25,
-                 random_state = 1):
+                 random_state = 1,
+                 ):
 
         self.scoring = scoring
         self.estimator = estimator #在计算score的时候使用estimator来predict
@@ -28,6 +29,9 @@ class SBS():
         self.random_state = random_state
         self.test_size = test_size
         self.element = element
+        self.hidden_layer = hidden_layer
+        self.learning_rate = learning_rate
+
 
     def fit(self, X_train, y_train,y_test):
 
@@ -77,7 +81,7 @@ class SBS():
             temp.append(y_train[u])
             trainDataTemp.append(temp)"""
 
-        y_pred =  self.estimator(self.element,10,0.0001,5,X_train,y_train,0,indices)
+        y_pred =  self.estimator(self.element,self.hidden_layer,self.learning_rate,5,X_train,y_train,0,indices)
         score = self.scoring(y_test, y_pred)
         return score
 """
