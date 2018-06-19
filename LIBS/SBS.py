@@ -15,7 +15,7 @@ class SBS():
                  estimator,
                  element,
                  k_features,
-                 #scoring = accuracy_score,#todo 此处的accuracy_score函数用于classification 需要重新写一个评估函数 https://www.cnblogs.com/harvey888/p/6964741.html
+                 #scoring = accuracy_score,此处的accuracy_score函数用于classification 需要重新写一个评估函数 https://www.cnblogs.com/harvey888/p/6964741.html
                  hidden_layer,
                  learning_rate,
                  scoring = mean_squared_error, #MSE 均方误差
@@ -84,6 +84,7 @@ class SBS():
         y_pred =  self.estimator(self.element,self.hidden_layer,self.learning_rate,5,X_train,y_train,0,indices)
         score = self.scoring(y_test, y_pred)
         return score
+
 """
 usage eg.
 
