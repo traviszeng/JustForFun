@@ -721,7 +721,7 @@ def GAselectFeature(CP,trainingData,element):
 
 if __name__=='__main__':
 
-    elementList = ['Ba']
+    elementList = ['Pb']
     HIDDEN_LAYER = 10
     for element in elementList:
         minRMSE = 99999
@@ -888,8 +888,8 @@ if __name__=='__main__':
     opt_bin = bin(int(optSolution[0]))[2:]
     selected_feature = []
     print("selected features is :")
-    for i in range(1,len(opt_bin)):
-        if opt_bin[i]=='1':
+    for i in range(1,len(opt_bin)+1):
+        if opt_bin[-i]=='1':
             selected_feature.append(CP[-i])
 
     print(selected_feature)
