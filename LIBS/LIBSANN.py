@@ -25,6 +25,26 @@ from numpy.random import seed
 from sklearn import datasets
 from tensorflow.python.framework import ops
 from SBS import SBS
+from sklearn.metrics import mean_squared_error
+
+from math import log2
+
+from gaft import GAEngine
+from gaft.components import BinaryIndividual
+from gaft.components import Population
+from gaft.operators import TournamentSelection
+from gaft.operators import UniformCrossover
+from gaft.operators import FlipBitMutation
+
+# Analysis plugin base class.
+#用于编写分析插件的接口类
+from gaft.plugin_interfaces.analysis import OnTheFlyAnalysis
+
+# Built-in best fitness analysis.
+#内置的存档适应度函数的分析类
+from gaft.analysis.fitness_store import FitnessStore
+#我们将用两种方式将分析插件注册到遗传算法引擎中
+
 
 
 """
@@ -409,6 +429,9 @@ def getRealTestData(maxList,minList,flag,indices):
 """
 神经网络训练方法
 """
+"""
+indices形式：(1,2,5,6) tuple
+"""
 def trainANN(element,HIDDEN_NUM, LEARNING_RATE, BATCH_SIZE, Data,y_train,isShowFigure,indices):
     ops.reset_default_graph()
 
@@ -603,6 +626,78 @@ def normalize_cols(m):
     return (m-col_min) / (col_max - col_min)
 
 
+"""
+使用遗传算法筛选特征
+
+"""
+def GAselectFeature(CP,trainingData,element):
+    # 定义种群.
+    indv_template = BinaryIndividual(ranges=[(1, 2 ** len(CP) + 1)], eps=1)
+    population = Population(indv_template=indv_template, size=200).init()
+
+    # 创建遗传算子
+    selection = TournamentSelection()
+    crossover = UniformCrossover(pc=0.8, pe=0.5)
+    mutation = FlipBitMutation(pm=0.1)
+
+    # 创建遗传算法引擎, 分析插件和适应度函数可以以参数的形式传入引擎中
+    engine = GAEngine(population=population, selection=selection,
+                      crossover=crossover, mutation=mutation,
+                      analysis=[FitnessStore])
+
+    # 定义适应度函数
+    @engine.fitness_register
+    def fitness(indv):
+        x, = indv.solution
+        print(int(x))
+        bin_x_list = list(bin(int(x))[2:])
+        print(bin_x_list)
+        tuple_original_list = list(tuple(range(len(CP))))
+        print(tuple_original_list)
+        selected_feature_bin = []
+        for i in range(1,len(bin_x_list)+1):
+            if bin_x_list[-i]=='1':
+                selected_feature_bin.append(tuple_original_list[-i])
+
+        print(selected_feature_bin)
+        selected_feature_bin.sort()
+        indices = tuple(selected_feature_bin)
+        X_train = np.array([x[0:(len(CP))] for x in trainingData])
+        y_train = np.array([x[len(CP)] for x in trainingData])
+
+
+        y_test = np.array([10, 20, 50])
+
+        y_pred = trainANN(element,7,0.001,5,X_train,y_train,0,indices)
+
+        error = mean_squared_error(y_test,y_pred)
+        print("error is:")
+        print(float(error))
+
+        return float(-error)
+
+
+    # Define on-the-fly analysis.
+    @engine.analysis_register
+    class ConsoleOutputAnalysis(OnTheFlyAnalysis):
+        interval = 1
+        master_only = True
+
+        def register_step(self, g, population, engine):
+            best_indv = population.best_indv(engine.fitness)
+            msg = 'Generation: {}, best fitness: {:.3f}'.format(g, engine.ori_fmax)
+            self.logger.info(msg)
+
+        def finalize(self, population, engine):
+            best_indv = population.best_indv(engine.fitness)
+            x = best_indv.solution
+            y = engine.ori_fmax
+            msg = 'Optimal solution: ({}, {})'.format(x, y)
+            self.logger.info(msg)
+
+    #开始
+    engine.run(ng=30)
+
 
 
 if __name__=='__main__':
@@ -713,20 +808,41 @@ if __name__=='__main__':
     """
         使用SBS筛选出更好的特征集合
     """
-    sbs = SBS(trainANN,element,1,HIDDEN_LAYER,learning_rate=0.0001)
+    """
+    sbs = SBS(trainANN,element,1)
     X_train  = np.array([x[0:(len(CP))] for x in trainingData])
     y_train = np.array([x[len(CP)] for x in trainingData])
 
     X_test_val = []
-    """for nu in [1,2,5]:
-        X_test_val.append(getRealTestData(X_train.max(axis=0),X_train.min(axis=0),nu))
-
-    X_test = np.array(X_test_val)"""
+   
     y_test = np.array([10,20,50])
     sbs.fit(X_train,y_train,y_test)
 
+    k_feat = [len(k) for k in sbs.subsets_]
+    plt.plot(k_feat, sbs.scores_, marker='o')
+    plt.xlim([0, 20])
+    plt.xlabel('Number of features')
+    plt.grid()
+    plt.tight_layout()
+
+    for TZF in TZFList1:
+        print(TZF)
+
+    print()
+    for TZF in TZFList2:
+        print(TZF)
+    print()
+    for TZF in TZFList5:
+        print(TZF)
+
+    plt.show()
+    """
 
 
+    """for nu in [1,2,5]:
+           X_test_val.append(getRealTestData(X_train.max(axis=0),X_train.min(axis=0),nu))
+
+       X_test = np.array(X_test_val)"""
     #trainingDatat = np.array([x[0:11] for x in trainingData])
     #maxList1 = trainingDatat.max(axis=0)
     #minList1 = trainingDatat.min(axis=0)
@@ -742,27 +858,13 @@ if __name__=='__main__':
     """for learningRate in [0.00001,0.00002,0.00003,0.00005,0.0001,0.0002,0.0003,0.0005,0.001,0.002,0.003,0.005,0.01,0.02,0.03,0.05,0.1,0.2,0.5,1,0.3]:
         for i in range(len(CP), 50):
             trainANN(element,i,learningRate,5,trainingData,0)"""
-    k_feat = [len(k) for k in sbs.subsets_]
-    plt.plot(k_feat, sbs.scores_, marker='o')
-    plt.xlim([0,20])
-    plt.xlabel('Number of features')
-    plt.grid()
-    plt.tight_layout()
-    
-    
-    
-    for TZF in TZFList1:
-            print(TZF)
-
-    print()
-    for TZF in TZFList2:
-            print(TZF)
-    print()
-    for TZF in TZFList5:
-            print(TZF)
 
 
-    plt.show()
+
+    """
+    使用遗传算法筛选特征
+    """
+    GAselectFeature(CP,trainingData,element)
 
     """"[94370860.92715232, 74355971.8969555, 392.3635511829468, 321.4634146341464, 5.642718026401211, 0.3425428719902997, 1.7219195305951387, 5.2931675242996, 1.7454860252287945]
     [129635761.58940399, 107307551.9803229, 316.39379386487155, 235.4878048780488, 4.505937655302278, 0.25687749660121045, 1.7411630059736414, 5.472877358490566, 1.6498544259938954]

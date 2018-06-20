@@ -10,69 +10,93 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="CoverageDataManager">
-    <SUITE FILE_PATH="coverage/LIBS$gaftExample.coverage" NAME="gaftExample Coverage Results" MODIFIED="1529397119728" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/LIBS$gaftExample.coverage" NAME="gaftExample Coverage Results" MODIFIED="1529459648167" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/LIBS$GeneticAlgorithm.coverage" NAME="GeneticAlgorithm Coverage Results" MODIFIED="1529393963716" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/LIBS$trainMn2.coverage" NAME="trainMn2 Coverage Results" MODIFIED="1529392414229" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/LIBS$LIBSANN.coverage" NAME="LIBSANN Coverage Results" MODIFIED="1529471678021" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+  </component>
+  <component name="DockManager">
+    <window id="1">
+      <content type="file-editors">
+        <state>
+          <leaf>
+            <file leaf-file-name="gaftExample" pinned="false" current-in-tab="true">
+              <entry file="file://$PROJECT_DIR$/gaftExample">
+                <provider selected="true" editor-type-id="text-editor">
+                  <state relative-caret-position="-231">
+                    <caret line="27" column="47" lean-forward="true" selection-start-line="27" selection-start-column="47" selection-end-line="27" selection-end-column="47" />
+                    <folding>
+                      <element signature="e#126#151#0" expanded="true" />
+                    </folding>
+                  </state>
+                </provider>
+              </entry>
+            </file>
+            <file leaf-file-name="SBS.py" pinned="false" current-in-tab="false">
+              <entry file="file://$PROJECT_DIR$/SBS.py">
+                <provider selected="true" editor-type-id="text-editor">
+                  <state relative-caret-position="378">
+                    <caret line="66" column="0" lean-forward="true" selection-start-line="66" selection-start-column="0" selection-end-line="66" selection-end-column="0" />
+                    <folding>
+                      <element signature="e#53#87#0" expanded="true" />
+                    </folding>
+                  </state>
+                </provider>
+              </entry>
+            </file>
+          </leaf>
+        </state>
+      </content>
+    </window>
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="SBS.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/SBS.py">
+      <file leaf-file-name="LIBSANN.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/LIBSANN.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1931">
-              <caret line="93" column="4" lean-forward="true" selection-start-line="93" selection-start-column="4" selection-end-line="93" selection-end-column="4" />
+            <state relative-caret-position="461">
+              <caret line="698" column="20" lean-forward="false" selection-start-line="698" selection-start-column="20" selection-end-line="698" selection-end-column="20" />
               <folding>
-                <element signature="e#53#87#0" expanded="true" />
+                <element signature="e#235#258#0" expanded="true" />
+                <element signature="e#1105#1388#0" expanded="false" />
+                <element signature="e#1500#1922#0" expanded="false" />
+                <element signature="e#2026#2253#0" expanded="false" />
+                <element signature="e#2326#2594#0" expanded="false" />
+                <element signature="e#2642#2878#0" expanded="false" />
+                <element signature="e#2953#3431#0" expanded="false" />
+                <element signature="e#3516#3774#0" expanded="false" />
+                <element signature="e#3860#4006#0" expanded="false" />
+                <element signature="e#4066#4300#0" expanded="false" />
+                <element signature="e#4371#4768#0" expanded="false" />
+                <element signature="e#4846#5176#0" expanded="false" />
+                <element signature="e#5274#5846#0" expanded="false" />
+                <element signature="e#5955#6310#0" expanded="false" />
+                <element signature="e#6578#8396#0" expanded="false" />
+                <element signature="e#8473#9530#0" expanded="false" />
+                <element signature="e#9683#15791#0" expanded="false" />
+                <element signature="e#15851#15981#0" expanded="false" />
+                <marker date="1529471677940" expanded="false" signature="17645:18200" ph="..." />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="gaftExample" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/gaftExample">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="349">
-              <caret line="35" column="34" lean-forward="true" selection-start-line="35" selection-start-column="34" selection-end-line="35" selection-end-column="34" />
-              <folding>
-                <element signature="e#126#151#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="best_fit.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="best_fit.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/best_fit.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="580">
-              <caret line="84" column="23" lean-forward="true" selection-start-line="84" selection-start-column="23" selection-end-line="84" selection-end-column="23" />
+            <state relative-caret-position="1995">
+              <caret line="95" column="14" lean-forward="true" selection-start-line="95" selection-start-column="14" selection-end-line="95" selection-end-column="14" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="GeneticAlgorithm.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/GeneticAlgorithm.py">
+      <file leaf-file-name="engine.py" pinned="false" current-in-tab="true">
+        <entry file="file://D:/Python/Python35/Lib/site-packages/gaft/engine.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="481">
-              <caret line="71" column="48" lean-forward="true" selection-start-line="71" selection-start-column="48" selection-end-line="71" selection-end-column="48" />
-              <folding>
-                <element signature="e#783#792#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="trainMn2.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/trainMn2.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-1365">
-              <caret line="645" column="11" lean-forward="false" selection-start-line="645" selection-start-column="11" selection-end-line="645" selection-end-column="11" />
-              <folding>
-                <element signature="e#235#258#0" expanded="true" />
-                <element signature="e#4723#5295#0" expanded="false" />
-                <element signature="e#5404#5759#0" expanded="false" />
-                <element signature="e#6027#7845#0" expanded="false" />
-              </folding>
+            <state relative-caret-position="5586">
+              <caret line="278" column="0" lean-forward="true" selection-start-line="278" selection-start-column="0" selection-end-line="278" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -91,9 +115,10 @@
       <list>
         <option value="$PROJECT_DIR$/GeneticAlgorithm.py" />
         <option value="$PROJECT_DIR$/trainMn2.py" />
-        <option value="$PROJECT_DIR$/SBS.py" />
         <option value="$PROJECT_DIR$/best_fit.py" />
         <option value="$PROJECT_DIR$/gaftExample" />
+        <option value="$PROJECT_DIR$/SBS.py" />
+        <option value="$PROJECT_DIR$/LIBSANN.py" />
       </list>
     </option>
   </component>
@@ -103,9 +128,9 @@
     <detection-done>true</detection-done>
     <sorting>DEFINITION_ORDER</sorting>
   </component>
-  <component name="ProjectFrameBounds" extendedState="7">
-    <option name="x" value="304" />
-    <option name="y" value="66" />
+  <component name="ProjectFrameBounds" extendedState="6">
+    <option name="x" value="-163" />
+    <option name="y" value="22" />
     <option name="width" value="1378" />
     <option name="height" value="780" />
   </component>
@@ -155,7 +180,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.gaftExample">
+  <component name="RunManager" selected="Python.LIBSANN">
     <configuration name="GeneticAlgorithm" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -170,6 +195,24 @@
       <module name="LIBS" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/GeneticAlgorithm.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+    </configuration>
+    <configuration name="LIBSANN" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="LIBS" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/LIBSANN.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -210,16 +253,18 @@
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
     </configuration>
-    <list size="3">
+    <list size="4">
       <item index="0" class="java.lang.String" itemvalue="Python.trainMn2" />
       <item index="1" class="java.lang.String" itemvalue="Python.GeneticAlgorithm" />
       <item index="2" class="java.lang.String" itemvalue="Python.gaftExample" />
+      <item index="3" class="java.lang.String" itemvalue="Python.LIBSANN" />
     </list>
     <recent_temporary>
-      <list size="3">
-        <item index="0" class="java.lang.String" itemvalue="Python.gaftExample" />
-        <item index="1" class="java.lang.String" itemvalue="Python.GeneticAlgorithm" />
-        <item index="2" class="java.lang.String" itemvalue="Python.trainMn2" />
+      <list size="4">
+        <item index="0" class="java.lang.String" itemvalue="Python.LIBSANN" />
+        <item index="1" class="java.lang.String" itemvalue="Python.gaftExample" />
+        <item index="2" class="java.lang.String" itemvalue="Python.GeneticAlgorithm" />
+        <item index="3" class="java.lang.String" itemvalue="Python.trainMn2" />
       </list>
     </recent_temporary>
   </component>
@@ -237,7 +282,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1936" height="1056" extended-state="7" />
+    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1748401" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
@@ -269,7 +314,7 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="3" />
+      <option name="time" value="6" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -298,12 +343,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="10941">
           <caret line="610" column="21" lean-forward="true" selection-start-line="610" selection-start-column="21" selection-end-line="610" selection-end-column="21" />
-          <folding>
-            <element signature="e#235#258#0" expanded="true" />
-            <element signature="e#4723#5295#0" expanded="false" />
-            <element signature="e#5404#5759#0" expanded="false" />
-            <element signature="e#6027#7845#0" expanded="false" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -321,12 +361,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="9525">
           <caret line="470" column="0" lean-forward="true" selection-start-line="470" selection-start-column="0" selection-end-line="470" selection-end-column="0" />
-          <folding>
-            <element signature="e#235#258#0" expanded="true" />
-            <element signature="e#4723#5295#0" expanded="false" />
-            <element signature="e#5404#5759#0" expanded="false" />
-            <element signature="e#6027#7845#0" expanded="false" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -344,12 +379,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="6783">
           <caret line="412" column="15" lean-forward="true" selection-start-line="412" selection-start-column="15" selection-end-line="412" selection-end-column="15" />
-          <folding>
-            <element signature="e#235#258#0" expanded="true" />
-            <element signature="e#4723#5295#0" expanded="false" />
-            <element signature="e#5404#5759#0" expanded="false" />
-            <element signature="e#6027#7845#0" expanded="false" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -357,12 +387,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="17550">
           <caret line="702" column="0" lean-forward="true" selection-start-line="702" selection-start-column="0" selection-end-line="702" selection-end-column="0" />
-          <folding>
-            <element signature="e#235#258#0" expanded="true" />
-            <element signature="e#4723#5295#0" expanded="false" />
-            <element signature="e#5404#5759#0" expanded="false" />
-            <element signature="e#6027#7845#0" expanded="false" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -380,12 +405,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="e#235#258#0" expanded="true" />
-            <element signature="e#4723#5295#0" expanded="false" />
-            <element signature="e#5404#5759#0" expanded="false" />
-            <element signature="e#6027#7845#0" expanded="false" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -400,35 +420,15 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="e#235#258#0" expanded="true" />
-            <element signature="e#4723#5295#0" expanded="false" />
-            <element signature="e#5404#5759#0" expanded="false" />
-            <element signature="e#6027#7845#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/SBS.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1931">
-          <caret line="93" column="4" lean-forward="true" selection-start-line="93" selection-start-column="4" selection-end-line="93" selection-end-column="4" />
-          <folding>
-            <element signature="e#53#87#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/trainMn2.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1365">
-          <caret line="645" column="11" lean-forward="false" selection-start-line="645" selection-start-column="11" selection-end-line="645" selection-end-column="11" />
-          <folding>
-            <element signature="e#235#258#0" expanded="true" />
-            <element signature="e#4723#5295#0" expanded="false" />
-            <element signature="e#5404#5759#0" expanded="false" />
-            <element signature="e#6027#7845#0" expanded="false" />
-          </folding>
+        <state relative-caret-position="378">
+          <caret line="719" column="19" lean-forward="true" selection-start-line="719" selection-start-column="19" selection-end-line="719" selection-end-column="19" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -442,20 +442,66 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/SBS.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="378">
+          <caret line="66" column="0" lean-forward="true" selection-start-line="66" selection-start-column="0" selection-end-line="66" selection-end-column="0" />
+          <folding>
+            <element signature="e#53#87#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/gaftExample">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="349">
-          <caret line="35" column="34" lean-forward="true" selection-start-line="35" selection-start-column="34" selection-end-line="35" selection-end-column="34" />
+        <state relative-caret-position="-231">
+          <caret line="27" column="47" lean-forward="true" selection-start-line="27" selection-start-column="47" selection-end-line="27" selection-end-column="47" />
           <folding>
             <element signature="e#126#151#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/LIBSANN.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="461">
+          <caret line="698" column="20" lean-forward="false" selection-start-line="698" selection-start-column="20" selection-end-line="698" selection-end-column="20" />
+          <folding>
+            <element signature="e#235#258#0" expanded="true" />
+            <element signature="e#1105#1388#0" expanded="false" />
+            <element signature="e#1500#1922#0" expanded="false" />
+            <element signature="e#2026#2253#0" expanded="false" />
+            <element signature="e#2326#2594#0" expanded="false" />
+            <element signature="e#2642#2878#0" expanded="false" />
+            <element signature="e#2953#3431#0" expanded="false" />
+            <element signature="e#3516#3774#0" expanded="false" />
+            <element signature="e#3860#4006#0" expanded="false" />
+            <element signature="e#4066#4300#0" expanded="false" />
+            <element signature="e#4371#4768#0" expanded="false" />
+            <element signature="e#4846#5176#0" expanded="false" />
+            <element signature="e#5274#5846#0" expanded="false" />
+            <element signature="e#5955#6310#0" expanded="false" />
+            <element signature="e#6578#8396#0" expanded="false" />
+            <element signature="e#8473#9530#0" expanded="false" />
+            <element signature="e#9683#15791#0" expanded="false" />
+            <element signature="e#15851#15981#0" expanded="false" />
+            <marker date="1529471677940" expanded="false" signature="17645:18200" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/best_fit.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="580">
-          <caret line="84" column="23" lean-forward="true" selection-start-line="84" selection-start-column="23" selection-end-line="84" selection-end-column="23" />
+        <state relative-caret-position="1995">
+          <caret line="95" column="14" lean-forward="true" selection-start-line="95" selection-start-column="14" selection-end-line="95" selection-end-column="14" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://D:/Python/Python35/Lib/site-packages/gaft/engine.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="5586">
+          <caret line="278" column="0" lean-forward="true" selection-start-line="278" selection-start-column="0" selection-end-line="278" selection-end-column="0" />
           <folding />
         </state>
       </provider>

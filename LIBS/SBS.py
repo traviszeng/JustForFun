@@ -16,8 +16,8 @@ class SBS():
                  element,
                  k_features,
                  #scoring = accuracy_score,此处的accuracy_score函数用于classification 需要重新写一个评估函数 https://www.cnblogs.com/harvey888/p/6964741.html
-                 hidden_layer,
-                 learning_rate,
+                 #hidden_layer,
+                 #learning_rate,
                  scoring = mean_squared_error, #MSE 均方误差
                  test_size = 0.25,
                  random_state = 1,
@@ -29,8 +29,8 @@ class SBS():
         self.random_state = random_state
         self.test_size = test_size
         self.element = element
-        self.hidden_layer = hidden_layer
-        self.learning_rate = learning_rate
+        #self.hidden_layer = hidden_layer
+        #self.learning_rate = learning_rate
 
 
     def fit(self, X_train, y_train,y_test):
@@ -41,6 +41,7 @@ class SBS():
         print(X_train.shape[1])
         dim = X_train.shape[1]
         self.indices_ = tuple(range(dim))
+
         self.subsets_ = [self.indices_]
         score = self._calc_score(X_train, y_train,
                                  y_test, self.indices_)
@@ -72,7 +73,9 @@ class SBS():
     def _calc_score(self, X_train, y_train, y_test, indices):
         """self.estimator.fit(X_train[:, indices], y_train)
         y_pred = self.estimator.predict(X_test[:, indices])"""
-        #print("X_train indices:")
+        print("X_train indices:")
+        print(indices)
+        print(type(indices))
         #print(X_train[:,indices])
         trainDataTemp = []
         #X_traintemp = X_train[:,indices]
@@ -81,7 +84,7 @@ class SBS():
             temp.append(y_train[u])
             trainDataTemp.append(temp)"""
 
-        y_pred =  self.estimator(self.element,self.hidden_layer,self.learning_rate,5,X_train,y_train,0,indices)
+        y_pred = self.estimator(self.element,7,0.001,5,X_train,y_train,0,indices)
         score = self.scoring(y_test, y_pred)
         return score
 
