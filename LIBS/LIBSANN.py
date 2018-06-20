@@ -632,8 +632,22 @@ def normalize_cols(m):
 """
 def GAselectFeature(CP,trainingData,element):
     # 定义种群.
-    indv_template = BinaryIndividual(ranges=[(1, 2 ** len(CP) + 1)], eps=1)
-    population = Population(indv_template=indv_template, size=200).init()
+    """
+    :param CP:特征峰list
+    :param trainingData:训练样本数据
+    :param element:训练元素
+    :return:
+    """
+    """
+    此处有坑 分辨率的代码是这样的
+    for i, ((a, b), eps) in enumerate(zip(self.ranges, self.eps)):
+            length = int(log2((b - a)/eps))
+            precision = (b - a)/(2**length)
+            self.lengths.append(length)
+            self.precisions[i] = precision
+    """
+    indv_template = BinaryIndividual(ranges=[(-1, 2 ** len(CP)-1)], eps=1)
+    population = Population(indv_template=indv_template, size=100).init()
 
     # 创建遗传算子
     selection = TournamentSelection()
@@ -649,7 +663,10 @@ def GAselectFeature(CP,trainingData,element):
     @engine.fitness_register
     def fitness(indv):
         x, = indv.solution
-        print(int(x))
+        if not x>=1:
+            return float(-99999)
+        print(x)
+        print(bin(int(x)))
         bin_x_list = list(bin(int(x))[2:])
         print(bin_x_list)
         tuple_original_list = list(tuple(range(len(CP))))
@@ -698,11 +715,13 @@ def GAselectFeature(CP,trainingData,element):
     #开始
     engine.run(ng=30)
 
+    return population.best_indv(engine.fitness).solution,engine.ori_fmax
+
 
 
 if __name__=='__main__':
 
-    elementList = ['Cu']
+    elementList = ['Ba']
     HIDDEN_LAYER = 10
     for element in elementList:
         minRMSE = 99999
@@ -864,7 +883,18 @@ if __name__=='__main__':
     """
     使用遗传算法筛选特征
     """
-    GAselectFeature(CP,trainingData,element)
+    optSolution,loss = GAselectFeature(CP,trainingData,element)
+
+    opt_bin = bin(int(optSolution[0]))[2:]
+    selected_feature = []
+    print("selected features is :")
+    for i in range(1,len(opt_bin)):
+        if opt_bin[i]=='1':
+            selected_feature.append(CP[-i])
+
+    print(selected_feature)
+
+
 
     """"[94370860.92715232, 74355971.8969555, 392.3635511829468, 321.4634146341464, 5.642718026401211, 0.3425428719902997, 1.7219195305951387, 5.2931675242996, 1.7454860252287945]
     [129635761.58940399, 107307551.9803229, 316.39379386487155, 235.4878048780488, 4.505937655302278, 0.25687749660121045, 1.7411630059736414, 5.472877358490566, 1.6498544259938954]
