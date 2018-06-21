@@ -37,13 +37,14 @@ from gaft.operators import UniformCrossover
 from gaft.operators import FlipBitMutation
 
 # Analysis plugin base class.
-#用于编写分析插件的接口类
+# 用于编写分析插件的接口类
 from gaft.plugin_interfaces.analysis import OnTheFlyAnalysis
 
 # Built-in best fitness analysis.
-#内置的存档适应度函数的分析类
+# 内置的存档适应度函数的分析类
 from gaft.analysis.fitness_store import FitnessStore
-#我们将用两种方式将分析插件注册到遗传算法引擎中
+
+# 我们将用两种方式将分析插件注册到遗传算法引擎中
 
 
 
@@ -55,14 +56,16 @@ return:
     特征谱线 list
 
 """
+
+
 def getCP(element):
-    file = open('E:\\ANN data\\spc\\'+element+'.txt','r')
+    file = open('E:\\ANN data\\spc\\' + element + '.txt', 'r')
     lines = file.readlines()
     file.close()
     CP = []
-    for i in range(0,len(lines)):
+    for i in range(0, len(lines)):
         wave = float(lines[i].split()[1])
-        if not (wave<float(200) or wave>float(601)):
+        if not (wave < float(200) or wave > float(601)):
             CP.append(wave)
 
     return CP
@@ -75,6 +78,8 @@ return:
 
 importanceList  as [wave,importance]
 """
+
+
 def getCPandImportance(element):
     file = open('E:\\ANN data\\spc\\' + element + '.txt', 'r')
     lines = file.readlines()
@@ -96,8 +101,6 @@ def getCPandImportance(element):
     return importanceList
 
 
-
-
 """
 process real data file
 
@@ -105,38 +108,46 @@ return:
     转换为一个list[波长,光强]
 
 """
+
+
 def rawDataToDataList(filename):
-    file = open(filename,'r',encoding = 'utf-8')
+    file = open(filename, 'r', encoding='utf-8')
     rawData = file.readlines()
     dataList = []
     for data in rawData:
         l = data.split()
-        dataList.append([float(l[0]),float(l[2])-float(l[1])])
+        dataList.append([float(l[0]), float(l[2]) - float(l[1])])
 
     return dataList
+
 
 """
 转换为Array的形式，返回两个list分别记录波长和光谱强度
 """
+
+
 def listToArray(dataList):
     waveList = []
     strengthList = []
     for data in dataList:
         waveList.append(data[0])
-        #对光强是负数的进行处理
-        if data[1]<0:
+        # 对光强是负数的进行处理
+        if data[1] < 0:
             strengthList.append(float(0))
         else:
             strengthList.append(data[1])
 
-    return waveList,strengthList
+    return waveList, strengthList
+
 
 """
 加载NIST库文件
 """
+
+
 def loadFile(filename):
-    #print('loading '+filename)
-    file = open(filename,encoding = 'utf-8')
+    # print('loading '+filename)
+    file = open(filename, encoding='utf-8')
 
     datalist = file.readlines()
 
@@ -147,34 +158,35 @@ def loadFile(filename):
 
     return newdatalist
 
+
 """
 处理文件获得的数据list,对空白的地方填0补全
 
 """
-def processDataList(newdatalist):
 
+
+def processDataList(newdatalist):
     datalist = []
     flag = 0
 
     LEN = len(newdatalist[0])
 
-    #print(newdatalist)
+    # print(newdatalist)
     for row in newdatalist:
-        if row!=['\n']:
+        if row != ['\n']:
 
             data = []
-            for i in range(0,LEN):
+            for i in range(0, LEN):
                 try:
                     data.append(float(row[i]))
 
                 except ValueError:
                     data.append(float(0))
 
-        #data.append(float(label))
-            if flag!=0:
+                    # data.append(float(label))
+            if flag != 0:
                 datalist.append(data)
-            flag+=1
-
+            flag += 1
 
     return datalist
 
@@ -183,29 +195,32 @@ def processDataList(newdatalist):
 找到一个特征峰对应的峰值
 寻找左右1范围内最大的峰值
 """
-def findPeakValueOfOneWave(dataList,wave):
+
+
+def findPeakValueOfOneWave(dataList, wave):
     Width = float(0.5)
     Max = 0
     maxWave = 0
 
     for data in dataList:
-        if data[0]>float(wave-Width) and data[0]<float(wave+Width):
-            if Max<data[1]:
-                Max  = data[1]
+        if data[0] > float(wave - Width) and data[0] < float(wave + Width):
+            if Max < data[1]:
+                Max = data[1]
                 maxWave = data[0]
 
-    return maxWave,Max
+    return maxWave, Max
 
 
 """
 获取整个CP列表的特征峰的峰值，并返回该特征峰的最大峰值和对应的波长
 """
-def findAllPeakValue(CP,dataList):
 
+
+def findAllPeakValue(CP, dataList):
     maxList = []
     for c in CP:
-        maxWave,Max = findPeakValueOfOneWave(dataList,c)
-        maxList.append([c,maxWave,Max])
+        maxWave, Max = findPeakValueOfOneWave(dataList, c)
+        maxList.append([c, maxWave, Max])
 
     return maxList
 
@@ -213,6 +228,8 @@ def findAllPeakValue(CP,dataList):
 """
 返回分别记录波长和峰值的两个列表
 """
+
+
 def getPeakValueList(Dict):
     waveList = []
     for key in Dict:
@@ -220,16 +237,19 @@ def getPeakValueList(Dict):
 
     waveList = sorted(waveList)
     maxList = []
-    for i in range(0,len(waveList)):
-        maxList.append( Dict[str(waveList[i])])
+    for i in range(0, len(waveList)):
+        maxList.append(Dict[str(waveList[i])])
 
-    return maxList,waveList
+    return maxList, waveList
+
 
 """
 获取真实数据中在训练集特征峰上最大的值
 
 """
-def getPeakReal(wavelist,datalist):
+
+
+def getPeakReal(wavelist, datalist):
     Width = float(0.5)
     mlist = []
     wlist = []
@@ -237,82 +257,89 @@ def getPeakReal(wavelist,datalist):
         Max = 0
         maxWave = 0
         for data in datalist:
-            if data[0]>float(w-Width) and data[0]<float(w+Width):
-                if Max<data[1]:
-                    Max  = data[1]
+            if data[0] > float(w - Width) and data[0] < float(w + Width):
+                if Max < data[1]:
+                    Max = data[1]
                     maxWave = data[0]
 
             mlist.append(Max)
             wlist.append(maxWave)
 
-    return wlist,mlist
+    return wlist, mlist
+
 
 """
 过滤获得峰值点：将小于200或者小于600的过滤，并获得峰值点
 """
+
+
 def findLocalOptimal(datalist):
     optList = []
-    for i in range(1,len(datalist)):
-        if datalist[i][0]<float(200) or datalist[i][0]>float(600):
+    for i in range(1, len(datalist)):
+        if datalist[i][0] < float(200) or datalist[i][0] > float(600):
             pass
-        elif datalist[i][1]>datalist[i+1][1] and datalist[i][1]>datalist[i-1][1]:
-            optList.append([datalist[i][0],datalist[i][1]])
+        elif datalist[i][1] > datalist[i + 1][1] and datalist[i][1] > datalist[i - 1][1]:
+            optList.append([datalist[i][0], datalist[i][1]])
         else:
             continue
 
     return optList
 
+
 """
 :return waveStrengthList 获取的和训练集对应的最大强度和波长的列表
 """
-def getPeakOptimal(waveList,optList):
+
+
+def getPeakOptimal(waveList, optList):
     Width = float(0.5)
     waveOptList = []
-    waveStrengthList =[]
+    waveStrengthList = []
     for wave in waveList:
         list = []
         MAX = 0
         MAXWAVE = 0
         for opt in optList:
-            #如果波长在+ -1范围内
-            if opt[0]<wave+Width and opt[0]>wave-Width:
+            # 如果波长在+ -1范围内
+            if opt[0] < wave + Width and opt[0] > wave - Width:
                 list.append(opt)
-                if opt[1]>MAX:
+                if opt[1] > MAX:
                     MAX = opt[1]
                     MAXWAVE = opt[0]
-            if opt[0]>wave+1.5:
-                waveStrengthList.append([MAXWAVE,MAX])
+            if opt[0] > wave + 1.5:
+                waveStrengthList.append([MAXWAVE, MAX])
                 break
 
         waveOptList.append(list)
 
-    return waveOptList,waveStrengthList
+    return waveOptList, waveStrengthList
+
 
 """
 获得和处理后的训练集波长集合对应的波长和最大强度列表
 
 """
 
-
-
 """
 找到最接近该波长的特征谱线，并返回其importance
 """
+
+
 def findClosestWave(wave):
     min = 9999
     closestWave = float(0)
     importance = 0
-    #print(cpImportanceList)
-    #print("test"+str(wave))
+    # print(cpImportanceList)
+    # print("test"+str(wave))
     for CPI in cpImportanceList:
-        if abs(CPI[0]-wave)<min:
-            min = abs(CPI[0]-wave)
+        if abs(CPI[0] - wave) < min:
+            min = abs(CPI[0] - wave)
             closestWave = CPI[0]
             importance = CPI[1]
 
-    #print([closestWave,importance])
+    # print([closestWave,importance])
 
-    return [closestWave,importance]
+    return [closestWave, importance]
 
 
 """
@@ -330,7 +357,8 @@ def findClosestWave(wave):
 :return 放缩的倍数
 """
 
-def findBenchmarkWave():#tenmaxList,twemaxList,fifmaxList,tenwaveList,twewaveList,fifwaveList,wslist):
+
+def findBenchmarkWave():  # tenmaxList,twemaxList,fifmaxList,tenwaveList,twewaveList,fifwaveList,wslist):
     """
     获得最大光强对应的wave
 
@@ -339,32 +367,33 @@ def findBenchmarkWave():#tenmaxList,twemaxList,fifmaxList,tenwaveList,twewaveLis
     WIDTH = float(0.5)
 
     flag = True
-    while(flag):
-        #print("show")
+    while (flag):
+        # print("show")
         print(tenmaxList)
-        #print(tenwaveList)
+        # print(tenwaveList)
         tenmax = tenmaxList.index(max(tenmaxList))
-        #print("10ppm最大的是"+str(tenmax))
-        #tenmax = tenmaxList.index(max(tenmaxList))
-        #print("20ppm最大的是" + str(tenmax))
-        #fifmax = fifmaxList.index(max(fifmaxList))
-        #print("50ppm最大的是" + str(fifmax))
+        # print("10ppm最大的是"+str(tenmax))
+        # tenmax = tenmaxList.index(max(tenmaxList))
+        # print("20ppm最大的是" + str(tenmax))
+        # fifmax = fifmaxList.index(max(fifmaxList))
+        # print("50ppm最大的是" + str(fifmax))
 
-        #如果该强度成一定线性关系
-        print(abs(twemaxList[tenmax]/tenmaxList[tenmax]))
-        print(abs(fifmaxList[tenmax]/tenmaxList[tenmax]))
-        if abs(twemaxList[tenmax]/tenmaxList[tenmax]-2)<WIDTH and abs(fifmaxList[tenmax]/tenmaxList[tenmax]-5)<WIDTH:
-            #print("第一个判断通过")
-            #且其对应的波长对该元素重要性>500
-            #print(findClosestWave(tenwaveList[tenmax])[1])
-            #print(findClosestWave(tenwaveList[tenmax])[1])
-            if findClosestWave(tenwaveList[tenmax])[1]>500 and findClosestWave(twewaveList[tenmax])[1]>500 and findClosestWave(fifwaveList[tenmax])[1]>500:
-
+        # 如果该强度成一定线性关系
+        print(abs(twemaxList[tenmax] / tenmaxList[tenmax]))
+        print(abs(fifmaxList[tenmax] / tenmaxList[tenmax]))
+        if abs(twemaxList[tenmax] / tenmaxList[tenmax] - 2) < WIDTH and abs(
+                                fifmaxList[tenmax] / tenmaxList[tenmax] - 5) < WIDTH:
+            # print("第一个判断通过")
+            # 且其对应的波长对该元素重要性>500
+            # print(findClosestWave(tenwaveList[tenmax])[1])
+            # print(findClosestWave(tenwaveList[tenmax])[1])
+            if findClosestWave(tenwaveList[tenmax])[1] > 500 and findClosestWave(twewaveList[tenmax])[1] > 500 and \
+                            findClosestWave(fifwaveList[tenmax])[1] > 500:
                 flag = False
-                #放缩的倍数
-                times = wslist[tenmax][1]/tenmaxList[tenmax]
-                print(element+'对应的标杆波长为:')
-                print(str(tenwaveList[tenmax]),str(tenmaxList[tenmax]))
+                # 放缩的倍数
+                times = wslist[tenmax][1] / tenmaxList[tenmax]
+                print(element + '对应的标杆波长为:')
+                print(str(tenwaveList[tenmax]), str(tenmaxList[tenmax]))
                 print(str(twewaveList[tenmax]), str(twemaxList[tenmax]))
                 print(str(fifwaveList[tenmax]), str(fifmaxList[tenmax]))
                 print(str(wslist[tenmax]))
@@ -372,8 +401,8 @@ def findBenchmarkWave():#tenmaxList,twemaxList,fifmaxList,tenwaveList,twewaveLis
 
                 return times
 
-        #print("zhixing")
-        #删掉不满足条件的特征谱线
+        # print("zhixing")
+        # 删掉不满足条件的特征谱线
         del tenwaveList[tenmax]
         del twewaveList[tenmax]
         del fifwaveList[tenmax]
@@ -387,22 +416,22 @@ def findBenchmarkWave():#tenmaxList,twemaxList,fifmaxList,tenwaveList,twewaveLis
     return 0
 
 
-
-
 """
 获取真实测试数据
 """
-def getRealTestData(maxList,minList,flag,indices):
+
+
+def getRealTestData(maxList, minList, flag, indices):
     real_predict_data = []
 
-    if flag==1:
+    if flag == 1:
         TZF = TZFList1
-    elif flag ==2:
+    elif flag == 2:
         TZF = TZFList2
     else:
-        TZF =TZFList5
+        TZF = TZFList5
 
-    for i in range(0,len(TZF)):
+    for i in range(0, len(TZF)):
         if i in indices:
             real_predict_data.append(TZF[i][2])
     # real_predict_data.append(10)
@@ -426,21 +455,24 @@ def getRealTestData(maxList,minList,flag,indices):
 
     return real_predict_data
 
+
 """
 神经网络训练方法
 """
 """
 indices形式：(1,2,5,6) tuple
 """
-def trainANN(element,HIDDEN_NUM, LEARNING_RATE, BATCH_SIZE, Data,y_train,isShowFigure,indices):
+
+
+def trainANN(element, HIDDEN_NUM, LEARNING_RATE, BATCH_SIZE, Data, y_train, isShowFigure, indices):
     ops.reset_default_graph()
 
     # 假定数据集合为data，前LEN项为LEN个特征谱线的光强，最后一项为铁元素浓度
     file = open('E:\\ANN_TRAIN\\LIBS_ANN v3 ' + element + '3.txt', 'a')
-    #print(Data)
+    # print(Data)
     print("indices is ")
     print(indices)
-    datatemp = Data[:,indices]
+    datatemp = Data[:, indices]
     data = []
 
     for u in range(0, len(datatemp)):
@@ -449,20 +481,20 @@ def trainANN(element,HIDDEN_NUM, LEARNING_RATE, BATCH_SIZE, Data,y_train,isShowF
         data.append(temp)
 
     print("data is")
-    #print(data)
+    # print(data)
     print("len of data is :")
     print(len(data))
 
     # for dat in data:
     # print(dat)
 
-    LEN = len(data[0])-1
+    LEN = len(data[0]) - 1
     print(LEN)
 
     x_vals = np.array([x[0:(LEN)] for x in data])
-    #print(x_vals)
+    # print(x_vals)
     y_vals = (np.array([x[LEN] for x in data]))
-    #print(y_vals)
+    # print(y_vals)
 
     maxList = x_vals.max(axis=0)
     minList = x_vals.min(axis=0)
@@ -491,9 +523,7 @@ def trainANN(element,HIDDEN_NUM, LEARNING_RATE, BATCH_SIZE, Data,y_train,isShowF
     x_vals_train = np.nan_to_num(normalize_cols(x_vals_train))
     x_vals_test = np.nan_to_num(normalize_cols(x_vals_test))
 
-
-
-    #print(type(x_vals_test))
+    # print(type(x_vals_test))
 
     # 定义batch的值,以5个数据作为一个批计算gradient
     batch_size = BATCH_SIZE
@@ -514,15 +544,15 @@ def trainANN(element,HIDDEN_NUM, LEARNING_RATE, BATCH_SIZE, Data,y_train,isShowF
     hidden_output = tf.nn.relu(tf.add(tf.matmul(x_data, A1), b1))
     final_output = tf.nn.relu(tf.add(tf.matmul(hidden_output, A2), b2))
 
-    #添加L2正则化防止过拟合
-    #tf.add_to_collection(tf.GraphKeys.WEIGHTS, A1)
-    #tf.add_to_collection(tf.GraphKeys.WEIGHTS, A2)
-    #regularizer = tf.contrib.layers.l2_regularizer(scale=5.0 / 50000)
-    #reg_term = tf.contrib.layers.apply_regularization(regularizer)
+    # 添加L2正则化防止过拟合
+    # tf.add_to_collection(tf.GraphKeys.WEIGHTS, A1)
+    # tf.add_to_collection(tf.GraphKeys.WEIGHTS, A2)
+    # regularizer = tf.contrib.layers.l2_regularizer(scale=5.0 / 50000)
+    # reg_term = tf.contrib.layers.apply_regularization(regularizer)
 
 
     # 定义均方误差作为损失函数
-    #loss = tf.reduce_mean(tf.square(y_target - final_output)+reg_term)
+    # loss = tf.reduce_mean(tf.square(y_target - final_output)+reg_term)
     loss = tf.reduce_mean(tf.square(y_target - final_output))
 
     # 声明优化算法，梯度下降，设置学习率为0.005
@@ -553,14 +583,17 @@ def trainANN(element,HIDDEN_NUM, LEARNING_RATE, BATCH_SIZE, Data,y_train,isShowF
         test_loss.append(np.sqrt(test_temp_loss))
         # print('第' + str(i) + '轮的测试loss为' + str(np.sqrt(test_temp_loss)))
         if (i + 1) % 50 == 0:
-            file.write('Generation: ' + str(i + 1) + '. Loss = ' + str(temp_loss)+'\n')
-            #print('Generation: ' + str(i + 1) + '. Loss = ' + str(temp_loss)+'\n')
+            file.write('Generation: ' + str(i + 1) + '. Loss = ' + str(temp_loss) + '\n')
+            print('Generation: ' + str(i + 1) + '. Loss = ' + str(temp_loss) + '\n')
     flag = 1
-    """if not (loss_vec[4999]<1 and loss_vec[4900]<1 and loss_vec[4950]<1):
-        flag = 0"""
+    if not (loss_vec[999]<1 and loss_vec[900]<1 and loss_vec[950]<1):
+        flag = 0
 
-    #打印权值
-    session.run(tf.Print(A1,[A1],summarize = LEN*HIDDEN_NUM))
+    if not flag:
+        return [9999,9999,9999]
+
+    # 打印权值
+    session.run(tf.Print(A1, [A1], summarize=LEN * HIDDEN_NUM))
     session.run(tf.Print(A2, [A2], summarize=HIDDEN_NUM))
     # 可视化loss
     """plt.plot(loss_vec, 'k-', label='Train Loss')
@@ -569,33 +602,33 @@ def trainANN(element,HIDDEN_NUM, LEARNING_RATE, BATCH_SIZE, Data,y_train,isShowF
     plt.legend(loc='upper right')
     plt.xlabel('Generation')
     plt.ylabel('Loss')"""
-    if isShowFigure==1:
+    if isShowFigure == 1:
         plt.show()
     """if isShowFigure==0:
         return 0"""
-    real_predict_data = getRealTestData(maxList,minList,1,indices)
+    real_predict_data = getRealTestData(maxList, minList, 1, indices)
     print("real predict data")
     print(real_predict_data)
 
     hidden = session.run(hidden_output, feed_dict={x_data: [real_predict_data]})
     final1 = session.run(final_output, feed_dict={hidden_output: hidden})
     print(str(final1[0][0]) + '\n')
-    #file.write(str(final1[0][0]) + '\n')
+    # file.write(str(final1[0][0]) + '\n')
 
 
-    real_predict_data = getRealTestData(maxList,minList,2,indices)
+    real_predict_data = getRealTestData(maxList, minList, 2, indices)
 
-    hidden = session.run(hidden_output,feed_dict = {x_data:[real_predict_data]})
+    hidden = session.run(hidden_output, feed_dict={x_data: [real_predict_data]})
     final2 = session.run(final_output, feed_dict={hidden_output: hidden})
-    print(str(final2[0][0])+'\n')
-    #file.write(str(final2[0][0])+'\n')
+    print(str(final2[0][0]) + '\n')
+    # file.write(str(final2[0][0])+'\n')
 
-    real_predict_data = getRealTestData(maxList, minList, 5,indices)
+    real_predict_data = getRealTestData(maxList, minList, 5, indices)
 
     hidden = session.run(hidden_output, feed_dict={x_data: [real_predict_data]})
     final5 = session.run(final_output, feed_dict={hidden_output: hidden})
-    print(str(final5[0][0])+'\n')
-    #file.write(str(final5[0][0])+'\n')
+    print(str(final5[0][0]) + '\n')
+    # file.write(str(final5[0][0])+'\n')
 
 
     """RMSE = (final5-50)*(final5-50)+(final2-20)*(final2-20)
@@ -607,30 +640,35 @@ def trainANN(element,HIDDEN_NUM, LEARNING_RATE, BATCH_SIZE, Data,y_train,isShowF
         file.write("RMSE=" + str(RMSE) + '\n')
         file.write("best learning rate is:" + str(LEARNING_RATE) + '\n')
         file.write("best LAYER NUM is:" + str(HIDDEN_NUM) + '\n')"""
-        #file.close()
+    # file.close()
 
 
 
 
 
-    return [final1[0][0],final2[0][0],final5[0][0]]
+    return [final1[0][0], final2[0][0], final5[0][0]]
+
 
 """
 使用min-max将特征向量放缩到0-1之间
 """
+
+
 def normalize_cols(m):
-    #print(m)
+    # print(m)
     col_max = m.max(axis=0)
-    #print(col_max)
+    # print(col_max)
     col_min = m.min(axis=0)
-    return (m-col_min) / (col_max - col_min)
+    return (m - col_min) / (col_max - col_min)
 
 
 """
 使用遗传算法筛选特征
 
 """
-def GAselectFeature(CP,trainingData,element):
+
+
+def GAselectFeature(CP, trainingData, element):
     # 定义种群.
     """
     :param CP:特征峰list
@@ -646,7 +684,7 @@ def GAselectFeature(CP,trainingData,element):
             self.lengths.append(length)
             self.precisions[i] = precision
     """
-    indv_template = BinaryIndividual(ranges=[(-1, 2 ** len(CP)-1)], eps=1)
+    indv_template = BinaryIndividual(ranges=[(-1, 2 ** len(CP) - 1)], eps=1)
     population = Population(indv_template=indv_template, size=100).init()
 
     # 创建遗传算子
@@ -663,7 +701,7 @@ def GAselectFeature(CP,trainingData,element):
     @engine.fitness_register
     def fitness(indv):
         x, = indv.solution
-        if not x>=1:
+        if not x >= 1:
             return float(-99999)
         print(x)
         print(bin(int(x)))
@@ -672,8 +710,8 @@ def GAselectFeature(CP,trainingData,element):
         tuple_original_list = list(tuple(range(len(CP))))
         print(tuple_original_list)
         selected_feature_bin = []
-        for i in range(1,len(bin_x_list)+1):
-            if bin_x_list[-i]=='1':
+        for i in range(1, len(bin_x_list) + 1):
+            if bin_x_list[-i] == '1':
                 selected_feature_bin.append(tuple_original_list[-i])
 
         print(selected_feature_bin)
@@ -682,17 +720,15 @@ def GAselectFeature(CP,trainingData,element):
         X_train = np.array([x[0:(len(CP))] for x in trainingData])
         y_train = np.array([x[len(CP)] for x in trainingData])
 
-
         y_test = np.array([10, 20, 50])
 
-        y_pred = trainANN(element,7,0.001,5,X_train,y_train,0,indices)
+        y_pred = trainANN(element, 7, 0.001, 5, X_train, y_train, 0, indices)
 
-        error = mean_squared_error(y_test,y_pred)
+        error = mean_squared_error(y_test, y_pred)
         print("error is:")
         print(float(error))
 
         return float(-error)
-
 
     # Define on-the-fly analysis.
     @engine.analysis_register
@@ -712,14 +748,13 @@ def GAselectFeature(CP,trainingData,element):
             msg = 'Optimal solution: ({}, {})'.format(x, y)
             self.logger.info(msg)
 
-    #开始
+    # 开始
     engine.run(ng=100)
 
-    return population.best_indv(engine.fitness).solution,engine.ori_fmax
+    return population.best_indv(engine.fitness).solution, engine.ori_fmax
 
 
-
-if __name__=='__main__':
+if __name__ == '__main__':
 
     elementList = ['Cu']
     HIDDEN_LAYER = 10
@@ -730,11 +765,9 @@ if __name__=='__main__':
         # 特征谱线和重要系数的列表
         OldcpImportanceList = getCPandImportance(element)
 
-
-
         CP = []
         cpImportanceList = []
-        for i in range(0,len(oldCP)):
+        for i in range(0, len(oldCP)):
             """if element=='Al':
                 if i!=4 and i!=10 and i!=8:
                     CP.append(oldCP[i])
@@ -762,13 +795,13 @@ if __name__=='__main__':
         tweppmData = processDataList(loadFile('E:\\ANN data\\data\\' + element + '\\20ppm.txt'))
         fifppmData = processDataList(loadFile('E:\\ANN data\\data\\' + element + '\\50ppm.txt'))
 
-        tenppmData = findAllPeakValue(CP,tenppmData)
-        tweppmData = findAllPeakValue(CP,tweppmData)
-        fifppmData = findAllPeakValue(CP,fifppmData)
+        tenppmData = findAllPeakValue(CP, tenppmData)
+        tweppmData = findAllPeakValue(CP, tweppmData)
+        fifppmData = findAllPeakValue(CP, fifppmData)
 
         print('10ppm real:')
         print('')
-        rawData = rawDataToDataList('E:\\ANN data\\data\\realData\\'+element+'10.txt')
+        rawData = rawDataToDataList('E:\\ANN data\\data\\realData\\' + element + '10.txt')
         TZFList1 = findAllPeakValue(CP, rawData)
 
         for TZF in TZFList1:
@@ -777,7 +810,7 @@ if __name__=='__main__':
         print('20ppm real:')
         print('')
 
-        rawData = rawDataToDataList('E:\\ANN data\\data\\realData\\'+element+'20.txt')
+        rawData = rawDataToDataList('E:\\ANN data\\data\\realData\\' + element + '20.txt')
         TZFList2 = findAllPeakValue(CP, rawData)
 
         for TZF in TZFList2:
@@ -786,7 +819,7 @@ if __name__=='__main__':
         print('50ppm real:')
         print('')
 
-        rawData = rawDataToDataList('E:\\ANN data\\data\\realData\\'+element+'50.txt')
+        rawData = rawDataToDataList('E:\\ANN data\\data\\realData\\' + element + '50.txt')
         TZFList5 = findAllPeakValue(CP, rawData)
 
         for TZF in TZFList5:
@@ -794,19 +827,22 @@ if __name__=='__main__':
 
         timesList = []
         for i in range(0, len(CP)):
-            timesList.append(((TZFList1[i][2] / tenppmData[i][2])+(TZFList2[i][2]/tweppmData[i][2])+(TZFList5[i][2]/fifppmData[i][2]))/3)
-            #timesList.append(TZFList1[i][2] / tenppmData[i][2])
-            #timesList.append(((TZFList1[i][2] / tenppmData[i][2])+(TZFList2[i][2]/tweppmData[i][2]))/2)
+            timesList.append(((TZFList1[i][2] / tenppmData[i][2]) + (TZFList2[i][2] / tweppmData[i][2]) + (
+            TZFList5[i][2] / fifppmData[i][2])) / 3)
+            # timesList.append(TZFList1[i][2] / tenppmData[i][2])
+            # timesList.append(((TZFList1[i][2] / tenppmData[i][2])+(TZFList2[i][2]/tweppmData[i][2]))/2)
 
         print(timesList)
 
         # 获得神经网络训练集
         trainingData = []
         for i in range(1, 51):
-            rawData = findAllPeakValue(CP,processDataList(loadFile('E:\\ANN data\\data\\' + element + '\\' + str(i) + 'ppm.txt')))
-            rawData2 = findAllPeakValue(CP,processDataList(loadFile('E:\\ANN data\\data\\' + element + '\\' + str(i+0.5) + 'ppm.txt')))
+            rawData = findAllPeakValue(CP, processDataList(
+                loadFile('E:\\ANN data\\data\\' + element + '\\' + str(i) + 'ppm.txt')))
+            rawData2 = findAllPeakValue(CP, processDataList(
+                loadFile('E:\\ANN data\\data\\' + element + '\\' + str(i + 0.5) + 'ppm.txt')))
 
-            for j in range(0,len(CP)):
+            for j in range(0, len(CP)):
                 rawData[j][2] = rawData[j][2] * timesList[j]
                 rawData2[j][2] = rawData2[j][2] * timesList[j]
 
@@ -820,32 +856,30 @@ if __name__=='__main__':
             oneData1 = []
             for j in range(0, len(CP)):
                 oneData1.append(rawData2[j][2])
-            oneData1.append(i+0.5)
+            oneData1.append(i + 0.5)
 
             trainingData.append(oneData1)
 
     """
         使用SBS筛选出更好的特征集合
     """
-    
+    """
     sbs = SBS(trainANN,element,1)
     X_train  = np.array([x[0:(len(CP))] for x in trainingData])
     y_train = np.array([x[len(CP)] for x in trainingData])
 
     X_test_val = []
-   
+
     y_test = np.array([10,20,50])
-    #y = trainANN(element,7,0.001,5,X_train,y_train,0,tuple([6,7,8]))
-    #print(mean_squared_error(y,[10,20,50]))
     sbs.fit(X_train,y_train,y_test)
-    
+
     k_feat = [len(k) for k in sbs.subsets_]
     plt.plot(k_feat, sbs.scores_, marker='o')
     plt.xlim([0, 20])
     plt.xlabel('Number of features')
     plt.grid()
     plt.tight_layout()
-    """
+
     for TZF in TZFList1:
         print(TZF)
 
@@ -855,61 +889,55 @@ if __name__=='__main__':
     print()
     for TZF in TZFList5:
         print(TZF)
-    """
 
     plt.show()
-
-    print(sbs.scores_.index(min(sbs.scores_)))
-    
-    
-
+    """
 
     """for nu in [1,2,5]:
            X_test_val.append(getRealTestData(X_train.max(axis=0),X_train.min(axis=0),nu))
 
        X_test = np.array(X_test_val)"""
-    #trainingDatat = np.array([x[0:11] for x in trainingData])
-    #maxList1 = trainingDatat.max(axis=0)
-    #minList1 = trainingDatat.min(axis=0)
-    #Ba
-    #resultList = trainANN(element, 7, 0.0001, 5, trainingData, 0)
-    #print(resultList)
-    #Cu
-    #maxList, minList = trainANN(element, 10, 0.0001, 5, trainingData, 0)
-    #Cd
+    # trainingDatat = np.array([x[0:11] for x in trainingData])
+    # maxList1 = trainingDatat.max(axis=0)
+    # minList1 = trainingDatat.min(axis=0)
+    # Ba
+    # resultList = trainANN(element, 7, 0.0001, 5, trainingData, 0)
+    # print(resultList)
+    # Cu
+    # maxList, minList = trainANN(element, 10, 0.0001, 5, trainingData, 0)
+    # Cd
     ##maxList,minList = trainANN(element,18, 0.0001, 5, trainingData,0)
-    #Pb
-    #maxList, minList = trainANN(element, 18, 0.0001, 5, trainingData, 0)
+    # Pb
+    # maxList, minList = trainANN(element, 18, 0.0001, 5, trainingData, 0)
     """for learningRate in [0.00001,0.00002,0.00003,0.00005,0.0001,0.0002,0.0003,0.0005,0.001,0.002,0.003,0.005,0.01,0.02,0.03,0.05,0.1,0.2,0.5,1,0.3]:
         for i in range(len(CP), 50):
             trainANN(element,i,learningRate,5,trainingData,0)"""
 
-
-
     """
     使用遗传算法筛选特征
     """
-    """
-    optSolution,loss = GAselectFeature(CP,trainingData,element)
+    
+    optSolution, loss = GAselectFeature(CP, trainingData, element)
 
     opt_bin = bin(int(optSolution[0]))[2:]
     selected_feature = []
     print("selected features is :")
-    for i in range(1,len(opt_bin)+1):
-        if opt_bin[-i]=='1':
+    for i in range(1, len(opt_bin) + 1):
+        if opt_bin[-i] == '1':
             selected_feature.append(CP[-i])
 
     print(selected_feature)
-    """
-
-
+    file = open("best_fit.py",'a')
+    file.write(selected_feature)
+    file.close()
+    
 
     """"[94370860.92715232, 74355971.8969555, 392.3635511829468, 321.4634146341464, 5.642718026401211, 0.3425428719902997, 1.7219195305951387, 5.2931675242996, 1.7454860252287945]
     [129635761.58940399, 107307551.9803229, 316.39379386487155, 235.4878048780488, 4.505937655302278, 0.25687749660121045, 1.7411630059736414, 5.472877358490566, 1.6498544259938954]
     [210839161.86094412, 180347668.86078954, 232.28970824980817, 176.8253983359186, 3.9845804090513384, 0.20619044933959188, 1.7438758959749787, 5.49163807890223, 1.5385280743025573]
     """
-    
-    
+
+
 
 
 

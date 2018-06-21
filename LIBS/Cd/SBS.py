@@ -31,7 +31,6 @@ class SBS():
         self.element = element
         #self.hidden_layer = hidden_layer
         #self.learning_rate = learning_rate
-        self.num = 0
 
 
     def fit(self, X_train, y_train,y_test):
@@ -87,7 +86,6 @@ class SBS():
 
         y_pred = self.estimator(self.element,7,0.001,5,X_train,y_train,0,indices)
         score = self.scoring(y_test, y_pred)
-        self.num+=1
         return score
 
 """
