@@ -721,7 +721,7 @@ def GAselectFeature(CP,trainingData,element):
 
 if __name__=='__main__':
 
-    elementList = ['Cu']
+    elementList = ['Cu','Ba','Pb','Cd']
     HIDDEN_LAYER = 10
     for element in elementList:
         minRMSE = 99999
@@ -824,27 +824,46 @@ if __name__=='__main__':
 
             trainingData.append(oneData1)
 
-    """
-        使用SBS筛选出更好的特征集合
-    """
-    
-    sbs = SBS(trainANN,element,1)
-    X_train  = np.array([x[0:(len(CP))] for x in trainingData])
-    y_train = np.array([x[len(CP)] for x in trainingData])
+        """
+            使用SBS筛选出更好的特征集合
+        """
+        for learningRate in [ 0.0001,0.0005, 0.001, 0.005, 0.01,0.05, 0.1,0.5, 1]:
+            #for hidden in range(len(CP), 50):
+            sbs = SBS(trainANN,element,1,learningRate)
+            X_train  = np.array([x[0:(len(CP))] for x in trainingData])
+            y_train = np.array([x[len(CP)] for x in trainingData])
 
-    X_test_val = []
-   
-    y_test = np.array([10,20,50])
-    #y = trainANN(element,7,0.001,5,X_train,y_train,0,tuple([6,7,8]))
-    #print(mean_squared_error(y,[10,20,50]))
-    sbs.fit(X_train,y_train,y_test)
-    
-    k_feat = [len(k) for k in sbs.subsets_]
-    plt.plot(k_feat, sbs.scores_, marker='o')
-    plt.xlim([0, 20])
-    plt.xlabel('Number of features')
-    plt.grid()
-    plt.tight_layout()
+            X_test_val = []
+
+            y_test = np.array([10,20,50])
+            #y = trainANN(element,7,0.001,5,X_train,y_train,0,tuple([6,7,8]))
+            #print(mean_squared_error(y,[10,20,50]))
+            sbs.fit(X_train,y_train,y_test)
+
+            k_feat = [len(k) for k in sbs.subsets_]
+            plt.plot(k_feat, sbs.scores_, marker='o')
+            plt.xlim([0, 20])
+            plt.xlabel('Number of features')
+            plt.grid()
+            plt.tight_layout()
+
+            file = open("E:\\JustForFun\\LIBS\\SBSlog"+element+".txt",'a')
+            minIndex = sbs.scores_.index(min(sbs.scores_))
+            file.write('current learning rate is:'+str(learningRate))
+            file.write('hidden layer num is:'+str(sbs.hiddenlayernum_[minIndex]))
+            file.write(sbs.scores_)
+            file.write('min loss is:')
+            file.write(min(sbs.scores_))
+            file.write('index is:'+str(minIndex))
+            file.write('Found subsets is:')
+            file.write(sbs.subsets_[minIndex])
+            file.write('Found line is :')
+            for INDEX in sbs.subsets_[minIndex]:
+                print(CP[INDEX])
+            file.write()
+
+            file.close()
+
     """
     for TZF in TZFList1:
         print(TZF)
@@ -857,9 +876,9 @@ if __name__=='__main__':
         print(TZF)
     """
 
-    plt.show()
+    #plt.show()
 
-    print(sbs.scores_.index(min(sbs.scores_)))
+    #print(sbs.scores_.index(min(sbs.scores_)))
     
     
 

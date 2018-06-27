@@ -17,7 +17,7 @@ class SBS():
                  k_features,
                  #scoring = accuracy_score,此处的accuracy_score函数用于classification 需要重新写一个评估函数 https://www.cnblogs.com/harvey888/p/6964741.html
                  #hidden_layer,
-                 #learning_rate,
+                 learning_rate,
                  scoring = mean_squared_error, #MSE 均方误差
                  test_size = 0.25,
                  random_state = 1,
@@ -30,8 +30,8 @@ class SBS():
         self.test_size = test_size
         self.element = element
         #self.hidden_layer = hidden_layer
-        #self.learning_rate = learning_rate
-        self.num = 0
+        self.learning_rate = learning_rate
+        #self.num = 0
 
 
     def fit(self, X_train, y_train,y_test):
@@ -44,23 +44,29 @@ class SBS():
         self.indices_ = tuple(range(dim))
 
         self.subsets_ = [self.indices_]
-        score = self._calc_score(X_train, y_train,
+        score,besthidden = self._calc_score(X_train, y_train,
                                  y_test, self.indices_)
         self.scores_ = [score]
+        self.hiddenlayernum_ =[besthidden]
 
         while dim > self.k_features:
             scores = []
             subsets = []
+            besthiddenlist = []
 
             for p in combinations(self.indices_, r=dim - 1):
-                score = self._calc_score(X_train, y_train,
+                score,besthidden = self._calc_score(X_train, y_train,
                                           y_test, p)
                 scores.append(score)
                 subsets.append(p)
+                besthiddenlist.append(besthidden)
+
 
             best = np.argmin(scores)
             self.indices_ = subsets[best]
             self.subsets_.append(self.indices_)
+            self.hiddenlayernum_.append(besthiddenlist[best])
+
             dim -= 1
 
             self.scores_.append(scores[best])
@@ -84,11 +90,16 @@ class SBS():
             temp = X_train[u].tolist()
             temp.append(y_train[u])
             trainDataTemp.append(temp)"""
-
-        y_pred = self.estimator(self.element,7,0.001,5,X_train,y_train,0,indices)
-        score = self.scoring(y_test, y_pred)
-        self.num+=1
-        return score
+        bestScore = 999999
+        bestHiddenLayer = 0
+        for HIDDEN in range(len(indices),40):
+            y_pred = self.estimator(self.element,HIDDEN,self.learning_rate,5,X_train,y_train,0,indices)
+            score = self.scoring(y_test, y_pred)
+            if score<bestScore:
+                bestScore = score
+                bestHiddenLayer = HIDDEN
+        #self.num+=1
+        return bestScore,bestHiddenLayer
 
 """
 usage eg.
