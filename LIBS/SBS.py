@@ -6,6 +6,7 @@ created by Travis on 2018/6/8
 from itertools import combinations
 import numpy as np
 from sklearn.metrics import mean_squared_error
+import math
 
 class SBS():
     """
@@ -52,20 +53,20 @@ class SBS():
         while dim > self.k_features:
             scores = []
             subsets = []
-            besthiddenlist = []
+            #besthiddenlist = []
 
             for p in combinations(self.indices_, r=dim - 1):
                 score,besthidden = self._calc_score(X_train, y_train,
                                           y_test, p)
                 scores.append(score)
                 subsets.append(p)
-                besthiddenlist.append(besthidden)
+                #besthiddenlist.append(besthidden)
 
 
             best = np.argmin(scores)
             self.indices_ = subsets[best]
             self.subsets_.append(self.indices_)
-            self.hiddenlayernum_.append(besthiddenlist[best])
+            #self.hiddenlayernum_.append(besthiddenlist[best])
 
             dim -= 1
 
@@ -92,12 +93,16 @@ class SBS():
             trainDataTemp.append(temp)"""
         bestScore = 999999
         bestHiddenLayer = 0
-        for HIDDEN in range(len(indices),40):
-            y_pred = self.estimator(self.element,HIDDEN,self.learning_rate,5,X_train,y_train,0,indices)
-            score = self.scoring(y_test, y_pred)
-            if score<bestScore:
-                bestScore = score
-                bestHiddenLayer = HIDDEN
+        #for HIDDEN in range(len(indices),40):
+        #使用公式求得合适的隐含层数目
+        m = len(indices)
+        n = 1
+        HIDDEN = math.sqrt(0.43*m*n+0.12*n*n+2.54*m+0.77*n+0.35)+0.51
+        y_pred = self.estimator(self.element,int(HIDDEN),self.learning_rate,5,X_train,y_train,0,indices)
+        score = self.scoring(y_test, y_pred)
+        if score<bestScore:
+            bestScore = score
+            #bestHiddenLayer = HIDDEN
         #self.num+=1
         return bestScore,bestHiddenLayer
 
