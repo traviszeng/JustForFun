@@ -26,6 +26,7 @@ from sklearn import datasets
 from tensorflow.python.framework import ops
 from SBS import SBS
 from sklearn.metrics import mean_squared_error
+import sys
 
 from math import log2
 
@@ -554,7 +555,7 @@ def trainANN(element,HIDDEN_NUM, LEARNING_RATE, BATCH_SIZE, Data,y_train,isShowF
         # print('第' + str(i) + '轮的测试loss为' + str(np.sqrt(test_temp_loss)))
         if (i + 1) % 50 == 0:
             file.write('Generation: ' + str(i + 1) + '. Loss = ' + str(temp_loss)+'\n')
-            #print('Generation: ' + str(i + 1) + '. Loss = ' + str(temp_loss)+'\n')
+            print('Generation: ' + str(i + 1) + '. Loss = ' + str(temp_loss)+'\n')
     flag = 1
     """if not (loss_vec[4999]<1 and loss_vec[4900]<1 and loss_vec[4950]<1):
         flag = 0"""
@@ -697,6 +698,7 @@ def GAselectFeature(CP,trainingData,element):
     # Define on-the-fly analysis.
     @engine.analysis_register
     class ConsoleOutputAnalysis(OnTheFlyAnalysis):
+
         interval = 1
         master_only = True
 
@@ -717,176 +719,215 @@ def GAselectFeature(CP,trainingData,element):
 
     return population.best_indv(engine.fitness).solution,engine.ori_fmax
 
+"""
+找到对应元素响应的特征峰
+"""
+def findResponseFeature():
+    reponse = []
+    for i in range(0,len(CP)):
+        #print(CP[i])
+        #print(TZFList2[i][2]/TZFList1[i][2])
+        #print(TZFList5[i][2]/TZFList1[i][2])
+        #print()
+        if TZFList2[i][2]/TZFList1[i][2]-2<0.5 and TZFList2[i][2]/TZFList1[i][2]-2>-0.5 and TZFList5[i][2]/TZFList1[i][2]-5<0.5 and TZFList5[i][2]/TZFList1[i][2]-5>-0.5:
+            reponse.append(i)
+
+    return reponse
+
+
 
 
 if __name__=='__main__':
 
-    elementList = ['Cu','Ba','Pb','Cd']
-    HIDDEN_LAYER = 10
-    for element in elementList:
-        minRMSE = 99999
-        # 特征谱线集
-        oldCP = getCP(element)
-        # 特征谱线和重要系数的列表
-        OldcpImportanceList = getCPandImportance(element)
-
-
-
-        CP = []
-        cpImportanceList = []
-        for i in range(0,len(oldCP)):
-            """if element=='Al':
-                if i!=4 and i!=10 and i!=8:
-                    CP.append(oldCP[i])
-                    cpImportanceList.append(OldcpImportanceList[i])
-            elif element=='Ba':
-                if i!=0 and i!=1 and i!=2 and i!=3 and i!=4 and i!=5:
-                    CP.append(oldCP[i])
-                    cpImportanceList.append(OldcpImportanceList[i])
-            elif element=='Cu':
-                if i==3 or i==7 or i==8 or i==12 or i==15 or i==16:
-                    CP.append(oldCP[i])
-                    cpImportanceList.append(OldcpImportanceList[i])
-            elif element=='Cd':
-                if i==2:  #or i==7 or i==8  or i==10 :
-                    CP.append(oldCP[i])
-                    cpImportanceList.append(OldcpImportanceList[i])
-            else:"""
-            CP.append(oldCP[i])
-            cpImportanceList.append(OldcpImportanceList[i])
-
-        """"
-        加载模拟的NIST数据
-        """
-        tenppmData = processDataList(loadFile('E:\\ANN data\\data\\' + element + '\\10ppm.txt'))
-        tweppmData = processDataList(loadFile('E:\\ANN data\\data\\' + element + '\\20ppm.txt'))
-        fifppmData = processDataList(loadFile('E:\\ANN data\\data\\' + element + '\\50ppm.txt'))
-
-        tenppmData = findAllPeakValue(CP,tenppmData)
-        tweppmData = findAllPeakValue(CP,tweppmData)
-        fifppmData = findAllPeakValue(CP,fifppmData)
-
-        print('10ppm real:')
-        print('')
-        rawData = rawDataToDataList('E:\\ANN data\\data\\realData\\'+element+'10.txt')
-        TZFList1 = findAllPeakValue(CP, rawData)
-
-        for TZF in TZFList1:
-            print(TZF)
-
-        print('20ppm real:')
-        print('')
-
-        rawData = rawDataToDataList('E:\\ANN data\\data\\realData\\'+element+'20.txt')
-        TZFList2 = findAllPeakValue(CP, rawData)
-
-        for TZF in TZFList2:
-            print(TZF)
-
-        print('50ppm real:')
-        print('')
-
-        rawData = rawDataToDataList('E:\\ANN data\\data\\realData\\'+element+'50.txt')
-        TZFList5 = findAllPeakValue(CP, rawData)
-
-        for TZF in TZFList5:
-            print(TZF)
-
-        timesList = []
-        for i in range(0, len(CP)):
-            timesList.append(((TZFList1[i][2] / tenppmData[i][2])+(TZFList2[i][2]/tweppmData[i][2])+(TZFList5[i][2]/fifppmData[i][2]))/3)
-            #timesList.append(TZFList1[i][2] / tenppmData[i][2])
-            #timesList.append(((TZFList1[i][2] / tenppmData[i][2])+(TZFList2[i][2]/tweppmData[i][2]))/2)
-
-        print(timesList)
-
-        # 获得神经网络训练集
-        trainingData = []
-        for i in range(1, 51):
-            rawData = findAllPeakValue(CP,processDataList(loadFile('E:\\ANN data\\data\\' + element + '\\' + str(i) + 'ppm.txt')))
-            rawData2 = findAllPeakValue(CP,processDataList(loadFile('E:\\ANN data\\data\\' + element + '\\' + str(i+0.5) + 'ppm.txt')))
-
-            for j in range(0,len(CP)):
-                rawData[j][2] = rawData[j][2] * timesList[j]
-                rawData2[j][2] = rawData2[j][2] * timesList[j]
-
-            oneData = []
-            for j in range(0, len(CP)):
-                oneData.append(rawData[j][2])
-            oneData.append(i)
-
-            trainingData.append(oneData)
-
-            oneData1 = []
-            for j in range(0, len(CP)):
-                oneData1.append(rawData2[j][2])
-            oneData1.append(i+0.5)
-
-            trainingData.append(oneData1)
-
-        """
-            使用SBS筛选出更好的特征集合
-        """
-        for learningRate in [ 0.0001,0.0005, 0.001, 0.005, 0.01,0.05, 0.1,0.5, 1]:
-            #for hidden in range(len(CP), 50):
-            sbs = SBS(trainANN,element,1,learningRate)
-            X_train  = np.array([x[0:(len(CP))] for x in trainingData])
-            y_train = np.array([x[len(CP)] for x in trainingData])
-
-            X_test_val = []
-
-            y_test = np.array([10,20,50])
-            #y = trainANN(element,7,0.001,5,X_train,y_train,0,tuple([6,7,8]))
-            #print(mean_squared_error(y,[10,20,50]))
-            sbs.fit(X_train,y_train,y_test)
-
-            k_feat = [len(k) for k in sbs.subsets_]
-            plt.plot(k_feat, sbs.scores_, marker='o')
-            plt.xlim([0, 20])
-            plt.xlabel('Number of features')
-            plt.grid()
-            plt.tight_layout()
-
-            file = open("E:\\JustForFun\\LIBS\\SBSlog"+element+".txt",'a')
-            minIndex = sbs.scores_.index(min(sbs.scores_))
-            file.write('current learning rate is:'+str(learningRate)+'\n')
-            file.write('hidden layer num is:'+str(sbs.hiddenlayernum_[minIndex])+'\n')
-            file.write(str(sbs.scores_)+'\n')
-            file.write('min loss is:'+'\n')
-            file.write(str(min(sbs.scores_))+'\n')
-            file.write('index is:'+str(minIndex)+'\n')
-            file.write('Found subsets is:'+'\n')
-            file.write(str(sbs.subsets_[minIndex])+'\n')
-            file.write('Found line is :'+'\n')
-            for INDEX in sbs.subsets_[minIndex]:
-                file.write(str(CP[INDEX])+' ')
-            file.write('\n')
-
-            file.close()
-
     """
+    :param 第一个参数是对应元素
+    :param 第二个参数为寻找特征峰方法
+    """
+    element = sys.argv[1]
+    optimizeFunc = sys.argv[2]
+    HIDDEN_LAYER = 10
+
+    minRMSE = 99999
+    # 特征谱线集
+    oldCP = getCP(element)
+    # 特征谱线和重要系数的列表
+    OldcpImportanceList = getCPandImportance(element)
+
+
+
+    CP = []
+    cpImportanceList = []
+    for i in range(0,len(oldCP)):
+        """if element=='Al':
+            if i!=4 and i!=10 and i!=8:
+                CP.append(oldCP[i])
+                cpImportanceList.append(OldcpImportanceList[i])
+        elif element=='Ba':
+            if i!=0 and i!=1 and i!=2 and i!=3 and i!=4 and i!=5:
+                CP.append(oldCP[i])
+                cpImportanceList.append(OldcpImportanceList[i])
+        elif element=='Cu':
+            if i==3 or i==7 or i==8 or i==12 or i==15 or i==16:
+                CP.append(oldCP[i])
+                cpImportanceList.append(OldcpImportanceList[i])
+        elif element=='Cd':
+            if i==2:  #or i==7 or i==8  or i==10 :
+                CP.append(oldCP[i])
+                cpImportanceList.append(OldcpImportanceList[i])
+        else:"""
+        CP.append(oldCP[i])
+        cpImportanceList.append(OldcpImportanceList[i])
+
+    """"
+    加载模拟的NIST数据
+    """
+    tenppmData = processDataList(loadFile('E:\\ANN data\\data\\' + element + '\\10ppm.txt'))
+    tweppmData = processDataList(loadFile('E:\\ANN data\\data\\' + element + '\\20ppm.txt'))
+    fifppmData = processDataList(loadFile('E:\\ANN data\\data\\' + element + '\\50ppm.txt'))
+
+    tenppmData = findAllPeakValue(CP,tenppmData)
+    tweppmData = findAllPeakValue(CP,tweppmData)
+    fifppmData = findAllPeakValue(CP,fifppmData)
+
+    print('10ppm real:')
+    print('')
+    rawData = rawDataToDataList('E:\\ANN data\\data\\realData\\'+element+'10.txt')
+    TZFList1 = findAllPeakValue(CP, rawData)
+
     for TZF in TZFList1:
         print(TZF)
 
-    print()
+    print('20ppm real:')
+    print('')
+
+    rawData = rawDataToDataList('E:\\ANN data\\data\\realData\\'+element+'20.txt')
+    TZFList2 = findAllPeakValue(CP, rawData)
+
     for TZF in TZFList2:
         print(TZF)
-    print()
+
+    print('50ppm real:')
+    print('')
+
+    rawData = rawDataToDataList('E:\\ANN data\\data\\realData\\'+element+'50.txt')
+    TZFList5 = findAllPeakValue(CP, rawData)
+
     for TZF in TZFList5:
         print(TZF)
+
+    timesList = []
+    for i in range(0, len(CP)):
+        timesList.append(((TZFList1[i][2] / tenppmData[i][2])+(TZFList2[i][2]/tweppmData[i][2])+(TZFList5[i][2]/fifppmData[i][2]))/3)
+        #timesList.append(TZFList1[i][2] / tenppmData[i][2])
+        #timesList.append(((TZFList1[i][2] / tenppmData[i][2])+(TZFList2[i][2]/tweppmData[i][2]))/2)
+
+    print(timesList)
+
+    # 获得神经网络训练集
+    trainingData = []
+    for i in range(1, 51):
+        rawData = findAllPeakValue(CP,processDataList(loadFile('E:\\ANN data\\data\\' + element + '\\' + str(i) + 'ppm.txt')))
+        rawData2 = findAllPeakValue(CP,processDataList(loadFile('E:\\ANN data\\data\\' + element + '\\' + str(i+0.5) + 'ppm.txt')))
+
+        for j in range(0,len(CP)):
+            rawData[j][2] = rawData[j][2] * timesList[j]
+            rawData2[j][2] = rawData2[j][2] * timesList[j]
+
+        oneData = []
+        for j in range(0, len(CP)):
+            oneData.append(rawData[j][2])
+        oneData.append(i)
+
+        trainingData.append(oneData)
+
+        oneData1 = []
+        for j in range(0, len(CP)):
+            oneData1.append(rawData2[j][2])
+        oneData1.append(i+0.5)
+
+        trainingData.append(oneData1)
+
+
+
     """
+        使用SBS筛选出更好的特征集合
+    """
+    #for learningRate in [ 0.0001,0.0005, 0.001, 0.005, 0.01,0.05, 0.1,0.5, 1]:
+        #for hidden in range(len(CP), 50):
+    learningRate = 0.05
+    if optimizeFunc=='SBS':
+        sbs = SBS(trainANN,element,1,learningRate)
+        X_train  = np.array([x[0:(len(CP))] for x in trainingData])
+        y_train = np.array([x[len(CP)] for x in trainingData])
 
-    #plt.show()
+        X_test_val = []
 
-    #print(sbs.scores_.index(min(sbs.scores_)))
-    
-    
+        y_test = np.array([10,20,50])
+        #y = trainANN(element,7,0.001,5,X_train,y_train,0,tuple([6,7,8]))
+        #print(mean_squared_error(y,[10,20,50]))
+        sbs.fit(X_train,y_train,y_test)
+
+        k_feat = [len(k) for k in sbs.subsets_]
+        plt.plot(k_feat, sbs.scores_, marker='o')
+        plt.xlim([0, 20])
+        plt.xlabel('Number of features')
+        plt.grid()
+        plt.tight_layout()
+
+        file = open("E:\\JustForFun\\LIBS\\SBSlog2"+element+".txt",'a')
+        minIndex = sbs.scores_.index(min(sbs.scores_))
+        file.write('current learning rate is:'+str(learningRate)+'\n')
+        #file.write('hidden layer num is:'+str(sbs.hiddenlayernum_[minIndex])+'\n')
+        file.write(str(sbs.scores_)+'\n')
+        file.write('min loss is:'+'\n')
+        file.write(str(min(sbs.scores_))+'\n')
+        file.write('index is:'+str(minIndex)+'\n')
+        file.write('Found subsets is:'+'\n')
+        file.write(str(sbs.subsets_[minIndex])+'\n')
+        file.write('Found line is :'+'\n')
+        for INDEX in sbs.subsets_[minIndex]:
+            file.write(str(CP[INDEX])+' ')
+        file.write('\n')
+
+        file.close()
+
+    """
+        使用遗传算法筛选特征
+        """
+    if optimizeFunc == 'GA':
+        optSolution, loss = GAselectFeature(CP, trainingData, element)
+
+        opt_bin = bin(int(optSolution[0]))[2:]
+        selected_feature = []
+        print("selected features is :")
+        for i in range(1, len(opt_bin) + 1):
+            if opt_bin[-i] == '1':
+                selected_feature.append(CP[-i])
+
+        print(selected_feature)
 
 
-    """for nu in [1,2,5]:
-           X_test_val.append(getRealTestData(X_train.max(axis=0),X_train.min(axis=0),nu))
+    #print(findResponseFeature())
+    X_train = np.array([x[0:(len(CP))] for x in trainingData])
+    y_train = np.array([x[len(CP)] for x in trainingData])
+    print("y_train")
+    print(y_train)
 
-       X_test = np.array(X_test_val)"""
+
+    X_test_val = []
+
+    y_test = np.array([10, 20, 50])
+    for iii in range(2,40):
+
+        result = trainANN(element,iii,learningRate,5,X_train,y_train,0,tuple(findResponseFeature()))
+    print(result)
+    for o in findResponseFeature():
+        print(CP[o])
+        print(TZFList2[o][2] / TZFList1[o][2])
+        print(TZFList5[o][2]/TZFList1[o][2])
+        print()
+
+
     #trainingDatat = np.array([x[0:11] for x in trainingData])
     #maxList1 = trainingDatat.max(axis=0)
     #minList1 = trainingDatat.min(axis=0)
@@ -899,34 +940,7 @@ if __name__=='__main__':
     ##maxList,minList = trainANN(element,18, 0.0001, 5, trainingData,0)
     #Pb
     #maxList, minList = trainANN(element, 18, 0.0001, 5, trainingData, 0)
-    """for learningRate in [0.00001,0.00002,0.00003,0.00005,0.0001,0.0002,0.0003,0.0005,0.001,0.002,0.003,0.005,0.01,0.02,0.03,0.05,0.1,0.2,0.5,1,0.3]:
-        for i in range(len(CP), 50):
-            trainANN(element,i,learningRate,5,trainingData,0)"""
 
-
-
-    """
-    使用遗传算法筛选特征
-    """
-    """
-    optSolution,loss = GAselectFeature(CP,trainingData,element)
-
-    opt_bin = bin(int(optSolution[0]))[2:]
-    selected_feature = []
-    print("selected features is :")
-    for i in range(1,len(opt_bin)+1):
-        if opt_bin[-i]=='1':
-            selected_feature.append(CP[-i])
-
-    print(selected_feature)
-    """
-
-
-
-    """"[94370860.92715232, 74355971.8969555, 392.3635511829468, 321.4634146341464, 5.642718026401211, 0.3425428719902997, 1.7219195305951387, 5.2931675242996, 1.7454860252287945]
-    [129635761.58940399, 107307551.9803229, 316.39379386487155, 235.4878048780488, 4.505937655302278, 0.25687749660121045, 1.7411630059736414, 5.472877358490566, 1.6498544259938954]
-    [210839161.86094412, 180347668.86078954, 232.28970824980817, 176.8253983359186, 3.9845804090513384, 0.20619044933959188, 1.7438758959749787, 5.49163807890223, 1.5385280743025573]
-    """
     
     
 

@@ -48,7 +48,7 @@ class SBS():
         score,besthidden = self._calc_score(X_train, y_train,
                                  y_test, self.indices_)
         self.scores_ = [score]
-        self.hiddenlayernum_ =[besthidden]
+        #self.hiddenlayernum_ =[besthidden]
 
         while dim > self.k_features:
             scores = []
