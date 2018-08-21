@@ -221,3 +221,590 @@ plt.legend(loc='upper left')
 plt.tight_layout()
 #plt.savefig('images/03_01.png', dpi=300)
 plt.show()
+
+
+
+# # Modeling class probabilities via logistic regression
+
+# ...
+
+# ### Logistic regression intuition and conditional probabilities
+
+# In[14]:
+
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+
+def sigmoid(z):
+    return 1.0 / (1.0 + np.exp(-z))
+
+z = np.arange(-7, 7, 0.1)
+phi_z = sigmoid(z)
+
+plt.plot(z, phi_z)
+plt.axvline(0.0, color='k')
+plt.ylim(-0.1, 1.1)
+plt.xlabel('z')
+plt.ylabel('$\phi (z)$')
+
+# y axis ticks and gridline
+plt.yticks([0.0, 0.5, 1.0])
+ax = plt.gca()
+ax.yaxis.grid(True)
+
+plt.tight_layout()
+#plt.savefig('images/03_02.png', dpi=300)
+plt.show()
+
+
+# In[15]:
+
+
+
+
+
+# ### Learning the weights of the logistic cost function
+
+# In[16]:
+
+
+def cost_1(z):
+    return - np.log(sigmoid(z))
+
+
+def cost_0(z):
+    return - np.log(1 - sigmoid(z))
+
+z = np.arange(-10, 10, 0.1)
+phi_z = sigmoid(z)
+
+c1 = [cost_1(x) for x in z]
+plt.plot(phi_z, c1, label='J(w) if y=1')
+
+c0 = [cost_0(x) for x in z]
+plt.plot(phi_z, c0, linestyle='--', label='J(w) if y=0')
+
+plt.ylim(0.0, 5.1)
+plt.xlim([0, 1])
+plt.xlabel('$\phi$(z)')
+plt.ylabel('J(w)')
+plt.legend(loc='best')
+plt.tight_layout()
+#plt.savefig('images/03_04.png', dpi=300)
+plt.show()
+
+
+# In[17]:
+
+
+class LogisticRegressionGD(object):
+    """Logistic Regression Classifier using gradient descent.
+
+    Parameters
+    ------------
+    eta : float
+      Learning rate (between 0.0 and 1.0)
+    n_iter : int
+      Passes over the training dataset.
+    random_state : int
+      Random number generator seed for random weight
+      initialization.
+
+
+    Attributes
+    -----------
+    w_ : 1d-array
+      Weights after fitting.
+    cost_ : list
+      Sum-of-squares cost function value in each epoch.
+
+    """
+    def __init__(self, eta=0.05, n_iter=100, random_state=1):
+        self.eta = eta
+        self.n_iter = n_iter
+        self.random_state = random_state
+
+    def fit(self, X, y):
+        """ Fit training data.
+
+        Parameters
+        ----------
+        X : {array-like}, shape = [n_samples, n_features]
+          Training vectors, where n_samples is the number of samples and
+          n_features is the number of features.
+        y : array-like, shape = [n_samples]
+          Target values.
+
+        Returns
+        -------
+        self : object
+
+        """
+        rgen = np.random.RandomState(self.random_state)
+        self.w_ = rgen.normal(loc=0.0, scale=0.01, size=1 + X.shape[1])
+        self.cost_ = []
+
+        for i in range(self.n_iter):
+            net_input = self.net_input(X)
+            output = self.activation(net_input)
+            errors = (y - output)
+            self.w_[1:] += self.eta * X.T.dot(errors)
+            self.w_[0] += self.eta * errors.sum()
+            
+            # note that we compute the logistic `cost` now
+            # instead of the sum of squared errors cost
+            cost = -y.dot(np.log(output)) - ((1 - y).dot(np.log(1 - output)))
+            self.cost_.append(cost)
+        return self
+    
+    def net_input(self, X):
+        """Calculate net input"""
+        return np.dot(X, self.w_[1:]) + self.w_[0]
+
+    def activation(self, z):
+        """Compute logistic sigmoid activation"""
+        return 1. / (1. + np.exp(-np.clip(z, -250, 250)))
+
+    def predict(self, X):
+        """Return class label after unit step"""
+        return np.where(self.net_input(X) >= 0.0, 1, 0)
+        # equivalent to:
+        # return np.where(self.activation(self.net_input(X)) >= 0.5, 1, 0)
+
+
+
+# In[18]:
+
+
+X_train_01_subset = X_train[(y_train == 0) | (y_train == 1)]
+y_train_01_subset = y_train[(y_train == 0) | (y_train == 1)]
+
+lrgd = LogisticRegressionGD(eta=0.05, n_iter=1000, random_state=1)
+lrgd.fit(X_train_01_subset,
+         y_train_01_subset)
+
+plot_decision_regions(X=X_train_01_subset, 
+                      y=y_train_01_subset,
+                      classifier=lrgd)
+
+plt.xlabel('petal length [standardized]')
+plt.ylabel('petal width [standardized]')
+plt.legend(loc='upper left')
+
+plt.tight_layout()
+#plt.savefig('images/03_05.png', dpi=300)
+plt.show()
+
+
+# ### Training a logistic regression model with scikit-learn
+
+# In[19]:
+
+
+from sklearn.linear_model import LogisticRegression
+
+lr = LogisticRegression(C=100.0, random_state=1)
+lr.fit(X_train_std, y_train)
+
+plot_decision_regions(X_combined_std, y_combined,
+                      classifier=lr, test_idx=range(105, 150))
+plt.xlabel('petal length [standardized]')
+plt.ylabel('petal width [standardized]')
+plt.legend(loc='upper left')
+plt.tight_layout()
+#plt.savefig('images/03_06.png', dpi=300)
+plt.show()
+
+
+# In[20]:
+
+
+lr.predict_proba(X_test_std[:3, :])
+
+
+# In[21]:
+
+
+lr.predict_proba(X_test_std[:3, :]).sum(axis=1)
+
+
+# In[22]:
+
+
+lr.predict_proba(X_test_std[:3, :]).argmax(axis=1)
+
+
+# In[23]:
+
+
+lr.predict(X_test_std[:3, :])
+
+
+# In[24]:
+
+
+lr.predict(X_test_std[0, :].reshape(1, -1))
+
+
+
+# ### Tackling overfitting via regularization
+
+# In[25]:
+
+
+
+
+# In[26]:
+
+
+weights, params = [], []
+for c in np.arange(-5, 5):
+    lr = LogisticRegression(C=10.**c, random_state=1)
+    lr.fit(X_train_std, y_train)
+    weights.append(lr.coef_[1])
+    params.append(10.**c)
+
+weights = np.array(weights)
+plt.plot(params, weights[:, 0],
+         label='petal length')
+plt.plot(params, weights[:, 1], linestyle='--',
+         label='petal width')
+plt.ylabel('weight coefficient')
+plt.xlabel('C')
+plt.legend(loc='upper left')
+plt.xscale('log')
+#plt.savefig('images/03_08.png', dpi=300)
+plt.show()
+
+
+
+# # Maximum margin classification with support vector machines
+
+# In[27]:
+
+
+
+
+# ## Maximum margin intuition
+
+# ...
+
+# ## Dealing with the nonlinearly separable case using slack variables
+
+# In[28]:
+
+
+
+
+# In[29]:
+
+
+from sklearn.svm import SVC
+
+svm = SVC(kernel='linear', C=1.0, random_state=1)
+svm.fit(X_train_std, y_train)
+
+plot_decision_regions(X_combined_std, 
+                      y_combined,
+                      classifier=svm, 
+                      test_idx=range(105, 150))
+plt.xlabel('petal length [standardized]')
+plt.ylabel('petal width [standardized]')
+plt.legend(loc='upper left')
+plt.tight_layout()
+#plt.savefig('images/03_11.png', dpi=300)
+plt.show()
+
+
+# ## Alternative implementations in scikit-learn
+
+# In[30]:
+
+
+from sklearn.linear_model import SGDClassifier
+
+ppn = SGDClassifier(loss='perceptron', n_iter=1000)
+lr = SGDClassifier(loss='log', n_iter=1000)
+svm = SGDClassifier(loss='hinge', n_iter=1000)
+
+
+# **Note**
+# 
+# - You can replace `Perceptron(n_iter, ...)` by `Perceptron(max_iter, ...)` in scikit-learn >= 0.19. The `n_iter` parameter is used here deriberately, because some people still use scikit-learn 0.18.
+
+
+# # Solving non-linear problems using a kernel SVM
+
+# In[31]:
+
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+np.random.seed(1)
+X_xor = np.random.randn(200, 2)
+y_xor = np.logical_xor(X_xor[:, 0] > 0,
+                       X_xor[:, 1] > 0)
+y_xor = np.where(y_xor, 1, -1)
+
+plt.scatter(X_xor[y_xor == 1, 0],
+            X_xor[y_xor == 1, 1],
+            c='b', marker='x',
+            label='1')
+plt.scatter(X_xor[y_xor == -1, 0],
+            X_xor[y_xor == -1, 1],
+            c='r',
+            marker='s',
+            label='-1')
+
+plt.xlim([-3, 3])
+plt.ylim([-3, 3])
+plt.legend(loc='best')
+plt.tight_layout()
+#plt.savefig('images/03_12.png', dpi=300)
+plt.show()
+
+
+# In[32]:
+
+
+
+
+
+# ## Using the kernel trick to find separating hyperplanes in higher dimensional space
+
+# In[33]:
+
+
+svm = SVC(kernel='rbf', random_state=1, gamma=0.10, C=10.0)
+svm.fit(X_xor, y_xor)
+plot_decision_regions(X_xor, y_xor,
+                      classifier=svm)
+
+plt.legend(loc='upper left')
+plt.tight_layout()
+#plt.savefig('images/03_14.png', dpi=300)
+plt.show()
+
+
+# In[34]:
+
+
+from sklearn.svm import SVC
+
+svm = SVC(kernel='rbf', random_state=1, gamma=0.2, C=1.0)
+svm.fit(X_train_std, y_train)
+
+plot_decision_regions(X_combined_std, y_combined,
+                      classifier=svm, test_idx=range(105, 150))
+plt.xlabel('petal length [standardized]')
+plt.ylabel('petal width [standardized]')
+plt.legend(loc='upper left')
+plt.tight_layout()
+#plt.savefig('images/03_15.png', dpi=300)
+plt.show()
+
+
+# In[35]:
+
+
+svm = SVC(kernel='rbf', random_state=1, gamma=100.0, C=1.0)
+svm.fit(X_train_std, y_train)
+
+plot_decision_regions(X_combined_std, y_combined, 
+                      classifier=svm, test_idx=range(105, 150))
+plt.xlabel('petal length [standardized]')
+plt.ylabel('petal width [standardized]')
+plt.legend(loc='upper left')
+plt.tight_layout()
+#plt.savefig('images/03_16.png', dpi=300)
+plt.show()
+
+
+
+# # Decision tree learning
+
+# In[36]:
+
+
+
+
+# In[37]:
+
+
+
+
+
+# ## Maximizing information gain - getting the most bang for the buck
+
+# In[38]:
+
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+
+def gini(p):
+    return p * (1 - p) + (1 - p) * (1 - (1 - p))
+
+
+def entropy(p):
+    return - p * np.log2(p) - (1 - p) * np.log2((1 - p))
+
+
+def error(p):
+    return 1 - np.max([p, 1 - p])
+
+x = np.arange(0.0, 1.0, 0.01)
+
+ent = [entropy(p) if p != 0 else None for p in x]
+sc_ent = [e * 0.5 if e else None for e in ent]
+err = [error(i) for i in x]
+
+fig = plt.figure()
+ax = plt.subplot(111)
+for i, lab, ls, c, in zip([ent, sc_ent, gini(x), err], 
+                          ['Entropy', 'Entropy (scaled)', 
+                           'Gini Impurity', 'Misclassification Error'],
+                          ['-', '-', '--', '-.'],
+                          ['black', 'lightgray', 'red', 'green', 'cyan']):
+    line = ax.plot(x, i, label=lab, linestyle=ls, lw=2, color=c)
+
+ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.15),
+          ncol=5, fancybox=True, shadow=False)
+
+ax.axhline(y=0.5, linewidth=1, color='k', linestyle='--')
+ax.axhline(y=1.0, linewidth=1, color='k', linestyle='--')
+plt.ylim([0, 1.1])
+plt.xlabel('p(i=1)')
+plt.ylabel('Impurity Index')
+#plt.savefig('images/03_19.png', dpi=300, bbox_inches='tight')
+plt.show()
+
+
+
+# ## Building a decision tree
+
+# In[39]:
+
+
+from sklearn.tree import DecisionTreeClassifier
+
+tree = DecisionTreeClassifier(criterion='gini', 
+                              max_depth=4, 
+                              random_state=1)
+tree.fit(X_train, y_train)
+
+X_combined = np.vstack((X_train, X_test))
+y_combined = np.hstack((y_train, y_test))
+plot_decision_regions(X_combined, y_combined, 
+                      classifier=tree, test_idx=range(105, 150))
+
+plt.xlabel('petal length [cm]')
+plt.ylabel('petal width [cm]')
+plt.legend(loc='upper left')
+plt.tight_layout()
+#plt.savefig('images/03_20.png', dpi=300)
+plt.show()
+
+
+
+# In[40]:
+
+
+from pydotplus import graph_from_dot_data
+from sklearn.tree import export_graphviz
+
+dot_data = export_graphviz(tree,
+                           filled=True, 
+                           rounded=True,
+                           class_names=['Setosa', 
+                                        'Versicolor',
+                                        'Virginica'],
+                           feature_names=['petal length', 
+                                          'petal width'],
+                           out_file=None) 
+graph = graph_from_dot_data(dot_data) 
+graph.write_png('tree.png') 
+
+
+# In[41]:
+
+
+
+
+
+# ## Combining weak to strong learners via random forests
+
+# In[42]:
+
+
+from sklearn.ensemble import RandomForestClassifier
+
+forest = RandomForestClassifier(criterion='gini',
+                                n_estimators=25, 
+                                random_state=1,
+                                n_jobs=2)
+forest.fit(X_train, y_train)
+
+plot_decision_regions(X_combined, y_combined, 
+                      classifier=forest, test_idx=range(105, 150))
+
+plt.xlabel('petal length [cm]')
+plt.ylabel('petal width [cm]')
+plt.legend(loc='upper left')
+plt.tight_layout()
+#plt.savefig('images/03_22.png', dpi=300)
+plt.show()
+
+
+
+# # K-nearest neighbors - a lazy learning algorithm
+
+# In[43]:
+
+
+
+
+# In[44]:
+
+
+from sklearn.neighbors import KNeighborsClassifier
+
+knn = KNeighborsClassifier(n_neighbors=5, 
+                           p=2, 
+                           metric='minkowski')
+knn.fit(X_train_std, y_train)
+
+plot_decision_regions(X_combined_std, y_combined, 
+                      classifier=knn, test_idx=range(105, 150))
+
+plt.xlabel('petal length [standardized]')
+plt.ylabel('petal width [standardized]')
+plt.legend(loc='upper left')
+plt.tight_layout()
+#plt.savefig('images/03_24.png', dpi=300)
+plt.show()
+
+
+
+# # Summary
+
+# ...
+
+# ---
+# 
+# Readers may ignore the next cell.
+
+# In[ ]:
+
+
+
+
+# In[ ]:
+
+
+
+
