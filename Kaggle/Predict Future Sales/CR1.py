@@ -45,3 +45,17 @@ sns.boxplot(x=train.item_price)
 #决定移除item_cnt_day>1000和item_price>1000000的记录
 train = train[train.item_cnt_day<100001]
 train = train[train.item_price<1001]
+
+#有一条记录中的item_price小于零 将其移除
+train =train[train.item_price>0]
+
+#有一些shop是重名的 根据商店名更正相应的唯一的shop_id
+# Якутск Орджоникидзе, 56
+train.loc[train.shop_id == 0, 'shop_id'] = 57
+test.loc[test.shop_id == 0, 'shop_id'] = 57
+# Якутск ТЦ "Центральный"
+train.loc[train.shop_id == 1, 'shop_id'] = 58
+test.loc[test.shop_id == 1, 'shop_id'] = 58
+# Жуковский ул. Чкалова 39м²
+train.loc[train.shop_id == 10, 'shop_id'] = 11
+test.loc[test.shop_id == 10, 'shop_id'] = 11
