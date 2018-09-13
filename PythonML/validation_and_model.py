@@ -20,6 +20,10 @@ from sklearn.model_selection import StratifiedKFold
 from sklearn.model_selection import cross_val_score
 import matplotlib.pyplot as plt
 from sklearn.model_selection import learning_curve
+from sklearn.model_selection import validation_curve
+
+from sklearn.model_selection import GridSearchCV
+from sklearn.svm import SVC
 
 
 
@@ -87,7 +91,8 @@ def main():
     print('CV accuracy: %.3f +/- %.3f' % (np.mean(scores), np.std(scores)))
 
 
-    print('4.Testing learning curve and validation curve'+20*'-')
+    #绘制样本大小和训练准确率以及交叉验证准确率之间关系
+    print('4.Testing learning curve '+20*'-')
     #a demo of learning curve and validation curve
     pipe_lr = make_pipeline(StandardScaler(),
                             LogisticRegression(penalty='l2', random_state=1))
@@ -131,6 +136,81 @@ def main():
     plt.tight_layout()
 
     plt.show()
+
+    #绘制的是模型参数与准确率之间的关系
+    print('5.Testing validation curve'+20*'-')
+    param_range = [0.001, 0.01, 0.1, 1.0, 10.0, 100.0]
+    train_scores, test_scores = validation_curve(
+        estimator=pipe_lr,
+        X=X_train,
+        y=y_train,
+        param_name='logisticregression__C',
+        param_range=param_range,
+        cv=10)
+
+    train_mean = np.mean(train_scores, axis=1)
+    train_std = np.std(train_scores, axis=1)
+    test_mean = np.mean(test_scores, axis=1)
+    test_std = np.std(test_scores, axis=1)
+
+    plt.plot(param_range, train_mean,
+             color='blue', marker='o',
+             markersize=5, label='training accuracy')
+
+    plt.fill_between(param_range, train_mean + train_std,
+                     train_mean - train_std, alpha=0.15,
+                     color='blue')
+
+    plt.plot(param_range, test_mean,
+             color='green', linestyle='--',
+             marker='s', markersize=5,
+             label='validation accuracy')
+
+    plt.fill_between(param_range,
+                     test_mean + test_std,
+                     test_mean - test_std,
+                     alpha=0.15, color='green')
+
+    plt.grid()
+    plt.xscale('log')
+    plt.legend(loc='lower right')
+    plt.xlabel('Parameter C')
+    plt.ylabel('Accuracy')
+    plt.ylim([0.8, 1.0])
+    plt.tight_layout()
+    # plt.savefig('images/06_06.png', dpi=300)
+    plt.show()
+
+
+    #网格搜索调优超参
+    print('6.Grid Search testing '+20*'-')
+
+    pipe_svc = make_pipeline(StandardScaler(),
+                             SVC(random_state=1))
+
+    param_range = [0.0001, 0.001, 0.01, 0.1, 1.0, 10.0, 100.0, 1000.0]
+    #字典的方式指定几个超参
+    param_grid = [{'svc__C': param_range,
+                   'svc__kernel': ['linear']},
+                  {'svc__C': param_range,
+                   'svc__gamma': param_range,
+                   'svc__kernel': ['rbf']}]
+
+    gs = GridSearchCV(estimator=pipe_svc,
+                      param_grid=param_grid,
+                      scoring='accuracy',
+                      cv=10,
+                      n_jobs=-1)
+    gs = gs.fit(X_train, y_train)
+    print(gs.best_score_)
+    print(gs.best_params_)
+
+    clf= gs.best_estimator_
+    clf.fit(X_train,y_train)
+
+    print('Test accuracy: %3f' % clf.score(X_test,y_test))
+    #也可以使用RandomizedSearchCV 抽取出随机参数组合
+
 
 
 
