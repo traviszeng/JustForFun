@@ -54,6 +54,9 @@ def main():
                                                         stratify=y,
                                                         random_state=1)
 
+    print('ytest')
+    print(y_test)
+
     #使用流水线将StandardScaler、PCA以及LogisticRegression串联起来
     print("1.using pipeline with standardScaler and PCA"+20*'-')
     pipe_lr = make_pipeline(StandardScaler(),
