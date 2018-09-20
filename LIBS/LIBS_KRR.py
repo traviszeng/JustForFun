@@ -11,6 +11,8 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import MinMaxScaler
+from sklearn.model_selection import learning_curve
+import matplotlib.pyplot as plt
 
 import numpy as np
 
@@ -227,6 +229,103 @@ if __name__=='__main__':
         print('Mean Absolute Error:', metrics.mean_absolute_error(y_test, y_pred))
         print('Mean Squared Error:', metrics.mean_squared_error(y_test, y_pred))
         print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test, y_pred)))
+
+        print('4.Testing learning curve ' + 20 * '-')
+        # a demo of learning curve and validation curve
+
+        """
+        这个函数的作用为：对于不同大小的训练集，确定交叉验证训练和测试的分数。
+        一个交叉验证发生器将整个数据集分割k次，分割成训练集和测试集。
+        不同大小的训练集的子集将会被用来训练评估器并且对于每一个大小的训练子集都会产生一个分数，然后测试集的分数也会计算。
+        然后，对于每一个训练子集，运行k次之后的所有这些分数将会被平均。
+
+            estimator：所使用的分类器
+
+            X:array-like, shape (n_samples, n_features)
+
+             训练向量，n_samples是样本的数量，n_features是特征的数量
+
+            y:array-like, shape (n_samples) or (n_samples, n_features), optional
+
+            目标相对于X分类或者回归
+
+            train_sizes:array-like, shape (n_ticks,), dtype float or int
+
+            训练样本的相对的或绝对的数字，这些量的样本将会生成learning curve。如果dtype是float，他将会被视为最大数量训练集的一部分（这个由所选择的验证方法所决定）。否则，他将会被视为训练集的绝对尺寸。要注意的是，对于分类而言，样本的大小必须要充分大，达到对于每一个分类都至少包含一个样本的情况。
+
+            cv:int, cross-validation generator or an iterable, optional
+
+            确定交叉验证的分离策略
+
+            --None，使用默认的3-fold cross-validation,
+
+            --integer,确定是几折交叉验证
+
+            --一个作为交叉验证生成器的对象
+
+            --一个被应用于训练/测试分离的迭代器
+
+            verbose : integer, optional
+
+            控制冗余：越高，有越多的信息
+
+
+
+            返回值：
+
+            train_sizes_abs：array, shape = (n_unique_ticks,), dtype int
+
+            用于生成learning curve的训练集的样本数。由于重复的输入将会被删除，所以ticks可能会少于n_ticks.
+
+            train_scores : array, shape (n_ticks, n_cv_folds)
+
+            在训练集上的分数
+
+            test_scores : array, shape (n_ticks, n_cv_folds)
+
+            在测试集上的分数
+        """
+        train_sizes, train_scores, test_scores = learning_curve(estimator=clf,
+                                                                X=X,
+                                                                y=Y,
+                                                                train_sizes=np.linspace(0.1, 1.0, 10),
+                                                                cv=10,
+                                                                n_jobs=-1,
+                                                                scoring='neg_mean_squared_error')
+
+        train_mean = np.mean(train_scores, axis=1)
+        train_std = np.std(train_scores, axis=1)
+        test_mean = np.mean(test_scores, axis=1)
+        test_std = np.std(test_scores, axis=1)
+
+        plt.plot(train_sizes, train_mean,
+                 color='blue', marker='o',
+                 markersize=5, label='training accuracy')
+
+        plt.fill_between(train_sizes,
+                         train_mean + train_std,
+                         train_mean - train_std,
+                         alpha=0.15, color='blue')
+
+        plt.plot(train_sizes, test_mean,
+                 color='green', linestyle='--',
+                 marker='s', markersize=5,
+                 label='validation accuracy')
+
+        plt.fill_between(train_sizes,
+                         test_mean + test_std,
+                         test_mean - test_std,
+                         alpha=0.15, color='green')
+
+        plt.grid()
+        plt.xlabel('Number of training samples')
+        plt.ylabel('Neg MSE')
+        plt.legend(loc='lower right')
+
+        plt.ylim([-1000, 1000])
+        plt.tight_layout()
+
+        plt.show()
 
 
 
