@@ -5,6 +5,10 @@ see:http://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html
 
 
 """
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
+from sklearn.pipeline import make_pipeline
+from sklearn.model_selection import GridSearchCV
 from sklearn.svm import SVR
 import numpy as np
 
@@ -107,7 +111,7 @@ def findPeakValueOfOneWave(dataList,wave):
     return maxWave,Max
 
 
-def SVRTrain():
+def SVRTrainDemo():
     n_samples,n_features = 10,5
 
 
@@ -133,12 +137,12 @@ if __name__=='__main__':
 
     for element in elementList:
 
-
+    #element = 'Cu'
         print('Testing element is '+element)
         print('1.Get element characteristic peaks'+20*'-')
         CP = getCP(element)
         #print(CP)
-
+        print()
         print('2.Get element peak according to NIST'+20*'-')
         trainingData = []
         X = []
@@ -168,9 +172,7 @@ if __name__=='__main__':
 
         #print(train_X)
         #print(train_y)
-        from sklearn.preprocessing import StandardScaler
-        from sklearn.model_selection import train_test_split
-        from sklearn.pipeline import make_pipeline
+
 
 
         X_train, X_test, y_train, y_test = train_test_split(X,
@@ -187,6 +189,47 @@ if __name__=='__main__':
 
         y_pred = pipe_lr.predict(X_test)
         print('Test Accuracy: %.3f' % pipe_lr.score(X_test, y_test))
+
+        from sklearn import metrics
+
+        print('Mean Absolute Error:', metrics.mean_absolute_error(y_test, y_pred))
+        print('Mean Squared Error:', metrics.mean_squared_error(y_test, y_pred))
+        print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test, y_pred)))
+
+        print()
+        print('3.Optimize params using Grid Search'+20*'-')
+        pipe_optimize = make_pipeline(StandardScaler(),
+                                      SVR())
+
+        param_range = [0.0001, 0.001, 0.01, 0.1, 1.0, 10.0, 100.0, 1000.0]
+        # 字典的方式指定几个超参
+        param_grid = [{'svr__C': param_range,
+                       'svr__kernel': ['linear']},
+                      {'svr__C': param_range,
+                       'svr__gamma': param_range,
+                       'svr__kernel': ['rbf']}]
+
+
+        gs = GridSearchCV(estimator=pipe_optimize,
+                          param_grid=param_grid,
+                          scoring='neg_mean_absolute_error',
+                          cv=10,
+                          n_jobs=-1)
+
+        gs = gs.fit(X_train, y_train)
+        print(gs.best_score_)
+        print(gs.best_params_)
+
+        clf = gs.best_estimator_
+        clf.fit(X_train, y_train)
+        y_pred = clf.predict(X_test)
+
+        print('Test accuracy: %3f' % clf.score(X_test, y_test))
+        print('Mean Absolute Error:', metrics.mean_absolute_error(y_test, y_pred))
+        print('Mean Squared Error:', metrics.mean_squared_error(y_test, y_pred))
+        print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test, y_pred)))
+
+
 
 
 
