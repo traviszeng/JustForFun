@@ -212,7 +212,7 @@ if __name__=='__main__':
         plt.title('Variable Importance')
         plt.show()
         """
-        plt.show()
+        #plt.show()
 
         print('4.Testing learning curve ' + 20 * '-')
         # a demo of learning curve and validation curve
@@ -282,6 +282,7 @@ if __name__=='__main__':
         test_mean = np.mean(test_scores, axis=1)
         test_std = np.std(test_scores, axis=1)
 
+        plt.subplot(1, 2, 2)
         plt.plot(train_sizes, train_mean,
                  color='blue', marker='o',
                  markersize=5, label='training accuracy')
@@ -306,7 +307,7 @@ if __name__=='__main__':
         plt.ylabel('Neg MSE')
         plt.legend(loc='lower right')
 
-        plt.ylim([-1000, 1000])
+        plt.ylim([-700,5])
         plt.tight_layout()
 
         plt.show()
