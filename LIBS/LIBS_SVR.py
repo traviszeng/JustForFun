@@ -5,10 +5,12 @@ see:http://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html
 
 
 """
-from sklearn.preprocessing import StandardScaler
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import make_pipeline
 from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import learning_curve
 from sklearn.svm import SVR
 import numpy as np
 
@@ -180,7 +182,7 @@ if __name__=='__main__':
                                                             test_size=0.20)
 
 
-        pipe_lr = make_pipeline(StandardScaler(),
+        pipe_lr = make_pipeline(MinMaxScaler(),
                                 SVR(C=1.0,epsilon=0.2))
 
 
@@ -198,7 +200,7 @@ if __name__=='__main__':
 
         print()
         print('3.Optimize params using Grid Search'+20*'-')
-        pipe_optimize = make_pipeline(StandardScaler(),
+        pipe_optimize = make_pipeline(MinMaxScaler(),
                                       SVR())
 
         param_range = [0.0001, 0.001, 0.01, 0.1, 1.0, 10.0, 100.0, 1000.0]
@@ -228,6 +230,52 @@ if __name__=='__main__':
         print('Mean Absolute Error:', metrics.mean_absolute_error(y_test, y_pred))
         print('Mean Squared Error:', metrics.mean_squared_error(y_test, y_pred))
         print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test, y_pred)))
+
+        """
+        print('4.Testing learning curve ' + 20 * '-')
+        # a demo of learning curve and validation curve
+
+
+        train_sizes, train_scores, test_scores = learning_curve(estimator=pipe_optimize,
+                                                                X=X_train,
+                                                                y=y_train,
+                                                                train_sizes=np.linspace(0.1, 1.0, 10),
+                                                                cv=10,
+                                                                n_jobs=-1)
+
+        train_mean = np.mean(train_scores, axis=1)
+        train_std = np.std(train_scores, axis=1)
+        test_mean = np.mean(test_scores, axis=1)
+        test_std = np.std(test_scores, axis=1)
+
+        plt.plot(train_sizes, train_mean,
+                 color='blue', marker='o',
+                 markersize=5, label='training accuracy')
+
+        plt.fill_between(train_sizes,
+                         train_mean + train_std,
+                         train_mean - train_std,
+                         alpha=0.15, color='blue')
+
+        plt.plot(train_sizes, test_mean,
+                 color='green', linestyle='--',
+                 marker='s', markersize=5,
+                 label='validation accuracy')
+
+        plt.fill_between(train_sizes,
+                         test_mean + test_std,
+                         test_mean - test_std,
+                         alpha=0.15, color='green')
+
+        plt.grid()
+        plt.xlabel('Number of training samples')
+        plt.ylabel('Accuracy')
+        plt.legend(loc='lower right')
+        plt.ylim([0, 1.03])
+        plt.tight_layout()
+
+        plt.show()
+        """
 
 
 

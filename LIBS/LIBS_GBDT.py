@@ -1,18 +1,17 @@
 """
+    LIBS gradient boosting regression
 
-    Kernel ridge regression demo
-    Created on 2018/9/16
 """
 
-from sklearn.kernel_ridge import KernelRidge
-from sklearn import metrics
-from sklearn.model_selection import GridSearchCV
-from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import train_test_split
-from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import MinMaxScaler
-
 import numpy as np
+import matplotlib.pyplot as plt
+
+from sklearn import ensemble
+from sklearn import datasets
+from sklearn.utils import shuffle
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error
+
 
 """
 加载NIST库文件
@@ -112,40 +111,30 @@ def findPeakValueOfOneWave(dataList,wave):
 
     return maxWave,Max
 
+# #############################################################################
+# Load data
+#boston = datasets.load_boston()
+#X, y = shuffle(boston.data, boston.target, random_state=13)
 
-def SVRTrain():
-    n_samples,n_features = 10,5
-
-
-    y = np.random.randn(n_samples)
-    x = np.random.randn(n_samples,n_features)
-    print('x:')
-    print(x)
-    print('Y =')
-    print(y)
-
-    clf = SVR(C=1.0,epsilon=0.2)
-    clf.fit(x,y)
-
-    print(clf.predict([x[0]]))
-
-    print(clf.score(x,y))
-
-
+#X = X.astype(np.float32)
+#offset = int(X.shape[0] * 0.9)
+#X_train, y_train = X[:offset], y[:offset]
+#X_test, y_test = X[offset:], y[offset:]\
 
 if __name__=='__main__':
 
-    elementList = ['Cu','Ba','Pb','Cd']
+    elementList = ['Cu', 'Ba', 'Pb', 'Cd']
 
     for element in elementList:
 
 
-        print('Testing element is '+element)
-        print('1.Get element characteristic peaks'+20*'-')
+        print('Testing element is ' + element)
+        print('1.Get element characteristic peaks' + 20 * '-')
         CP = getCP(element)
-        #print(CP)
+        # print(CP)
 
-        print('2.Get element peak according to NIST'+20*'-')
+        print()
+        print('2.Get element peak according to NIST' + 20 * '-')
         trainingData = []
         X = []
         Y = []
@@ -169,12 +158,7 @@ if __name__=='__main__':
 
             X.append(x)
 
-            Y.append(i+0.5)
-
-
-        #print(train_X)
-        #print(train_y)
-
+            Y.append(i + 0.5)
 
 
         X_train, X_test, y_train, y_test = train_test_split(X,
@@ -182,52 +166,49 @@ if __name__=='__main__':
                                                             test_size=0.20)
 
 
+        # #############################################################################
+        # Fit regression model
+        params = {'n_estimators': 500, 'max_depth': 4, 'min_samples_split': 2,
+                  'learning_rate': 0.01, 'loss': 'ls'}
+        clf = ensemble.GradientBoostingRegressor(**params)
 
-        pipe_lr = make_pipeline(MinMaxScaler(),
-                                KernelRidge(alpha=1.0))
-
-
-        pipe_lr.fit(X_train,y_train)
-
-
-        y_pred = pipe_lr.predict(X_test)
-        print('Test Accuracy: %.3f' % pipe_lr.score(X_test, y_test))
-        print('Mean Absolute Error:', metrics.mean_absolute_error(y_test, y_pred))
-        print('Mean Squared Error:', metrics.mean_squared_error(y_test, y_pred))
-        print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test, y_pred)))
-
-        print()
-        print('3.Optimize params using Grid Search' + 20 * '-')
-        pipe_optimize = make_pipeline(MinMaxScaler(),
-                                      KernelRidge())
-
-        param_range = [0.0001, 0.001, 0.01, 0.1, 1.0, 10.0, 100.0, 1000.0]
-        # 字典的方式指定几个超参
-        param_grid = [{'kernelridge__alpha': param_range,
-                       'kernelridge__kernel': ['linear']},
-                      {'kernelridge__alpha': param_range,
-                       'kernelridge__gamma': param_range,
-                       'kernelridge__kernel': ['rbf']}]
-
-        gs = GridSearchCV(estimator=pipe_optimize,
-                          param_grid=param_grid,
-                          scoring='neg_mean_absolute_error',
-                          cv=10,
-                          n_jobs=-1)
-
-        gs = gs.fit(X_train, y_train)
-        print(gs.best_score_)
-        print(gs.best_params_)
-
-        clf = gs.best_estimator_
         clf.fit(X_train, y_train)
-        y_pred = clf.predict(X_test)
+        mse = mean_squared_error(y_test, clf.predict(X_test))
+        print("MSE: %.4f" % mse)
 
-        print('Test accuracy: %3f' % clf.score(X_test, y_test))
-        print('Mean Absolute Error:', metrics.mean_absolute_error(y_test, y_pred))
-        print('Mean Squared Error:', metrics.mean_squared_error(y_test, y_pred))
-        print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test, y_pred)))
+        # #############################################################################
+        # Plot training deviance
 
+        # compute test set deviance
+        test_score = np.zeros((params['n_estimators'],), dtype=np.float64)
 
+        for i, y_pred in enumerate(clf.staged_predict(X_test)):
+            test_score[i] = clf.loss_(y_test, y_pred)
 
+        plt.figure(figsize=(12, 6))
+        plt.subplot(1, 2, 1)
+        plt.title('Deviance')
+        plt.plot(np.arange(params['n_estimators']) + 1, clf.train_score_, 'b-',
+                 label='Training Set Deviance')
+        plt.plot(np.arange(params['n_estimators']) + 1, test_score, 'r-',
+                 label='Test Set Deviance')
+        plt.legend(loc='upper right')
+        plt.xlabel('Boosting Iterations')
+        plt.ylabel('Deviance')
 
+        # #############################################################################
+        # Plot feature importance
+        """
+        feature_importance = clf.feature_importances_
+        # make importances relative to max importance
+        feature_importance = 100.0 * (feature_importance / feature_importance.max())
+        sorted_idx = np.argsort(feature_importance)
+        pos = np.arange(sorted_idx.shape[0]) + .5
+        plt.subplot(1, 2, 2)
+        plt.barh(pos, feature_importance[sorted_idx], align='center')
+        plt.yticks(pos, boston.feature_names[sorted_idx])
+        plt.xlabel('Relative Importance')
+        plt.title('Variable Importance')
+        plt.show()
+        """
+        plt.show()
