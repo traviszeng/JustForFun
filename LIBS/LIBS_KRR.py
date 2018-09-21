@@ -138,8 +138,9 @@ def SVRTrain():
 if __name__=='__main__':
 
     elementList = ['Cu','Ba','Pb','Cd']
-
+    index = 0
     for element in elementList:
+        index += 1
 
 
         print('Testing element is '+element)
@@ -285,7 +286,7 @@ if __name__=='__main__':
 
             在测试集上的分数
         """
-        train_sizes, train_scores, test_scores = learning_curve(estimator=clf,
+        train_sizes, train_scores, test_scores = learning_curve(estimator=KernelRidge(),
                                                                 X=X,
                                                                 y=Y,
                                                                 train_sizes=np.linspace(0.1, 1.0, 10),
@@ -297,7 +298,7 @@ if __name__=='__main__':
         train_std = np.std(train_scores, axis=1)
         test_mean = np.mean(test_scores, axis=1)
         test_std = np.std(test_scores, axis=1)
-
+        plt.subplot(2,2,index)
         plt.plot(train_sizes, train_mean,
                  color='blue', marker='o',
                  markersize=5, label='training accuracy')
@@ -325,7 +326,7 @@ if __name__=='__main__':
         plt.ylim([-1000, 1000])
         plt.tight_layout()
 
-        plt.show()
+    plt.show()
 
 
 

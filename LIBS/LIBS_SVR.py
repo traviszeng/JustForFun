@@ -137,8 +137,9 @@ def SVRTrainDemo():
 if __name__=='__main__':
 
     elementList = ['Cu','Ba','Pb','Cd']
-
+    index = 0
     for element in elementList:
+        index+=1
 
     #element = 'Cu'
         print('Testing element is '+element)
@@ -288,7 +289,10 @@ if __name__=='__main__':
             
             在测试集上的分数
         """
-        train_sizes, train_scores, test_scores = learning_curve(estimator=clf,
+
+        pipe_new = make_pipeline(MinMaxScaler(),
+                                 SVR())
+        train_sizes, train_scores, test_scores = learning_curve(estimator=pipe_new,
                                                                 X=X,
                                                                 y=Y,
                                                                 train_sizes=np.linspace(0.1, 1.0, 10),
@@ -301,6 +305,7 @@ if __name__=='__main__':
         test_mean = np.mean(test_scores, axis=1)
         test_std = np.std(test_scores, axis=1)
 
+        plt.subplot(2,2,index)
         plt.plot(train_sizes, train_mean,
                  color='blue', marker='o',
                  markersize=5, label='training accuracy')
@@ -328,10 +333,10 @@ if __name__=='__main__':
         plt.ylim([-1000,1000])
         plt.tight_layout()
 
-        plt.show()
+    plt.show()
 
-        print('5.Use learning curve to get proper params' + 20 * '-')
-        param_range = [0.0001, 0.001, 0.01, 0.1, 1.0, 10.0, 100.0, 1000.0]
+    print('5.Use learning curve to get proper params' + 20 * '-')
+    param_range = [0.0001, 0.001, 0.01, 0.1, 1.0, 10.0, 100.0, 1000.0]
 
 
 
