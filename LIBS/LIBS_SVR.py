@@ -296,7 +296,7 @@ if __name__=='__main__':
                                                                 X=X,
                                                                 y=Y,
                                                                 train_sizes=np.linspace(0.1, 1.0, 10),
-                                                                cv=8,
+                                                                cv=4,
                                                                 n_jobs=-1,
                                                                 scoring='neg_mean_squared_error')
 
@@ -330,7 +330,7 @@ if __name__=='__main__':
         plt.ylabel('Neg MSE')
         plt.legend(loc='lower right')
 
-        plt.ylim([-1000,1000])
+        plt.ylim([-800,10])
         plt.tight_layout()
 
     plt.show()
