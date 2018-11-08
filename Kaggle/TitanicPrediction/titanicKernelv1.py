@@ -3,6 +3,9 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import LabelEncoder
+import warnings
+
+warnings.filterwarnings('ignore')
 
 pd.set_option('display.max_rows',500)
 pd.set_option('display.max_columns',100)
@@ -21,13 +24,13 @@ print("Percentage of females who survived:", train["Survived"][train["Sex"] == '
 print("Percentage of males who survived:", train["Survived"][train["Sex"] == 'male'].value_counts(normalize = True)[1]*100)
 
 sns.barplot(x = 'Pclass',y = 'Survived',data = train)
-plt.show()
+#plt.show()
 print("Percentage of Pclass = 1 who survived:",train['Survived'][train['Pclass']==1].value_counts(normalize=True)[1]*100)
 print("Percentage of Pclass = 2 who survived:",train['Survived'][train['Pclass']==2].value_counts(normalize=True)[1]*100)
 print("Percentage of Pclass = 3 who survived:",train['Survived'][train['Pclass']==3].value_counts(normalize=True)[1]*100)
 
 sns.barplot(x = 'Embarked',y ='Survived',data = train)
-plt.show()
+#plt.show()
 
 #draw a bar plot for SibSp vs. survival
 sns.barplot(x="SibSp", y="Survived", data=train)
@@ -38,10 +41,10 @@ print("Percentage of SibSp = 0 who survived:", train["Survived"][train["SibSp"] 
 print("Percentage of SibSp = 1 who survived:", train["Survived"][train["SibSp"] == 1].value_counts(normalize = True)[1]*100)
 
 print("Percentage of SibSp = 2 who survived:", train["Survived"][train["SibSp"] == 2].value_counts(normalize = True)[1]*100)
-plt.show()
+#plt.show()
 
 sns.barplot(x="Parch", y="Survived", data=train)
-plt.show()
+#plt.show()
 print("Percentage of Parch = 0 who survived:", train["Survived"][train["Parch"] == 0].value_counts(normalize = True)[1]*100)
 
 print("Percentage of Parch = 1 who survived:", train["Survived"][train["Parch"] == 1].value_counts(normalize = True)[1]*100)
@@ -65,7 +68,7 @@ test['AgeGroup'] = pd.cut(test["Age"], bins, labels = labels)
 
 #draw a bar plot of Age vs. survival
 sns.barplot(x="AgeGroup", y="Survived", data=train)
-plt.show()
+#plt.show()
 
 
 #people with recorded cabin numbers are of higher socioeconomic class, and thus more likely to survive
@@ -78,7 +81,7 @@ print("Percentage of CabinBool = 1 who survived:", train["Survived"][train["Cabi
 print("Percentage of CabinBool = 0 who survived:", train["Survived"][train["CabinBool"] == 0].value_counts(normalize = True)[1]*100)
 #draw a bar plot of CabinBool vs. survival
 sns.barplot(x="CabinBool", y="Survived", data=train)
-plt.show()
+#plt.show()
 
 
 """
@@ -337,13 +340,31 @@ models = pd.DataFrame({
 models.sort_values(by='Score', ascending=False)
 
 
+
+
+from sklearn.ensemble import VotingClassifier
 #set ids as PassengerId and predict survival
 ids = test['PassengerId']
-predictions = gbk.predict(test.drop('PassengerId', axis=1))
+#predictions = gbk.predict(test.drop('PassengerId', axis=1))
+model = VotingClassifier(estimators=[('gbk',gbk),
+                                     ('sgd',sgd),
+                                     ('knn',knn),
+                                     ('randomforest',randomforest),
+                                     ('perceptron',perceptron),
+                                     ('decisiontree',decisiontree),
+                                     ('svc',svc),
+                                     ('linear_svc',linear_svc),
+                                     ('logreg',logreg),
+                                     ('gaussian',gaussian)])
+model.fit(x_train,y_train)
+y_pred = model.predict(x_val)
+acc_ensemble = round(accuracy_score(y_pred, y_val) * 100, 2)
+print("Ensemble accuracy:"+str(acc_ensemble))
 
+predictions = model.predict(test.drop('PassengerId', axis=1))
 #set the output as a dataframe and convert to csv file named submission.csv
 output = pd.DataFrame({ 'PassengerId' : ids, 'Survived': predictions })
-output.to_csv('submission.csv', index=False)
+output.to_csv('submissionv2.csv', index=False)
 """
 #female为0 male为1
 train.loc[train.Sex=="male",'Sex'] = 1
