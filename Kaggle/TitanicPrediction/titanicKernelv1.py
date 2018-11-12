@@ -181,8 +181,8 @@ test['AgeGroup'] = test['AgeGroup'].map(age_mapping)
 train.head()
 
 #dropping the Age feature for now, might change
-train = train.drop(['Age'], axis = 1)
-test = test.drop(['Age'], axis = 1)
+#train = train.drop(['Age'], axis = 1)
+##test = test.drop(['Age'], axis = 1)
 
 
 #drop the name feature since it contains no more useful information.
@@ -217,8 +217,67 @@ test['FareBand'] = pd.qcut(test['Fare'], 4, labels=[1, 2, 3, 4])
 # drop Fare values
 train = train.drop(['Fare'], axis=1)
 test = test.drop(['Fare'], axis=1)
+combine = [train,test]
+guess_ages = np.zeros((2,3))
+guess_ages
+for dataset in combine:
+    for i in range(0, 2):
+        for j in range(0, 3):
+            guess_df = dataset[(dataset['Sex'] == i) & \
+                               (dataset['Pclass'] == j + 1)]['Age'].dropna()
+
+            # age_mean = guess_df.mean()
+            # age_std = guess_df.std()
+            # age_guess = rnd.uniform(age_mean - age_std, age_mean + age_std)
+
+            age_guess = guess_df.median()
+
+            # Convert random age float to nearest .5 age
+            guess_ages[i, j] = int(age_guess / 0.5 + 0.5) * 0.5
+
+    for i in range(0, 2):
+        for j in range(0, 3):
+            dataset.loc[(dataset.Age.isnull()) & (dataset.Sex == i) & (dataset.Pclass == j + 1), \
+                        'Age'] = guess_ages[i, j]
+
+    dataset['Age'] = dataset['Age'].astype(int)
+
+train.head()
+train['AgeBand'] = pd.cut(train['Age'], 5)
+train[['AgeBand', 'Survived']].groupby(['AgeBand'], as_index=False).mean().sort_values(by='AgeBand', ascending=True)
+
+for dataset in combine:
+    dataset.loc[ dataset['Age'] <= 16, 'Age'] = 0
+    dataset.loc[(dataset['Age'] > 16) & (dataset['Age'] <= 32), 'Age'] = 1
+    dataset.loc[(dataset['Age'] > 32) & (dataset['Age'] <= 48), 'Age'] = 2
+    dataset.loc[(dataset['Age'] > 48) & (dataset['Age'] <= 64), 'Age'] = 3
+    dataset.loc[ dataset['Age'] > 64, 'Age']
+
+train = train.drop(['AgeBand'], axis=1)
+combine = [train, test]
+train.head()
+
+for dataset in combine:
+    dataset['FamilySize'] = dataset['SibSp'] + dataset['Parch'] + 1
+
+train[['FamilySize', 'Survived']].groupby(['FamilySize'], as_index=False).mean().sort_values(by='Survived', ascending=False)
+
+for dataset in combine:
+    dataset['IsAlone'] = 0
+    dataset.loc[dataset['FamilySize'] == 1, 'IsAlone'] = 1
+
+train[['IsAlone', 'Survived']].groupby(['IsAlone'], as_index=False).mean()
+
+#Let us drop Parch, SibSp, and FamilySize features in favor of IsAlone.
+train = train.drop(['Parch', 'SibSp', 'FamilySize'], axis=1)
+test = test.drop(['Parch', 'SibSp', 'FamilySize'], axis=1)
+combine = [train, test]
 
 
+for dataset in combine:
+    dataset['Age*Class'] = dataset.Age * dataset.Pclass
+
+train.loc[:, ['Age*Class', 'Age', 'Pclass']].head(10)
 """
 Choose a best model
 
@@ -364,7 +423,7 @@ print("Ensemble accuracy:"+str(acc_ensemble))
 predictions = model.predict(test.drop('PassengerId', axis=1))
 #set the output as a dataframe and convert to csv file named submission.csv
 output = pd.DataFrame({ 'PassengerId' : ids, 'Survived': predictions })
-output.to_csv('submissionv2.csv', index=False)
+output.to_csv('submissionv3.csv', index=False)
 """
 #female为0 male为1
 train.loc[train.Sex=="male",'Sex'] = 1
