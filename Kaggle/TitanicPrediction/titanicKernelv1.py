@@ -63,11 +63,11 @@ train["Age"] = train["Age"].fillna(-0.5)
 test["Age"] = test["Age"].fillna(-0.5)
 bins = [-1, 0, 5, 12, 18, 24, 35, 60, np.inf]
 labels = ['Unknown', 'Baby', 'Child', 'Teenager', 'Student', 'Young Adult', 'Adult', 'Senior']
-train['AgeGroup'] = pd.cut(train["Age"], bins, labels = labels)
-test['AgeGroup'] = pd.cut(test["Age"], bins, labels = labels)
+#train['AgeGroup'] = pd.cut(train["Age"], bins, labels = labels)
+#test['AgeGroup'] = pd.cut(test["Age"], bins, labels = labels)
 
 #draw a bar plot of Age vs. survival
-sns.barplot(x="AgeGroup", y="Survived", data=train)
+#sns.barplot(x="AgeGroup", y="Survived", data=train)
 #plt.show()
 
 
@@ -147,7 +147,7 @@ for dataset in combine:
     dataset['Title'] = dataset['Title'].fillna(0)
 
 train.head()
-
+"""
 # fill missing age with mode age group for each title
 mr_age = train[train["Title"] == 1]["AgeGroup"].mode()  # Young Adult
 miss_age = train[train["Title"] == 2]["AgeGroup"].mode()  # Student
@@ -182,7 +182,7 @@ train.head()
 
 #dropping the Age feature for now, might change
 #train = train.drop(['Age'], axis = 1)
-##test = test.drop(['Age'], axis = 1)
+##test = test.drop(['Age'], axis = 1)"""
 
 
 #drop the name feature since it contains no more useful information.
@@ -196,6 +196,13 @@ train['Sex'] = train['Sex'].map(sex_mapping)
 test['Sex'] = test['Sex'].map(sex_mapping)
 
 train.head()
+
+combine = [train,test]
+freq_port = train.Embarked.dropna().mode()[0]
+for dataset in combine:
+    dataset['Embarked'] = dataset['Embarked'].fillna(freq_port)
+    
+train[['Embarked', 'Survived']].groupby(['Embarked'], as_index=False).mean().sort_values(by='Survived', ascending=False)
 
 #map each Embarked value to a numerical value
 embarked_mapping = {"S": 1, "C": 2, "Q": 3}
@@ -274,10 +281,14 @@ test = test.drop(['Parch', 'SibSp', 'FamilySize'], axis=1)
 combine = [train, test]
 
 
+
 for dataset in combine:
     dataset['Age*Class'] = dataset.Age * dataset.Pclass
 
 train.loc[:, ['Age*Class', 'Age', 'Pclass']].head(10)
+
+
+
 """
 Choose a best model
 
