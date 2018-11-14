@@ -60,15 +60,31 @@ all_data['TicketGroup'] = all_data['TicketGroup'].apply(Ticket_Label)
 
 
 #Age Feature：Age缺失量为263，缺失量较大，用Sex, Title, Pclass三个特征构建随机森林模型，填充年龄缺失值。
+"""
+这个地方思路是好的 但似乎不应该用all_data的来训练，这样会将test中的信息也包含了进来
+"""
 age_df = all_data[['Age', 'Pclass','Sex','Title']]
 age_df=pd.get_dummies(age_df)
 known_age = age_df[age_df.Age.notnull()].as_matrix()
 unknown_age = age_df[age_df.Age.isnull()].as_matrix()
 y = known_age[:, 0]
 X = known_age[:, 1:]
-rfr = RandomForestRegressor(random_state=0, n_estimators=100, n_jobs=-1)
-rfr.fit(X, y)
-predictedAges = rfr.predict(unknown_age[:, 1::])
+"""
+为此处RandomForestRegressor添加gridsearch调参
+"""
+grid_max_depth = [2, 4, 6, 8, 10, None]
+grid_n_estimator = [10, 50, 100, 300]
+sample_leaf_options = [1,5,10,50,100,200,500]
+params = {'n_estimators':grid_n_estimator,
+          'min_samples_leaf':sample_leaf_options,
+          'max_depth':grid_max_depth}
+rfr = RandomForestRegressor(random_state=0, n_jobs=-1)
+grid = GridSearchCV(rfr, params, cv=10, scoring="neg_mean_absolute_error")
+grid.fit(X, y)
+print('Best params for RFR is'+str(grid.best_params_))
+print('Best score is '+str(grid.best_score_))
+
+predictedAges = grid.best_estimator_.predict(unknown_age[:, 1::])
 all_data.loc[ (all_data.Age.isnull()), 'Age' ] = predictedAges
 
 #Embarked Feature：Embarked缺失量为2，缺失Embarked信息的乘客的Pclass均为1，且Fare均为80，因为Embarked为C且Pclass为1的乘客的Fare中位数为80，所以缺失值填充为C
@@ -153,4 +169,4 @@ print("CV Score : Mean - %.7g | Std - %.7g " % (np.mean(cv_score), np.std(cv_sco
 
 predictions = pipeline.predict(test)
 submission = pd.DataFrame({"PassengerId": PassengerId, "Survived": predictions.astype(np.int32)})
-submission.to_csv("submissionv5.csv", index=False)
+submission.to_csv("submissionv6.csv", index=False)
