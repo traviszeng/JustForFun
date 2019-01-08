@@ -420,7 +420,7 @@ class StackingAveragedModels(BaseEstimator, RegressorMixin, TransformerMixin):
 
 stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, KRR),
                                                  meta_model = lasso)
-best_stacked_model = copy.deepcopy(stacked_averaged_models)
+best_stacked_model1 = copy.deepcopy(stacked_averaged_models)
 
 score = rmsle_cv(stacked_averaged_models)
 print("Stacking Averaged models score: {:.4f} ({:.4f})".format(score.mean(), score.std()))
@@ -429,24 +429,24 @@ stacked_averaged_models = StackingAveragedModels(base_models = (lasso, GBoost, K
                                                  meta_model = ENet)
 
 score = rmsle_cv(stacked_averaged_models)
-if rmsle_cv(best_stacked_model).mean()>score.mean():
-    best_stacked_model = copy.deepcopy(stacked_averaged_models)
+if rmsle_cv(best_stacked_model1).mean()>score.mean():
+    best_stacked_model1 = copy.deepcopy(stacked_averaged_models)
 print("Stacking Averaged models score: {:.4f} ({:.4f})".format(score.mean(), score.std()))
 
 stacked_averaged_models = StackingAveragedModels(base_models = (lasso, GBoost, ENet),
                                                  meta_model = KRR)
 
 score = rmsle_cv(stacked_averaged_models)
-if rmsle_cv(best_stacked_model).mean()>score.mean():
-    best_stacked_model = copy.deepcopy(stacked_averaged_models)
+if rmsle_cv(best_stacked_model1).mean()>score.mean():
+    best_stacked_model1 = copy.deepcopy(stacked_averaged_models)
 print("Stacking Averaged models score: {:.4f} ({:.4f})".format(score.mean(), score.std()))
 
 stacked_averaged_models = StackingAveragedModels(base_models = (lasso, ENet, KRR),
                                                  meta_model = GBoost)
 
 score = rmsle_cv(stacked_averaged_models)
-if rmsle_cv(best_stacked_model).mean()>score.mean():
-    best_stacked_model = copy.deepcopy(stacked_averaged_models)
+if rmsle_cv(best_stacked_model1).mean()>score.mean():
+    best_stacked_model1 = copy.deepcopy(stacked_averaged_models)
 print("Stacking Averaged models score: {:.4f} ({:.4f})".format(score.mean(), score.std()))
 
 print("-----------Including all single learner-----------------")
@@ -454,8 +454,8 @@ stacked_averaged_models = StackingAveragedModels(base_models = (lasso, ENet, KRR
                                                  meta_model = GBoost)
 
 score = rmsle_cv(stacked_averaged_models)
-if rmsle_cv(best_stacked_model).mean()>score.mean():
-    best_stacked_model = copy.deepcopy(stacked_averaged_models)
+#if rmsle_cv(best_stacked_model).mean()>score.mean():
+best_stacked_model = copy.deepcopy(stacked_averaged_models)
 print("Stacking Averaged models score: {:.4f} ({:.4f})".format(score.mean(), score.std()))
 
 stacked_averaged_models = StackingAveragedModels(base_models = (lasso, ENet, KRR,svr,GBoost),
@@ -491,7 +491,7 @@ if rmsle_cv(best_stacked_model).mean()>score.mean():
     best_stacked_model = copy.deepcopy(stacked_averaged_models)
 print("Stacking Averaged models score: {:.4f} ({:.4f})".format(score.mean(), score.std()))
 
-stacked_averaged_models3 = StackingAveragedModels(base_models = (KRR, ENet, GBoost,svr,rfr),
+stacked_averaged_models = StackingAveragedModels(base_models = (KRR, ENet, GBoost,svr,rfr),
                                                  meta_model = lasso)
 
 score = rmsle_cv(stacked_averaged_models)
@@ -502,6 +502,11 @@ print("Stacking Averaged models score: {:.4f} ({:.4f})".format(score.mean(), sco
 #We first define a rmsle evaluation function
 def rmsle(y, y_pred):
     return np.sqrt(mean_squared_error(y, y_pred))
+
+best_stacked_model1.fit(train.values, y_train)
+stacked_train_pred = best_stacked_model1.predict(train.values)
+stacked_pred = np.expm1(best_stacked_model1.predict(test.values))
+print(rmsle(y_train, stacked_train_pred))
 
 #找到一个分数最佳的
 best_stacked_model.fit(train.values, y_train)
