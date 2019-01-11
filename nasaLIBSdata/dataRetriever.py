@@ -9,6 +9,9 @@ from urllib.request import urlopen
 
 html_add = "http://pds-geosciences.wustl.edu"
 
+"""
+写文件
+"""
 def write_document(file_address):
     res = requests.get(file_address)
     if res.status_code==requests.codes.ok:
@@ -24,4 +27,14 @@ def write_document(file_address):
         file.close()
     else:
         print('network Error with'+file_address)
+
+def getLink(url):
+    html = urlopen(url)
+    bs = BeautifulSoup(html,'html.parser')
+    obj = bs.findAll('a')
+    return obj
+
+
+if __name__=='__main__':
+    write_document(html_add+'/msl/msl-m-chemcam-libs-2-edr-v1/mslccm_0xxx_181207.md5')
 
