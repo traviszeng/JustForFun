@@ -388,14 +388,13 @@ class StackingAveragedModels(BaseEstimator, RegressorMixin, TransformerMixin):
         self.meta_model = meta_model
         self.n_folds = n_folds
 
-    # We again fit the data on clones of the original models
+    # 在原有模型的拷贝上再次训练
     def fit(self, X, y):
         self.base_models_ = [list() for x in self.base_models]
         self.meta_model_ = clone(self.meta_model)
         kfold = KFold(n_splits=self.n_folds, shuffle=True, random_state=156)
 
-        # Train cloned base models then create out-of-fold predictions
-        # that are needed to train the cloned meta-model
+        #在拷贝的基本模型上进行out-of-fold预测，并用预测得到的作为meta model的feature
         out_of_fold_predictions = np.zeros((X.shape[0], len(self.base_models)))
         for i, model in enumerate(self.base_models):
             for train_index, holdout_index in kfold.split(X, y):
@@ -405,12 +404,11 @@ class StackingAveragedModels(BaseEstimator, RegressorMixin, TransformerMixin):
                 y_pred = instance.predict(X[holdout_index])
                 out_of_fold_predictions[holdout_index, i] = y_pred
 
-        # Now train the cloned  meta-model using the out-of-fold predictions as new feature
+        #用out-of-foldfeature训练meta-model
         self.meta_model_.fit(out_of_fold_predictions, y)
         return self
 
-    # Do the predictions of all base models on the test data and use the averaged predictions as
-    # meta-features for the final prediction which is done by the meta-model
+    # 使用基学习器预测测试数据，并将各基学习器预测值平均后作为meta-data feed给meta-model在做预测
     def predict(self, X):
         meta_features = np.column_stack([
             np.column_stack([model.predict(X) for model in base_models]).mean(axis=1)
