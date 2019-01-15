@@ -30,4 +30,40 @@ for column in concentrate_data.columns:
 	print(concentrate_data[column].isna().value_counts())
 	
 
+route_200_AVG = "E:\\JustForFun\\CanadaLIBSdata\\LIBS OpenData csv\\csv Material Large Set 200pulseaverage"
+route_1000_AVG = "E:\\JustForFun\\CanadaLIBSdata\\LIBS OpenData csv\\csv Certified Samples Subset 1000pulseaverage"
+
+postfix_200AVG ="_200AVG.csv"
+postfix_1000AVG = "_1000AVG.csv"
+
+"""
+加载训练样本
+"""
+
+data_set_200AVG = {}
+#加载200AVG的样本，并将其存到data_set_200AVG中
+os.chdir(route_200_AVG)
+num = 0
+for indexs in concentrate_data.index:
+    if os.path.exists(concentrate_data.loc[indexs].values[0]+postfix_200AVG):
+        num+=1
+        print("Get data file:"+concentrate_data.loc[indexs].values[0]+postfix_200AVG)
+        data = pd.read_csv(concentrate_data.loc[indexs].values[0]+postfix_200AVG,header = None,names = ['WaveLength','Intensity'])
+        data_set_200AVG[concentrate_data.loc[indexs].values[0]+"_200AVG"] = data
+
+print("Get "+str(num)+" 200_AVG files.")
+print()
+
+data_set_1000AVG = {}
+num = 0
+#加载1000AVG的样本，并将其存到data_set_1000AVG中
+os.chdir(route_1000_AVG)
+for indexs in concentrate_data.index:
+    if os.path.exists(concentrate_data.loc[indexs].values[0]+postfix_1000AVG):
+        num+=1
+        print("Get data file:"+concentrate_data.loc[indexs].values[0]+postfix_1000AVG)
+        data = pd.read_csv(concentrate_data.loc[indexs].values[0]+postfix_1000AVG,header = None,names = ['WaveLength','Intensity'])
+        data_set_1000AVG[concentrate_data.loc[indexs].values[0]+"_1000AVG"] = data
+
+print("Get "+str(num)+" 1000_AVG files.")
 
