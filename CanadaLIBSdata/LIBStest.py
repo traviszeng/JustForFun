@@ -7,6 +7,19 @@ import pandas as pd
 import re
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.linear_model import ElasticNet, Lasso,  BayesianRidge, LassoLarsIC
+from sklearn.ensemble import RandomForestRegressor,  GradientBoostingRegressor
+from sklearn.svm import SVR
+from sklearn.kernel_ridge import KernelRidge
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import RobustScaler
+from sklearn.base import BaseEstimator, TransformerMixin, RegressorMixin, clone
+from sklearn.model_selection import KFold, cross_val_score, train_test_split
+from sklearn.metrics import mean_squared_error
+from sklearn.ensemble import RandomForestRegressor
+import xgboost as xgb
+import lightgbm as lgb
+import copy
 
 concentrate_data = pd.read_csv("E:\\JustForFun\\CanadaLIBSdata\\LIBS OpenData csv\\Sample_Composition_Data.csv")
 #前81行为数据
@@ -298,6 +311,256 @@ X_train, X_test, y_train, y_test = train_test_split(X,
                                                     P_y,
                                                     test_size=0.20)
 clf = SVR(C=1.0,epsilon=0.2)
+clf.fit(X_train,y_train)
+
+
+y_pred = clf.predict(X_test)
+print('Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print()
+print('1.2 随机森林测试---------------------------------')
+from sklearn.ensemble import RandomForestRegressor
+print('1.1.1 Al的实验-----------------------')
+
+X_train, X_test, y_train, y_test = train_test_split(X,
+                                                    Al_y,
+                                                    test_size=0.20)
+clf = RandomForestRegressor(n_estimators=20,random_state=0)
+clf.fit(X_train,y_train)
+
+
+y_pred = clf.predict(X_test)
+print('Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print('1.1.2 Ca的实验-----------------------')
+del clf
+X_train, X_test, y_train, y_test = train_test_split(X,
+                                                    Ca_y,
+                                                    test_size=0.20)
+clf = RandomForestRegressor(n_estimators=20,random_state=0)
+clf.fit(X_train,y_train)
+
+
+y_pred = clf.predict(X_test)
+print('Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+
+print('1.1.3 Fe的实验-----------------------')
+del clf
+X_train, X_test, y_train, y_test = train_test_split(X,
+                                                    Fe_y,
+                                                    test_size=0.20)
+clf = RandomForestRegressor(n_estimators=20,random_state=0)
+clf.fit(X_train,y_train)
+
+
+y_pred = clf.predict(X_test)
+print('Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+
+print('1.1.4 K的实验-----------------------')
+del clf
+X_train, X_test, y_train, y_test = train_test_split(X,
+                                                    K_y,
+                                                    test_size=0.20)
+clf = RandomForestRegressor(n_estimators=20,random_state=0)
+clf.fit(X_train,y_train)
+
+
+y_pred = clf.predict(X_test)
+print('Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print('1.1.5 Mg的实验-----------------------')
+del clf
+X_train, X_test, y_train, y_test = train_test_split(X,
+                                                    Mg_y,
+                                                    test_size=0.20)
+clf = RandomForestRegressor(n_estimators=20,random_state=0)
+clf.fit(X_train,y_train)
+
+
+y_pred = clf.predict(X_test)
+print('Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print('1.1.6 Mn的实验-----------------------')
+del clf
+X_train, X_test, y_train, y_test = train_test_split(X,
+                                                    Mn_y,
+                                                    test_size=0.20)
+clf = RandomForestRegressor(n_estimators=20,random_state=0)
+clf.fit(X_train,y_train)
+
+
+y_pred = clf.predict(X_test)
+print('Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print('1.1.7 Na的实验-----------------------')
+del clf
+X_train, X_test, y_train, y_test = train_test_split(X,
+                                                    Na_y,
+                                                    test_size=0.20)
+clf = RandomForestRegressor(n_estimators=20,random_state=0)
+clf.fit(X_train,y_train)
+
+
+y_pred = clf.predict(X_test)
+print('Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print('1.1.8 Si的实验-----------------------')
+del clf
+X_train, X_test, y_train, y_test = train_test_split(X,
+                                                    Si_y,
+                                                    test_size=0.20)
+clf = RandomForestRegressor(n_estimators=20,random_state=0)
+clf.fit(X_train,y_train)
+
+
+y_pred = clf.predict(X_test)
+print('Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print('1.1.9 Ti的实验-----------------------')
+del clf
+X_train, X_test, y_train, y_test = train_test_split(X,
+                                                    Ti_y,
+                                                    test_size=0.20)
+clf = RandomForestRegressor(n_estimators=20,random_state=0)
+clf.fit(X_train,y_train)
+
+
+y_pred = clf.predict(X_test)
+print('Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print('1.1.10 P的实验-----------------------')
+del clf
+X_train, X_test, y_train, y_test = train_test_split(X,
+                                                    P_y,
+                                                    test_size=0.20)
+clf = RandomForestRegressor(n_estimators=20,random_state=0)
+clf.fit(X_train,y_train)
+
+
+y_pred = clf.predict(X_test)
+print('Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print()
+print('1.3 KRR测试---------------------------------')
+
+print('1.3.1 Al的实验-----------------------')
+
+X_train, X_test, y_train, y_test = train_test_split(X,
+                                                    Al_y,
+                                                    test_size=0.20)
+clf = Lasso(alpha =0.0005, random_state=1)
+clf.fit(X_train,y_train)
+
+
+y_pred = clf.predict(X_test)
+print('Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print('1.3.2 Ca的实验-----------------------')
+del clf
+X_train, X_test, y_train, y_test = train_test_split(X,
+                                                    Ca_y,
+                                                    test_size=0.20)
+clf = Lasso(alpha =0.0005, random_state=1)
+clf.fit(X_train,y_train)
+
+
+y_pred = clf.predict(X_test)
+print('Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+
+print('1.3.3 Fe的实验-----------------------')
+del clf
+X_train, X_test, y_train, y_test = train_test_split(X,
+                                                    Fe_y,
+                                                    test_size=0.20)
+clf = Lasso(alpha =0.0005, random_state=1)
+clf.fit(X_train,y_train)
+
+
+y_pred = clf.predict(X_test)
+print('Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+
+print('1.3.4 K的实验-----------------------')
+del clf
+X_train, X_test, y_train, y_test = train_test_split(X,
+                                                    K_y,
+                                                    test_size=0.20)
+clf = Lasso(alpha =0.0005, random_state=1)
+clf.fit(X_train,y_train)
+
+
+y_pred = clf.predict(X_test)
+print('Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print('1.3.5 Mg的实验-----------------------')
+del clf
+X_train, X_test, y_train, y_test = train_test_split(X,
+                                                    Mg_y,
+                                                    test_size=0.20)
+clf = Lasso(alpha =0.0005, random_state=1)
+clf.fit(X_train,y_train)
+
+
+y_pred = clf.predict(X_test)
+print('Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print('1.3.6 Mn的实验-----------------------')
+del clf
+X_train, X_test, y_train, y_test = train_test_split(X,
+                                                    Mn_y,
+                                                    test_size=0.20)
+clf = Lasso(alpha =0.0005, random_state=1)
+clf.fit(X_train,y_train)
+
+
+y_pred = clf.predict(X_test)
+print('Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print('1.3.7 Na的实验-----------------------')
+del clf
+X_train, X_test, y_train, y_test = train_test_split(X,
+                                                    Na_y,
+                                                    test_size=0.20)
+clf = Lasso(alpha =0.0005, random_state=1)
+clf.fit(X_train,y_train)
+
+
+y_pred = clf.predict(X_test)
+print('Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print('1.3.8 Si的实验-----------------------')
+del clf
+X_train, X_test, y_train, y_test = train_test_split(X,
+                                                    Si_y,
+                                                    test_size=0.20)
+clf = Lasso(alpha =0.0005, random_state=1)
+clf.fit(X_train,y_train)
+
+
+y_pred = clf.predict(X_test)
+print('Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print('1.3.9 Ti的实验-----------------------')
+del clf
+X_train, X_test, y_train, y_test = train_test_split(X,
+                                                    Ti_y,
+                                                    test_size=0.20)
+clf = Lasso(alpha =0.0005, random_state=1)
+clf.fit(X_train,y_train)
+
+
+y_pred = clf.predict(X_test)
+print('Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print('1.3.10 P的实验-----------------------')
+del clf
+X_train, X_test, y_train, y_test = train_test_split(X,
+                                                    P_y,
+                                                    test_size=0.20)
+clf = Lasso(alpha =0.0005, random_state=1)
 clf.fit(X_train,y_train)
 
 
