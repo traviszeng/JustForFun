@@ -4,6 +4,7 @@
 import os
 import sys
 import pandas as pd
+import re
 
 concentrate_data = pd.read_csv("E:\\JustForFun\\CanadaLIBSdata\\LIBS OpenData csv\\Sample_Composition_Data.csv")
 #前81行为数据
@@ -50,6 +51,17 @@ for indexs in concentrate_data.index:
         print("Get data file:"+concentrate_data.loc[indexs].values[0]+postfix_200AVG)
         data = pd.read_csv(concentrate_data.loc[indexs].values[0]+postfix_200AVG,header = None,names = ['WaveLength','Intensity'])
         data_set_200AVG[concentrate_data.loc[indexs].values[0]+"_200AVG"] = data
+    #处理hand sample类型的样本
+    if re.match('hand sample*',concentrate_data.loc[indexs].values[0]):
+        
+        f_list = concentrate_data.loc[indexs].values[0].split()
+        filename = f_list[0]+" "+f_list[1]+postfix_200AVG
+        if os.path.exists(filename):
+            num+=1
+            print("Get data file:"+filename)
+            data = pd.read_csv(filename,header = None,names = ['WaveLength','Intensity'])
+            data_set_200AVG[concentrate_data.loc[indexs].values[0]+"_200AVG"] = data
+        
 
 print("Get "+str(num)+" 200_AVG files.")
 print()
@@ -64,6 +76,18 @@ for indexs in concentrate_data.index:
         print("Get data file:"+concentrate_data.loc[indexs].values[0]+postfix_1000AVG)
         data = pd.read_csv(concentrate_data.loc[indexs].values[0]+postfix_1000AVG,header = None,names = ['WaveLength','Intensity'])
         data_set_1000AVG[concentrate_data.loc[indexs].values[0]+"_1000AVG"] = data
+    #处理hand sample类型的样本
+    if re.match('hand sample*',concentrate_data.loc[indexs].values[0]):
+        
+        f_list = concentrate_data.loc[indexs].values[0].split()
+        filename = f_list[0]+" "+f_list[1]+postfix_1000AVG
+        if os.path.exists(filename):
+            num+=1
+            print("Get data file:"+filename)
+            data = pd.read_csv(filename,header = None,names = ['WaveLength','Intensity'])
+            data_set_1000AVG[concentrate_data.loc[indexs].values[0]+"_1000AVG"] = data
 
 print("Get "+str(num)+" 1000_AVG files.")
+
+
 
