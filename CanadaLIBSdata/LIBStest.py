@@ -139,7 +139,12 @@ del nist['Unknown']
 #筛选在样本精度范围的nist线
 nist = nist.loc[nist.WaveLength>=198.066]
 nist = nist.loc[nist.WaveLength<=970.142]
-
+element_dict = {}
+for indexs in nist.index:
+    if nist.loc[indexs].Element in element_dict:
+        element_dict[nist.loc[indexs].Element].append([nist.loc[indexs].WaveLength,nist.loc[indexs].Importance])
+    else:
+        element_dict[nist.loc[indexs].Element] = [[nist.loc[indexs].WaveLength,nist.loc[indexs].Importance]]
 
 
 
@@ -582,3 +587,43 @@ clf.fit(X_train,y_train)
 
 y_pred = clf.predict(X_test)
 print('Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+#寻找对应元素特征峰作为特征
+"""
+:param 寻找元素
+:return 对应元素的特征序列
+
+寻峰范围为0.5，即寻找左右0.5的max值作为特征峰
+"""
+def selectFeature(element):
+    #取得element_dict里的波长和importance 元祖
+    element_nist = element_dict[element]
+    featurelist  = []
+    for samplename,concentrate in concentrate_set_200AVG.items():
+        templist = []
+        #第一项为特征波长，第二项为importance
+        for feature_list in element_dict[element]:
+            temp = data_set_200AVG[samplename].loc[data_set_200AVG[samplename].WaveLength<feature_list[0]+0.5]
+            feature_value = temp.loc[temp.WaveLength>feature_list[0]-0.5,'Intensity'].max()
+            templist.append(feature_value)
+
+        featurelist.append(templist)
+    for samplename,concentrate in concentrate_set_1000AVG.items():
+        templist = []
+        #第一项为特征波长，第二项为importance
+        for feature_list in element_dict[element]:
+            temp = data_set_1000AVG[samplename].loc[data_set_1000AVG[samplename].WaveLength<feature_list[0]+0.5]
+            feature_value = temp.loc[temp.WaveLength>feature_list[0]-0.5,'Intensity'].max()
+            templist.append(feature_value)
+
+        featurelist.append(templist)
+    return featurelist
+
+print('2.根据NIST库筛选特征-------------------------')
+print('2.1 Al的特征--------------------------')
+Al_x = selectFeature('Al')
+
+
+
+
+
