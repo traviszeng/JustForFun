@@ -8,6 +8,8 @@ import re
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.linear_model import ElasticNet, Lasso,  BayesianRidge, LassoLarsIC
+from sklearn.kernel_ridge import KernelRidge
+from sklearn.ensemble import RandomForestRegressor,  GradientBoostingRegressor
 
 from sklearn.ensemble import RandomForestRegressor
 import xgboost as xgb
@@ -239,14 +241,38 @@ for i in range(0,10):
     #print("对应的特征峰和importance为 "+str(element_dict['Al'])[indices[i]])
 
 print()
-print('1.1.3 KRR测试---------------------------------')
+print('1.1.3 LASSO测试---------------------------------')
 
 clf = Lasso(alpha =0.0005, random_state=1)
 clf.fit(X_train,y_train)
 
 
 y_pred = clf.predict(X_test)
-print('KRR for AL Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+print('LASSO for AL Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+print("KRR TEST----------------------------------")
+clf = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Elastic Net TEST----------------------------------")
+clf = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Gradient Boosting TEST----------------------------------")
+clf = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
+                                   max_depth=4, max_features='sqrt',
+                                   min_samples_leaf=15, min_samples_split=10,
+                                   loss='huber', random_state =5)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+
+
+
 
 print()
 print('1.2 Ca的实验-------------------------')
@@ -284,14 +310,34 @@ for i in range(0,10):
     #print("对应的特征峰和importance为 "+str(element_dict['Al'])[indices[i]])
 
 print()
-print('1.2.3 KRR测试---------------------------------')
+print('1.2.3 LASSO测试---------------------------------')
 
 clf = Lasso(alpha =0.0005, random_state=1)
 clf.fit(X_train,y_train)
 
 
 y_pred = clf.predict(X_test)
-print('KRR for Ca Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+print('LASSO for Ca Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+print("KRR TEST----------------------------------")
+clf = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Elastic Net TEST----------------------------------")
+clf = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Gradient Boosting TEST----------------------------------")
+clf = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
+                                   max_depth=4, max_features='sqrt',
+                                   min_samples_leaf=15, min_samples_split=10,
+                                   loss='huber', random_state =5)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print()
 print('1.3 Fe的实验-------------------------')
@@ -328,14 +374,34 @@ for i in range(0,10):
     #print("对应的特征峰和importance为 "+str(element_dict['Al'])[indices[i]])
 
 print()
-print('1.3.3 KRR测试---------------------------------')
+print('1.3.3 LASSO测试---------------------------------')
 
 clf = Lasso(alpha =0.0005, random_state=1)
 clf.fit(X_train,y_train)
 
 
 y_pred = clf.predict(X_test)
-print('KRR for Fe Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+print('LASSO for Fe Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+print("KRR TEST----------------------------------")
+clf = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Elastic Net TEST----------------------------------")
+clf = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Gradient Boosting TEST----------------------------------")
+clf = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
+                                   max_depth=4, max_features='sqrt',
+                                   min_samples_leaf=15, min_samples_split=10,
+                                   loss='huber', random_state =5)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print()
 print('1.4 K的实验-------------------------')
@@ -373,14 +439,34 @@ for i in range(0,10):
     #print("对应的特征峰和importance为 "+str(element_dict['Al'])[indices[i]])
 
 print()
-print('1.4.3 KRR测试---------------------------------')
+print('1.4.3 LASSO测试---------------------------------')
 
 clf = Lasso(alpha =0.0005, random_state=1)
 clf.fit(X_train,y_train)
 
 
 y_pred = clf.predict(X_test)
-print('KRR for K Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+print('LASSO for K Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+print("KRR TEST----------------------------------")
+clf = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Elastic Net TEST----------------------------------")
+clf = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Gradient Boosting TEST----------------------------------")
+clf = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
+                                   max_depth=4, max_features='sqrt',
+                                   min_samples_leaf=15, min_samples_split=10,
+                                   loss='huber', random_state =5)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print()
 print('1.5 Mg的实验-------------------------')
@@ -418,14 +504,34 @@ for i in range(0,10):
     #print("对应的特征峰和importance为 "+str(element_dict['Al'])[indices[i]])
 
 print()
-print('1.5.3 KRR测试---------------------------------')
+print('1.5.3 LASSO测试---------------------------------')
 
 clf = Lasso(alpha =0.0005, random_state=1)
 clf.fit(X_train,y_train)
 
 
 y_pred = clf.predict(X_test)
-print('KRR for Mg Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+print('LASSO for Mg Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+print("KRR TEST----------------------------------")
+clf = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Elastic Net TEST----------------------------------")
+clf = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Gradient Boosting TEST----------------------------------")
+clf = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
+                                   max_depth=4, max_features='sqrt',
+                                   min_samples_leaf=15, min_samples_split=10,
+                                   loss='huber', random_state =5)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print()
 print('1.6 Mn的实验-------------------------')
@@ -463,14 +569,34 @@ for i in range(0,10):
     #print("对应的特征峰和importance为 "+str(element_dict['Al'])[indices[i]])
 
 print()
-print('1.6.3 KRR测试---------------------------------')
+print('1.6.3 LASSO测试---------------------------------')
 
 clf = Lasso(alpha =0.0005, random_state=1)
 clf.fit(X_train,y_train)
 
 
 y_pred = clf.predict(X_test)
-print('KRR for Mn Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+print('LASSO for Mn Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+print("KRR TEST----------------------------------")
+clf = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Elastic Net TEST----------------------------------")
+clf = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Gradient Boosting TEST----------------------------------")
+clf = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
+                                   max_depth=4, max_features='sqrt',
+                                   min_samples_leaf=15, min_samples_split=10,
+                                   loss='huber', random_state =5)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print()
 print('1.7 Na的实验-------------------------')
@@ -507,14 +633,34 @@ for i in range(0,10):
     #print("对应的特征峰和importance为 "+str(element_dict['Al'])[indices[i]])
 
 print()
-print('1.7.3 KRR测试---------------------------------')
+print('1.7.3 LASSO测试---------------------------------')
 
 clf = Lasso(alpha =0.0005, random_state=1)
 clf.fit(X_train,y_train)
 
 
 y_pred = clf.predict(X_test)
-print('KRR for Na Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+print('LASSO for Na Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+print("KRR TEST----------------------------------")
+clf = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Elastic Net TEST----------------------------------")
+clf = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Gradient Boosting TEST----------------------------------")
+clf = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
+                                   max_depth=4, max_features='sqrt',
+                                   min_samples_leaf=15, min_samples_split=10,
+                                   loss='huber', random_state =5)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print()
 print('1.8 Si的实验-------------------------')
@@ -551,14 +697,34 @@ for i in range(0,10):
     #print("对应的特征峰和importance为 "+str(element_dict['Al'])[indices[i]])
 
 print()
-print('1.8.3 KRR测试---------------------------------')
+print('1.8.3 LASSO测试---------------------------------')
 
 clf = Lasso(alpha =0.0005, random_state=1)
 clf.fit(X_train,y_train)
 
 
 y_pred = clf.predict(X_test)
-print('KRR for Si Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+print('LASSO for Si Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+print("KRR TEST----------------------------------")
+clf = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Elastic Net TEST----------------------------------")
+clf = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Gradient Boosting TEST----------------------------------")
+clf = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
+                                   max_depth=4, max_features='sqrt',
+                                   min_samples_leaf=15, min_samples_split=10,
+                                   loss='huber', random_state =5)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print()
 print('1.9 Ti的实验-------------------------')
@@ -594,14 +760,34 @@ for i in range(0,10):
     #print("对应的特征峰和importance为 "+str(element_dict['Al'])[indices[i]])
 
 print()
-print('1.9.3 KRR测试---------------------------------')
+print('1.9.3 LASSO测试---------------------------------')
 
 clf = Lasso(alpha =0.0005, random_state=1)
 clf.fit(X_train,y_train)
 
 
 y_pred = clf.predict(X_test)
-print('KRR for Ti Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+print('LASSO for Ti Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+print("KRR TEST----------------------------------")
+clf = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Elastic Net TEST----------------------------------")
+clf = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Gradient Boosting TEST----------------------------------")
+clf = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
+                                   max_depth=4, max_features='sqrt',
+                                   min_samples_leaf=15, min_samples_split=10,
+                                   loss='huber', random_state =5)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print()
 print('1.10 P的实验-------------------------')
@@ -638,14 +824,35 @@ for i in range(0,10):
     #print("对应的特征峰和importance为 "+str(element_dict['Al'])[indices[i]])
 
 print()
-print('1.10.3 KRR测试---------------------------------')
+print('1.10.3 LASSO测试---------------------------------')
 
 clf = Lasso(alpha =0.0005, random_state=1)
 clf.fit(X_train,y_train)
 
 
 y_pred = clf.predict(X_test)
-print('KRR for P Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+print('LASSO for P Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("KRR TEST----------------------------------")
+clf = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Elastic Net TEST----------------------------------")
+clf = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Gradient Boosting TEST----------------------------------")
+clf = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
+                                   max_depth=4, max_features='sqrt',
+                                   min_samples_leaf=15, min_samples_split=10,
+                                   loss='huber', random_state =5)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 
 #寻找对应元素特征峰作为特征
@@ -714,14 +921,35 @@ for i in range(0,10):
     print("对应的特征峰和importance为 " + str(element_dict['Al'][indices[i]]))
 
 print()
-print('2.1.3 KRR测试---------------------------------')
+print('2.1.3 LASSO测试---------------------------------')
 
 clf = Lasso(alpha =0.0005, random_state=1)
 clf.fit(X_train,y_train)
 
 
 y_pred = clf.predict(X_test)
-print('KRR for AL Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+print('LASSO for AL Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("KRR TEST----------------------------------")
+clf = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Elastic Net TEST----------------------------------")
+clf = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Gradient Boosting TEST----------------------------------")
+clf = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
+                                   max_depth=4, max_features='sqrt',
+                                   min_samples_leaf=15, min_samples_split=10,
+                                   loss='huber', random_state =5)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print('2.2 Ca的相关实验--------------------------')
 Ca_x = selectFeature('Ca')
@@ -757,15 +985,37 @@ for i in range(0,10):
     print("对应的特征峰和importance为 " + str(element_dict['Ca'][indices[i]]))
 
 print()
-print('2.2.3 KRR测试---------------------------------')
+print('2.2.3 LASSO测试---------------------------------')
 
 clf = Lasso(alpha =0.0005, random_state=1)
 clf.fit(X_train,y_train)
 
 
 y_pred = clf.predict(X_test)
-print('KRR for Ca Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+print('LASSO for Ca Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
+print("KRR TEST----------------------------------")
+clf = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Elastic Net TEST----------------------------------")
+clf = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Gradient Boosting TEST----------------------------------")
+clf = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
+                                   max_depth=4, max_features='sqrt',
+                                   min_samples_leaf=15, min_samples_split=10,
+                                   loss='huber', random_state =5)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+"""
 print('2.3 Fe的相关实验--------------------------')
 Fe_x = selectFeature('Fe')
 
@@ -800,16 +1050,38 @@ for i in range(0,10):
     print("对应的特征峰和importance为 " + str(element_dict['Fe'][indices[i]]))
 
 print()
-print('2.3.3 KRR测试---------------------------------')
+print('2.3.3 LASSO测试---------------------------------')
 
 clf = Lasso(alpha =0.0005, random_state=1)
 clf.fit(X_train,y_train)
 
 
 y_pred = clf.predict(X_test)
-print('KRR for Fe Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+print('LASSO for Fe Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
-print('2.4 Al的相关实验--------------------------')
+print("KRR TEST----------------------------------")
+clf = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Elastic Net TEST----------------------------------")
+clf = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Gradient Boosting TEST----------------------------------")
+clf = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
+                                   max_depth=4, max_features='sqrt',
+                                   min_samples_leaf=15, min_samples_split=10,
+                                   loss='huber', random_state =5)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
+"""
+
+print('2.4 K的相关实验--------------------------')
 K_x = selectFeature('K')
 
 print('2.4.1 Vector Machine Regression-----------------------')
@@ -843,14 +1115,35 @@ for i in range(0,10):
     print("对应的特征峰和importance为 " + str(element_dict['K'][indices[i]]))
 
 print()
-print('2.4.3 KRR测试---------------------------------')
+print('2.4.3 LASSO测试---------------------------------')
 
 clf = Lasso(alpha =0.0005, random_state=1)
 clf.fit(X_train,y_train)
 
 
 y_pred = clf.predict(X_test)
-print('KRR for K Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+print('LASSO for K Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("KRR TEST----------------------------------")
+clf = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Elastic Net TEST----------------------------------")
+clf = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Gradient Boosting TEST----------------------------------")
+clf = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
+                                   max_depth=4, max_features='sqrt',
+                                   min_samples_leaf=15, min_samples_split=10,
+                                   loss='huber', random_state =5)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print('2.5 Mg的相关实验--------------------------')
 Mg_x = selectFeature('Mg')
@@ -886,14 +1179,35 @@ for i in range(0,10):
     print("对应的特征峰和importance为 " + str(element_dict['Mg'][indices[i]]))
 
 print()
-print('2.5.3 KRR测试---------------------------------')
+print('2.5.3 LASSO测试---------------------------------')
 
 clf = Lasso(alpha =0.0005, random_state=1)
 clf.fit(X_train,y_train)
 
 
 y_pred = clf.predict(X_test)
-print('KRR for Mg Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+print('LASSO for Mg Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("KRR TEST----------------------------------")
+clf = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Elastic Net TEST----------------------------------")
+clf = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Gradient Boosting TEST----------------------------------")
+clf = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
+                                   max_depth=4, max_features='sqrt',
+                                   min_samples_leaf=15, min_samples_split=10,
+                                   loss='huber', random_state =5)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 
 print('2.6 Mn的相关实验--------------------------')
@@ -930,15 +1244,35 @@ for i in range(0,10):
     print("对应的特征峰和importance为 " + str(element_dict['Mn'][indices[i]]))
 
 print()
-print('2.6.3 KRR测试---------------------------------')
+print('2.6.3 LASSO测试---------------------------------')
 
 clf = Lasso(alpha =0.0005, random_state=1)
 clf.fit(X_train,y_train)
 
 
 y_pred = clf.predict(X_test)
-print('KRR for Mn Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+print('LASSO for Mn Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
+print("KRR TEST----------------------------------")
+clf = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Elastic Net TEST----------------------------------")
+clf = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Gradient Boosting TEST----------------------------------")
+clf = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
+                                   max_depth=4, max_features='sqrt',
+                                   min_samples_leaf=15, min_samples_split=10,
+                                   loss='huber', random_state =5)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print('2.7 Na的相关实验--------------------------')
 Na_x = selectFeature('Na')
@@ -974,14 +1308,35 @@ for i in range(0,10):
     print("对应的特征峰和importance为 " + str(element_dict['Na'][indices[i]]))
 
 print()
-print('2.7.3 KRR测试---------------------------------')
+print('2.7.3 LASSO测试---------------------------------')
 
 clf = Lasso(alpha =0.0005, random_state=1)
 clf.fit(X_train,y_train)
 
 
 y_pred = clf.predict(X_test)
-print('KRR for Na Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+print('LASSO for Na Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("KRR TEST----------------------------------")
+clf = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Elastic Net TEST----------------------------------")
+clf = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Gradient Boosting TEST----------------------------------")
+clf = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
+                                   max_depth=4, max_features='sqrt',
+                                   min_samples_leaf=15, min_samples_split=10,
+                                   loss='huber', random_state =5)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 
 print('2.8 Si的相关实验--------------------------')
@@ -1018,14 +1373,35 @@ for i in range(0,10):
     print("对应的特征峰和importance为 " + str(element_dict['Si'][indices[i]]))
 
 print()
-print('2.8.3 KRR测试---------------------------------')
+print('2.8.3 LASSO测试---------------------------------')
 
 clf = Lasso(alpha =0.0005, random_state=1)
 clf.fit(X_train,y_train)
 
 
 y_pred = clf.predict(X_test)
-print('KRR for Si Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+print('LASSO for Si Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("KRR TEST----------------------------------")
+clf = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Elastic Net TEST----------------------------------")
+clf = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Gradient Boosting TEST----------------------------------")
+clf = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
+                                   max_depth=4, max_features='sqrt',
+                                   min_samples_leaf=15, min_samples_split=10,
+                                   loss='huber', random_state =5)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 
 
@@ -1063,14 +1439,35 @@ for i in range(0,10):
     print("对应的特征峰和importance为 " + str(element_dict['Ti'][indices[i]]))
 
 print()
-print('2.9.3 KRR测试---------------------------------')
+print('2.9.3 LASSO测试---------------------------------')
 
 clf = Lasso(alpha =0.0005, random_state=1)
 clf.fit(X_train,y_train)
 
 
 y_pred = clf.predict(X_test)
-print('KRR for Ti Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+print('LASSO for Ti Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("KRR TEST----------------------------------")
+clf = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Elastic Net TEST----------------------------------")
+clf = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Gradient Boosting TEST----------------------------------")
+clf = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
+                                   max_depth=4, max_features='sqrt',
+                                   min_samples_leaf=15, min_samples_split=10,
+                                   loss='huber', random_state =5)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 
 print('2.10 P的相关实验--------------------------')
@@ -1107,11 +1504,32 @@ for i in range(0,10):
     print("对应的特征峰和importance为 " + str(element_dict['P'][indices[i]]))
 
 print()
-print('2.10.3 KRR测试---------------------------------')
+print('2.10.3 LASSO测试---------------------------------')
 
 clf = Lasso(alpha =0.0005, random_state=1)
 clf.fit(X_train,y_train)
 
 
 y_pred = clf.predict(X_test)
-print('KRR for P Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+print('LASSO for P Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("KRR TEST----------------------------------")
+clf = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Elastic Net TEST----------------------------------")
+clf = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Gradient Boosting TEST----------------------------------")
+clf = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
+                                   max_depth=4, max_features='sqrt',
+                                   min_samples_leaf=15, min_samples_split=10,
+                                   loss='huber', random_state =5)
+clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
