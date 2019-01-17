@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 from sklearn.linear_model import ElasticNet, Lasso,  BayesianRidge, LassoLarsIC
 from sklearn.kernel_ridge import KernelRidge
 from sklearn.ensemble import RandomForestRegressor,  GradientBoostingRegressor
+from sklearn.base import BaseEstimator, TransformerMixin, RegressorMixin, clone
 
 from sklearn.ensemble import RandomForestRegressor
 import xgboost as xgb
@@ -19,6 +20,9 @@ from sklearn.model_selection import train_test_split
 from sklearn.pipeline import make_pipeline
 from sklearn.metrics import mean_squared_error
 from sklearn.svm import SVR
+from sklearn.model_selection import KFold, cross_val_score, train_test_split
+
+
 
 concentrate_data = pd.read_csv("E:\\JustForFun\\CanadaLIBSdata\\LIBS OpenData csv\\Sample_Composition_Data.csv")
 #前81行为数据
@@ -145,6 +149,70 @@ for indexs in nist.index:
     else:
         element_dict[nist.loc[indexs].Element] = [[nist.loc[indexs].WaveLength,nist.loc[indexs].Importance]]
 
+"""
+    Ensemble bagging method
+    using average
+"""
+
+class baggingAveragingModels(BaseEstimator, RegressorMixin, TransformerMixin):
+    def __init__(self, models):
+        self.models = models
+
+    # we define clones of the original models to fit the data in
+    def fit(self, X, y):
+        self.models_ = [clone(x) for x in self.models]
+
+        # Train cloned base models
+        for model in self.models_:
+            model.fit(X, y)
+
+        return self
+
+    # Now we do the predictions for cloned models and average them
+    def predict(self, X):
+        predictions = np.column_stack([
+            model.predict(X) for model in self.models_
+        ])
+        return np.mean(predictions, axis=1)
+
+"""
+    Ensemble stacking method
+    一层stacking
+"""
+
+
+class StackingAveragedModels(BaseEstimator, RegressorMixin, TransformerMixin):
+    def __init__(self, base_models, meta_model, n_folds=5):
+        self.base_models = base_models
+        self.meta_model = meta_model
+        self.n_folds = n_folds
+
+    # 在原有模型的拷贝上再次训练
+    def fit(self, X, y):
+        self.base_models_ = [list() for x in self.base_models]
+        self.meta_model_ = clone(self.meta_model)
+        kfold = KFold(n_splits=self.n_folds, shuffle=True, random_state=156)
+
+        #在拷贝的基本模型上进行out-of-fold预测，并用预测得到的作为meta model的feature
+        out_of_fold_predictions = np.zeros((X.shape[0], len(self.base_models)))
+        for i, model in enumerate(self.base_models):
+            for train_index, holdout_index in kfold.split(X, y):
+                instance = clone(model)
+                self.base_models_[i].append(instance)
+                instance.fit(X[train_index], y[train_index])
+                y_pred = instance.predict(X[holdout_index])
+                out_of_fold_predictions[holdout_index, i] = y_pred
+
+        #用out-of-foldfeature训练meta-model
+        self.meta_model_.fit(out_of_fold_predictions, y)
+        return self
+
+    # 使用基学习器预测测试数据，并将各基学习器预测值平均后作为meta-data feed给meta-model在做预测
+    def predict(self, X):
+        meta_features = np.column_stack([
+            np.column_stack([model.predict(X) for model in base_models]).mean(axis=1)
+            for base_models in self.base_models_])
+        return self.meta_model_.predict(meta_features)
 
 
 #准备训练数据，未作任何处理，将整个光谱输入

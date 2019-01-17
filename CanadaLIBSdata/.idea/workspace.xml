@@ -17,8 +17,8 @@
       <file leaf-file-name="LIBStest.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/LIBStest.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="240">
-              <caret line="1081" column="3" lean-forward="false" selection-start-line="1081" selection-start-column="3" selection-end-line="1081" selection-end-column="3" />
+            <state relative-caret-position="945">
+              <caret line="222" column="9" lean-forward="true" selection-start-line="222" selection-start-column="9" selection-end-line="222" selection-end-column="9" />
               <folding>
                 <element signature="e#36#45#0" expanded="true" />
               </folding>
@@ -192,8 +192,8 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/LIBStest.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="240">
-          <caret line="1081" column="3" lean-forward="false" selection-start-line="1081" selection-start-column="3" selection-end-line="1081" selection-end-column="3" />
+        <state relative-caret-position="945">
+          <caret line="222" column="9" lean-forward="true" selection-start-line="222" selection-start-column="9" selection-end-line="222" selection-end-column="9" />
           <folding>
             <element signature="e#36#45#0" expanded="true" />
           </folding>
