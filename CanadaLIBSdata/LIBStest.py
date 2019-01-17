@@ -274,7 +274,7 @@ for samplename,concentrate in concentrate_set_1000AVG.items():
 
 print('Data preprocessing finished.')
 print()
-print('1.单独学习器实验------------------------------')
+print('1.未处理X实验，输入整个光谱------------------------------')
 print()
 print('1.1 Al的实验-------------------------')
 
@@ -283,24 +283,24 @@ print('1.1.1 Vector Machine Regression-----------------------')
 X_train, X_test, y_train, y_test = train_test_split(X,
                                                     Al_y,
                                                     test_size=0.20)
-clf = SVR(C=1.0,epsilon=0.2)
-clf.fit(X_train,y_train)
+svr = SVR(C=1.0,epsilon=0.2)
+svr.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = svr.predict(X_test)
 print('SVR for AL Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print()
 print('1.1.2 随机森林测试---------------------------------')
 
-clf = RandomForestRegressor(n_estimators=20,random_state=0)
-clf.fit(X_train,y_train)
+rfr = RandomForestRegressor(n_estimators=20,random_state=0)
+rfr.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = rfr.predict(X_test)
 print('RFR for AL Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 #各特征的importance
-importance = clf.feature_importances_
+importance = rfr.feature_importances_
 #根据importance大小排序
 indices = np.argsort(importance)[::-1]
 #打印前十的importance
@@ -311,35 +311,76 @@ for i in range(0,10):
 print()
 print('1.1.3 LASSO测试---------------------------------')
 
-clf = Lasso(alpha =0.0005, random_state=1)
-clf.fit(X_train,y_train)
+lasso = Lasso(alpha =0.0005, random_state=1)
+lasso.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = lasso.predict(X_test)
 print('LASSO for AL Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 print("KRR TEST----------------------------------")
-clf = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+krr = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
+krr.fit(X_train,y_train)
+y_pred = krr.predict(X_test)
 print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Elastic Net TEST----------------------------------")
-clf = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+ENet = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+ENet.fit(X_train,y_train)
+y_pred = ENet.predict(X_test)
 print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Gradient Boosting TEST----------------------------------")
-clf = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
+GBoost = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
                                    max_depth=4, max_features='sqrt',
                                    min_samples_leaf=15, min_samples_split=10,
                                    loss='huber', random_state =5)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+GBoost.fit(X_train,y_train)
+y_pred = GBoost.predict(X_test)
 print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
 
+print("Bagging Experiment---------------------")
+baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,Lasso))
+baggingModel.fit(X_train,y_train)
+y_pred  =baggingModel.predict(X_test)
+print('Bagging squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Stacking Experiment------------------------------")
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,svr,rfr),
+                                                 meta_model = lasso)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is lasso squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (lasso, GBoost, krr,svr,rfr),
+                                                 meta_model = ENet)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is ENet squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, Lasso, krr,svr,rfr),
+                                                 meta_model = GBoost)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, lasso,svr,rfr),
+                                                 meta_model = krr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is krr squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,lasso,rfr),
+                                                 meta_model = svr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is svr squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,svr,lasso),
+                                                 meta_model = rfr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is rfr squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 
 print()
@@ -352,24 +393,24 @@ print('1.2.1 Vector Machine Regression-----------------------')
 X_train, X_test, y_train, y_test = train_test_split(X,
                                                     Ca_y,
                                                     test_size=0.20)
-clf = SVR(C=1.0,epsilon=0.2)
-clf.fit(X_train,y_train)
+svr = SVR(C=1.0,epsilon=0.2)
+svr.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = svr.predict(X_test)
 print('SVR for Ca Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print()
 print('1.2.2 随机森林测试---------------------------------')
 
-clf = RandomForestRegressor(n_estimators=20,random_state=0)
-clf.fit(X_train,y_train)
+rfr = RandomForestRegressor(n_estimators=20,random_state=0)
+rfr.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = rfr.predict(X_test)
 print('RFR for Ca Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 #各特征的importance
-importance = clf.feature_importances_
+importance = rfr.feature_importances_
 #根据importance大小排序
 indices = np.argsort(importance)[::-1]
 #打印前十的importance
@@ -380,32 +421,75 @@ for i in range(0,10):
 print()
 print('1.2.3 LASSO测试---------------------------------')
 
-clf = Lasso(alpha =0.0005, random_state=1)
-clf.fit(X_train,y_train)
+lasso = Lasso(alpha =0.0005, random_state=1)
+lasso.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = lasso.predict(X_test)
 print('LASSO for Ca Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 print("KRR TEST----------------------------------")
-clf = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+krr = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
+krr.fit(X_train,y_train)
+y_pred = krr.predict(X_test)
 print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Elastic Net TEST----------------------------------")
-clf = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+ENet = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+ENet.fit(X_train,y_train)
+y_pred = ENet.predict(X_test)
 print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Gradient Boosting TEST----------------------------------")
-clf = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
+GBoost = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
                                    max_depth=4, max_features='sqrt',
                                    min_samples_leaf=15, min_samples_split=10,
                                    loss='huber', random_state =5)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+GBoost.fit(X_train,y_train)
+y_pred = GBoost.predict(X_test)
 print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
+print("Bagging Experiment---------------------")
+baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,Lasso))
+baggingModel.fit(X_train,y_train)
+y_pred  =baggingModel.predict(X_test)
+print('Bagging squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Stacking Experiment------------------------------")
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,svr,rfr),
+                                                 meta_model = lasso)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is lasso squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (lasso, GBoost, krr,svr,rfr),
+                                                 meta_model = ENet)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is ENet squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, Lasso, krr,svr,rfr),
+                                                 meta_model = GBoost)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, lasso,svr,rfr),
+                                                 meta_model = krr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is krr squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,lasso,rfr),
+                                                 meta_model = svr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is svr squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,svr,lasso),
+                                                 meta_model = rfr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is rfr squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print()
 print('1.3 Fe的实验-------------------------')
@@ -416,24 +500,24 @@ print('1.3.1 Vector Machine Regression-----------------------')
 X_train, X_test, y_train, y_test = train_test_split(X,
                                                     Fe_y,
                                                     test_size=0.20)
-clf = SVR(C=1.0,epsilon=0.2)
-clf.fit(X_train,y_train)
+svr = SVR(C=1.0,epsilon=0.2)
+svr.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = svr.predict(X_test)
 print('SVR for Fe Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print()
 print('1.3.2 随机森林测试---------------------------------')
 
-clf = RandomForestRegressor(n_estimators=20,random_state=0)
-clf.fit(X_train,y_train)
+rfr = RandomForestRegressor(n_estimators=20,random_state=0)
+rfr.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = rfr.predict(X_test)
 print('RFR for Fe Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 #各特征的importance
-importance = clf.feature_importances_
+importance = rfr.feature_importances_
 #根据importance大小排序
 indices = np.argsort(importance)[::-1]
 #打印前十的importance
@@ -444,32 +528,75 @@ for i in range(0,10):
 print()
 print('1.3.3 LASSO测试---------------------------------')
 
-clf = Lasso(alpha =0.0005, random_state=1)
-clf.fit(X_train,y_train)
+lasso = Lasso(alpha =0.0005, random_state=1)
+lasso.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = lasso.predict(X_test)
 print('LASSO for Fe Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 print("KRR TEST----------------------------------")
-clf = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+krr = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
+krr.fit(X_train,y_train)
+y_pred = krr.predict(X_test)
 print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Elastic Net TEST----------------------------------")
-clf = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+ENet = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+ENet.fit(X_train,y_train)
+y_pred = ENet.predict(X_test)
 print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Gradient Boosting TEST----------------------------------")
-clf = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
+GBoost = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
                                    max_depth=4, max_features='sqrt',
                                    min_samples_leaf=15, min_samples_split=10,
                                    loss='huber', random_state =5)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+GBoost.fit(X_train,y_train)
+y_pred = GBoost.predict(X_test)
 print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
+print("Bagging Experiment---------------------")
+baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,Lasso))
+baggingModel.fit(X_train,y_train)
+y_pred  =baggingModel.predict(X_test)
+print('Bagging squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Stacking Experiment------------------------------")
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,svr,rfr),
+                                                 meta_model = lasso)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is lasso squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (lasso, GBoost, krr,svr,rfr),
+                                                 meta_model = ENet)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is ENet squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, Lasso, krr,svr,rfr),
+                                                 meta_model = GBoost)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, lasso,svr,rfr),
+                                                 meta_model = krr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is krr squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,lasso,rfr),
+                                                 meta_model = svr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is svr squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,svr,lasso),
+                                                 meta_model = rfr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is rfr squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print()
 print('1.4 K的实验-------------------------')
@@ -481,24 +608,24 @@ print('1.4.1 Vector Machine Regression-----------------------')
 X_train, X_test, y_train, y_test = train_test_split(X,
                                                     K_y,
                                                     test_size=0.20)
-clf = SVR(C=1.0,epsilon=0.2)
-clf.fit(X_train,y_train)
+svr = SVR(C=1.0,epsilon=0.2)
+svr.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = svr.predict(X_test)
 print('SVR for K Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print()
 print('1.4.2 随机森林测试---------------------------------')
 
-clf = RandomForestRegressor(n_estimators=20,random_state=0)
-clf.fit(X_train,y_train)
+rfr = RandomForestRegressor(n_estimators=20,random_state=0)
+rfr.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = rfr.predict(X_test)
 print('RFR for K Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 #各特征的importance
-importance = clf.feature_importances_
+importance = rfr.feature_importances_
 #根据importance大小排序
 indices = np.argsort(importance)[::-1]
 #打印前十的importance
@@ -509,32 +636,76 @@ for i in range(0,10):
 print()
 print('1.4.3 LASSO测试---------------------------------')
 
-clf = Lasso(alpha =0.0005, random_state=1)
-clf.fit(X_train,y_train)
+lasso = Lasso(alpha =0.0005, random_state=1)
+lasso.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = lasso.predict(X_test)
 print('LASSO for K Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 print("KRR TEST----------------------------------")
-clf = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+krr = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
+krr.fit(X_train,y_train)
+y_pred = krr.predict(X_test)
 print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Elastic Net TEST----------------------------------")
-clf = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+ENet = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+ENet.fit(X_train,y_train)
+y_pred = ENet.predict(X_test)
 print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Gradient Boosting TEST----------------------------------")
-clf = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
+GBoost = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
                                    max_depth=4, max_features='sqrt',
                                    min_samples_leaf=15, min_samples_split=10,
                                    loss='huber', random_state =5)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+GBoost.fit(X_train,y_train)
+y_pred = GBoost.predict(X_test)
 print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Bagging Experiment---------------------")
+baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,Lasso))
+baggingModel.fit(X_train,y_train)
+y_pred  =baggingModel.predict(X_test)
+print('Bagging squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Stacking Experiment------------------------------")
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,svr,rfr),
+                                                 meta_model = lasso)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is lasso squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (lasso, GBoost, krr,svr,rfr),
+                                                 meta_model = ENet)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is ENet squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, Lasso, krr,svr,rfr),
+                                                 meta_model = GBoost)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, lasso,svr,rfr),
+                                                 meta_model = krr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is krr squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,lasso,rfr),
+                                                 meta_model = svr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is svr squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,svr,lasso),
+                                                 meta_model = rfr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is rfr squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print()
 print('1.5 Mg的实验-------------------------')
@@ -546,24 +717,24 @@ print('1.5.1 Vector Machine Regression-----------------------')
 X_train, X_test, y_train, y_test = train_test_split(X,
                                                     Mg_y,
                                                     test_size=0.20)
-clf = SVR(C=1.0,epsilon=0.2)
-clf.fit(X_train,y_train)
+svr = SVR(C=1.0,epsilon=0.2)
+svr.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = svr.predict(X_test)
 print('SVR for Mg Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print()
 print('1.5.2 随机森林测试---------------------------------')
 
-clf = RandomForestRegressor(n_estimators=20,random_state=0)
-clf.fit(X_train,y_train)
+rfr = RandomForestRegressor(n_estimators=20,random_state=0)
+rfr.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = rfr.predict(X_test)
 print('RFR for Mg Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 #各特征的importance
-importance = clf.feature_importances_
+importance = rfr.feature_importances_
 #根据importance大小排序
 indices = np.argsort(importance)[::-1]
 #打印前十的importance
@@ -574,32 +745,76 @@ for i in range(0,10):
 print()
 print('1.5.3 LASSO测试---------------------------------')
 
-clf = Lasso(alpha =0.0005, random_state=1)
-clf.fit(X_train,y_train)
+lasso = Lasso(alpha =0.0005, random_state=1)
+lasso.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = lasso.predict(X_test)
 print('LASSO for Mg Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 print("KRR TEST----------------------------------")
-clf = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+krr = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
+krr.fit(X_train,y_train)
+y_pred = krr.predict(X_test)
 print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Elastic Net TEST----------------------------------")
-clf = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+ENet = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+ENet.fit(X_train,y_train)
+y_pred = ENet.predict(X_test)
 print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Gradient Boosting TEST----------------------------------")
-clf = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
+GBoost = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
                                    max_depth=4, max_features='sqrt',
                                    min_samples_leaf=15, min_samples_split=10,
                                    loss='huber', random_state =5)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+GBoost.fit(X_train,y_train)
+y_pred = GBoost.predict(X_test)
 print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Bagging Experiment---------------------")
+baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,Lasso))
+baggingModel.fit(X_train,y_train)
+y_pred  =baggingModel.predict(X_test)
+print('Bagging squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Stacking Experiment------------------------------")
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,svr,rfr),
+                                                 meta_model = lasso)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is lasso squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (lasso, GBoost, krr,svr,rfr),
+                                                 meta_model = ENet)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is ENet squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, Lasso, krr,svr,rfr),
+                                                 meta_model = GBoost)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, lasso,svr,rfr),
+                                                 meta_model = krr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is krr squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,lasso,rfr),
+                                                 meta_model = svr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is svr squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,svr,lasso),
+                                                 meta_model = rfr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is rfr squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print()
 print('1.6 Mn的实验-------------------------')
@@ -611,24 +826,24 @@ print('1.6.1 Vector Machine Regression-----------------------')
 X_train, X_test, y_train, y_test = train_test_split(X,
                                                     Mn_y,
                                                     test_size=0.20)
-clf = SVR(C=1.0,epsilon=0.2)
-clf.fit(X_train,y_train)
+svr = SVR(C=1.0,epsilon=0.2)
+svr.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = svr.predict(X_test)
 print('SVR for Mn Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print()
 print('1.6.2 随机森林测试---------------------------------')
 
-clf = RandomForestRegressor(n_estimators=20,random_state=0)
-clf.fit(X_train,y_train)
+rfr = RandomForestRegressor(n_estimators=20,random_state=0)
+rfr.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = rfr.predict(X_test)
 print('RFR for Mn Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 #各特征的importance
-importance = clf.feature_importances_
+importance = rfr.feature_importances_
 #根据importance大小排序
 indices = np.argsort(importance)[::-1]
 #打印前十的importance
@@ -639,32 +854,76 @@ for i in range(0,10):
 print()
 print('1.6.3 LASSO测试---------------------------------')
 
-clf = Lasso(alpha =0.0005, random_state=1)
-clf.fit(X_train,y_train)
+lasso = Lasso(alpha =0.0005, random_state=1)
+lasso.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = lasso.predict(X_test)
 print('LASSO for Mn Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 print("KRR TEST----------------------------------")
-clf = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+krr = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
+krr.fit(X_train,y_train)
+y_pred = krr.predict(X_test)
 print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Elastic Net TEST----------------------------------")
-clf = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+ENet = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+ENet.fit(X_train,y_train)
+y_pred = ENet.predict(X_test)
 print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Gradient Boosting TEST----------------------------------")
-clf = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
+GBoost = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
                                    max_depth=4, max_features='sqrt',
                                    min_samples_leaf=15, min_samples_split=10,
                                    loss='huber', random_state =5)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+GBoost.fit(X_train,y_train)
+y_pred = GBoost.predict(X_test)
 print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Bagging Experiment---------------------")
+baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,Lasso))
+baggingModel.fit(X_train,y_train)
+y_pred  =baggingModel.predict(X_test)
+print('Bagging squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Stacking Experiment------------------------------")
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,svr,rfr),
+                                                 meta_model = lasso)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is lasso squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (lasso, GBoost, krr,svr,rfr),
+                                                 meta_model = ENet)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is ENet squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, Lasso, krr,svr,rfr),
+                                                 meta_model = GBoost)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, lasso,svr,rfr),
+                                                 meta_model = krr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is krr squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,lasso,rfr),
+                                                 meta_model = svr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is svr squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,svr,lasso),
+                                                 meta_model = rfr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is rfr squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print()
 print('1.7 Na的实验-------------------------')
@@ -675,24 +934,24 @@ print('1.7.1 Vector Machine Regression-----------------------')
 X_train, X_test, y_train, y_test = train_test_split(X,
                                                     Na_y,
                                                     test_size=0.20)
-clf = SVR(C=1.0,epsilon=0.2)
-clf.fit(X_train,y_train)
+svr = SVR(C=1.0,epsilon=0.2)
+svr.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = svr.predict(X_test)
 print('SVR for Na Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print()
 print('1.7.2 随机森林测试---------------------------------')
 
-clf = RandomForestRegressor(n_estimators=20,random_state=0)
-clf.fit(X_train,y_train)
+rfr = RandomForestRegressor(n_estimators=20,random_state=0)
+rfr.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = rfr.predict(X_test)
 print('RFR for Na Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 #各特征的importance
-importance = clf.feature_importances_
+importance = rfr.feature_importances_
 #根据importance大小排序
 indices = np.argsort(importance)[::-1]
 #打印前十的importance
@@ -703,32 +962,76 @@ for i in range(0,10):
 print()
 print('1.7.3 LASSO测试---------------------------------')
 
-clf = Lasso(alpha =0.0005, random_state=1)
-clf.fit(X_train,y_train)
+lasso = Lasso(alpha =0.0005, random_state=1)
+lasso.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = lasso.predict(X_test)
 print('LASSO for Na Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 print("KRR TEST----------------------------------")
-clf = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+krr = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
+krr.fit(X_train,y_train)
+y_pred = krr.predict(X_test)
 print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Elastic Net TEST----------------------------------")
-clf = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+ENet = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+ENet.fit(X_train,y_train)
+y_pred =ENet.predict(X_test)
 print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Gradient Boosting TEST----------------------------------")
-clf = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
+GBoost = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
                                    max_depth=4, max_features='sqrt',
                                    min_samples_leaf=15, min_samples_split=10,
                                    loss='huber', random_state =5)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+GBoost.fit(X_train,y_train)
+y_pred = GBoost.predict(X_test)
 print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Bagging Experiment---------------------")
+baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,Lasso))
+baggingModel.fit(X_train,y_train)
+y_pred  =baggingModel.predict(X_test)
+print('Bagging squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Stacking Experiment------------------------------")
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,svr,rfr),
+                                                 meta_model = lasso)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is lasso squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (lasso, GBoost, krr,svr,rfr),
+                                                 meta_model = ENet)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is ENet squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, Lasso, krr,svr,rfr),
+                                                 meta_model = GBoost)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, lasso,svr,rfr),
+                                                 meta_model = krr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is krr squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,lasso,rfr),
+                                                 meta_model = svr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is svr squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,svr,lasso),
+                                                 meta_model = rfr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is rfr squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print()
 print('1.8 Si的实验-------------------------')
@@ -739,24 +1042,24 @@ print('1.8.1 Vector Machine Regression-----------------------')
 X_train, X_test, y_train, y_test = train_test_split(X,
                                                     Si_y,
                                                     test_size=0.20)
-clf = SVR(C=1.0,epsilon=0.2)
-clf.fit(X_train,y_train)
+svr = SVR(C=1.0,epsilon=0.2)
+svr.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = svr.predict(X_test)
 print('SVR for Si Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print()
 print('1.8.2 随机森林测试---------------------------------')
 
-clf = RandomForestRegressor(n_estimators=20,random_state=0)
-clf.fit(X_train,y_train)
+rfr = RandomForestRegressor(n_estimators=20,random_state=0)
+rfr.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = rfr.predict(X_test)
 print('RFR for Si Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 #各特征的importance
-importance = clf.feature_importances_
+importance = rfr.feature_importances_
 #根据importance大小排序
 indices = np.argsort(importance)[::-1]
 #打印前十的importance
@@ -767,32 +1070,76 @@ for i in range(0,10):
 print()
 print('1.8.3 LASSO测试---------------------------------')
 
-clf = Lasso(alpha =0.0005, random_state=1)
-clf.fit(X_train,y_train)
+lasso = Lasso(alpha =0.0005, random_state=1)
+lasso.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = lasso.predict(X_test)
 print('LASSO for Si Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 print("KRR TEST----------------------------------")
-clf = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+krr = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
+krr.fit(X_train,y_train)
+y_pred = krr.predict(X_test)
 print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Elastic Net TEST----------------------------------")
-clf = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+ENet = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+ENet.fit(X_train,y_train)
+y_pred = ENet.predict(X_test)
 print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Gradient Boosting TEST----------------------------------")
-clf = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
+GBoost = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
                                    max_depth=4, max_features='sqrt',
                                    min_samples_leaf=15, min_samples_split=10,
                                    loss='huber', random_state =5)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+GBoost.fit(X_train,y_train)
+y_pred = GBoost.predict(X_test)
 print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Bagging Experiment---------------------")
+baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,Lasso))
+baggingModel.fit(X_train,y_train)
+y_pred  =baggingModel.predict(X_test)
+print('Bagging squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Stacking Experiment------------------------------")
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,svr,rfr),
+                                                 meta_model = lasso)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is lasso squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (lasso, GBoost, krr,svr,rfr),
+                                                 meta_model = ENet)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is ENet squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, Lasso, krr,svr,rfr),
+                                                 meta_model = GBoost)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, lasso,svr,rfr),
+                                                 meta_model = krr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is krr squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,lasso,rfr),
+                                                 meta_model = svr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is svr squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,svr,lasso),
+                                                 meta_model = rfr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is rfr squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print()
 print('1.9 Ti的实验-------------------------')
@@ -802,24 +1149,24 @@ print('1.9.1 Vector Machine Regression-----------------------')
 X_train, X_test, y_train, y_test = train_test_split(X,
                                                     Ti_y,
                                                     test_size=0.20)
-clf = SVR(C=1.0,epsilon=0.2)
-clf.fit(X_train,y_train)
+svr = SVR(C=1.0,epsilon=0.2)
+svr.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = svr.predict(X_test)
 print('SVR for Ti Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print()
 print('1.9.2 随机森林测试---------------------------------')
 
-clf = RandomForestRegressor(n_estimators=20,random_state=0)
-clf.fit(X_train,y_train)
+rfr = RandomForestRegressor(n_estimators=20,random_state=0)
+rfr.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = rfr.predict(X_test)
 print('RFR for Ti Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 #各特征的importance
-importance = clf.feature_importances_
+importance = rfr.feature_importances_
 #根据importance大小排序
 indices = np.argsort(importance)[::-1]
 #打印前十的importance
@@ -830,32 +1177,76 @@ for i in range(0,10):
 print()
 print('1.9.3 LASSO测试---------------------------------')
 
-clf = Lasso(alpha =0.0005, random_state=1)
-clf.fit(X_train,y_train)
+lasso = Lasso(alpha =0.0005, random_state=1)
+lasso.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = lasso.predict(X_test)
 print('LASSO for Ti Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 print("KRR TEST----------------------------------")
-clf = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+krr = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
+krr.fit(X_train,y_train)
+y_pred = krr.predict(X_test)
 print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Elastic Net TEST----------------------------------")
-clf = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+ENet = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+ENet.fit(X_train,y_train)
+y_pred = ENet.predict(X_test)
 print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Gradient Boosting TEST----------------------------------")
-clf = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
+GBoost = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
                                    max_depth=4, max_features='sqrt',
                                    min_samples_leaf=15, min_samples_split=10,
                                    loss='huber', random_state =5)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+GBoost.fit(X_train,y_train)
+y_pred = GBoost.predict(X_test)
 print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Bagging Experiment---------------------")
+baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,Lasso))
+baggingModel.fit(X_train,y_train)
+y_pred  =baggingModel.predict(X_test)
+print('Bagging squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Stacking Experiment------------------------------")
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,svr,rfr),
+                                                 meta_model = lasso)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is lasso squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (lasso, GBoost, krr,svr,rfr),
+                                                 meta_model = ENet)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is ENet squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, Lasso, krr,svr,rfr),
+                                                 meta_model = GBoost)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, lasso,svr,rfr),
+                                                 meta_model = krr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is krr squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,lasso,rfr),
+                                                 meta_model = svr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is svr squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,svr,lasso),
+                                                 meta_model = rfr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is rfr squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print()
 print('1.10 P的实验-------------------------')
@@ -866,24 +1257,24 @@ print('1.10.1 Vector Machine Regression-----------------------')
 X_train, X_test, y_train, y_test = train_test_split(X,
                                                     P_y,
                                                     test_size=0.20)
-clf = SVR(C=1.0,epsilon=0.2)
-clf.fit(X_train,y_train)
+svr = SVR(C=1.0,epsilon=0.2)
+svr.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = svr.predict(X_test)
 print('SVR for P Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print()
 print('1.10.2 随机森林测试---------------------------------')
 
-clf = RandomForestRegressor(n_estimators=20,random_state=0)
-clf.fit(X_train,y_train)
+rfr = RandomForestRegressor(n_estimators=20,random_state=0)
+rfr.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = rfr.predict(X_test)
 print('RFR for P Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 #各特征的importance
-importance = clf.feature_importances_
+importance = rfr.feature_importances_
 #根据importance大小排序
 indices = np.argsort(importance)[::-1]
 #打印前十的importance
@@ -894,33 +1285,76 @@ for i in range(0,10):
 print()
 print('1.10.3 LASSO测试---------------------------------')
 
-clf = Lasso(alpha =0.0005, random_state=1)
-clf.fit(X_train,y_train)
+lasso = Lasso(alpha =0.0005, random_state=1)
+lasso.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = lasso.predict(X_test)
 print('LASSO for P Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("KRR TEST----------------------------------")
-clf = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+krr = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
+krr.fit(X_train,y_train)
+y_pred = krr.predict(X_test)
 print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Elastic Net TEST----------------------------------")
-clf = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+ENet = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+ENet.fit(X_train,y_train)
+y_pred = ENet.predict(X_test)
 print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Gradient Boosting TEST----------------------------------")
-clf = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
+GBoost = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
                                    max_depth=4, max_features='sqrt',
                                    min_samples_leaf=15, min_samples_split=10,
                                    loss='huber', random_state =5)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+GBoost.fit(X_train,y_train)
+y_pred = GBoost.predict(X_test)
 print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
+print("Bagging Experiment---------------------")
+baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,Lasso))
+baggingModel.fit(X_train,y_train)
+y_pred  =baggingModel.predict(X_test)
+print('Bagging squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Stacking Experiment------------------------------")
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,svr,rfr),
+                                                 meta_model = lasso)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is lasso squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (lasso, GBoost, krr,svr,rfr),
+                                                 meta_model = ENet)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is ENet squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, Lasso, krr,svr,rfr),
+                                                 meta_model = GBoost)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, lasso,svr,rfr),
+                                                 meta_model = krr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is krr squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,lasso,rfr),
+                                                 meta_model = svr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is svr squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,svr,lasso),
+                                                 meta_model = rfr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is rfr squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 
 #寻找对应元素特征峰作为特征
@@ -963,24 +1397,25 @@ print('2.1.1 Vector Machine Regression-----------------------')
 X_train, X_test, y_train, y_test = train_test_split(Al_x,
                                                     Al_y,
                                                     test_size=0.20)
-clf = SVR(C=1.0,epsilon=0.2)
-clf.fit(X_train,y_train)
+svr = SVR(C=1.0,epsilon=0.2)
+svr.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = svr.predict(X_test)
 print('SVR for AL Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
 
 print()
 print('2.1.2 随机森林测试---------------------------------')
 
-clf = RandomForestRegressor(n_estimators=20,random_state=0)
-clf.fit(X_train,y_train)
+rfr = RandomForestRegressor(n_estimators=20,random_state=0)
+rfr.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = rfr.predict(X_test)
 print('RFR for AL Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 #各特征的importance
-importance = clf.feature_importances_
+importance = rfr.feature_importances_
 #根据importance大小排序
 indices = np.argsort(importance)[::-1]
 #打印前十的importance
@@ -991,33 +1426,77 @@ for i in range(0,10):
 print()
 print('2.1.3 LASSO测试---------------------------------')
 
-clf = Lasso(alpha =0.0005, random_state=1)
-clf.fit(X_train,y_train)
+lasso = Lasso(alpha =0.0005, random_state=1)
+lasso.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = lasso.predict(X_test)
 print('LASSO for AL Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("KRR TEST----------------------------------")
-clf = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+krr = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
+krr.fit(X_train,y_train)
+y_pred = krr.predict(X_test)
 print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Elastic Net TEST----------------------------------")
-clf = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+ENet = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+ENet.fit(X_train,y_train)
+y_pred = ENet.predict(X_test)
 print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Gradient Boosting TEST----------------------------------")
-clf = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
+GBoost = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
                                    max_depth=4, max_features='sqrt',
                                    min_samples_leaf=15, min_samples_split=10,
                                    loss='huber', random_state =5)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+GBoost.fit(X_train,y_train)
+y_pred = GBoost.predict(X_test)
 print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Bagging Experiment---------------------")
+baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,Lasso))
+baggingModel.fit(X_train,y_train)
+y_pred  =baggingModel.predict(X_test)
+print('Bagging squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Stacking Experiment------------------------------")
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,svr,rfr),
+                                                 meta_model = lasso)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is lasso squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (lasso, GBoost, krr,svr,rfr),
+                                                 meta_model = ENet)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is ENet squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, Lasso, krr,svr,rfr),
+                                                 meta_model = GBoost)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, lasso,svr,rfr),
+                                                 meta_model = krr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is krr squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,lasso,rfr),
+                                                 meta_model = svr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is svr squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,svr,lasso),
+                                                 meta_model = rfr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is rfr squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print('2.2 Ca的相关实验--------------------------')
 Ca_x = selectFeature('Ca')
@@ -1027,24 +1506,24 @@ print('2.2.1 Vector Machine Regression-----------------------')
 X_train, X_test, y_train, y_test = train_test_split(Ca_x,
                                                     Ca_y,
                                                     test_size=0.20)
-clf = SVR(C=1.0,epsilon=0.2)
-clf.fit(X_train,y_train)
+svr = SVR(C=1.0,epsilon=0.2)
+svr.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = svr.predict(X_test)
 print('SVR for Ca Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print()
 print('2.2.2 随机森林测试---------------------------------')
 
-clf = RandomForestRegressor(n_estimators=20,random_state=0)
-clf.fit(X_train,y_train)
+rfr = RandomForestRegressor(n_estimators=20,random_state=0)
+rfr.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = rfr.predict(X_test)
 print('RFR for Ca Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 #各特征的importance
-importance = clf.feature_importances_
+importance = rfr.feature_importances_
 #根据importance大小排序
 indices = np.argsort(importance)[::-1]
 #打印前十的importance
@@ -1055,33 +1534,77 @@ for i in range(0,10):
 print()
 print('2.2.3 LASSO测试---------------------------------')
 
-clf = Lasso(alpha =0.0005, random_state=1)
-clf.fit(X_train,y_train)
+lasso = Lasso(alpha =0.0005, random_state=1)
+lasso.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = lasso.predict(X_test)
 print('LASSO for Ca Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("KRR TEST----------------------------------")
-clf = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+krr = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
+krr.fit(X_train,y_train)
+y_pred = krr.predict(X_test)
 print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Elastic Net TEST----------------------------------")
-clf = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+ENet = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+ENet.fit(X_train,y_train)
+y_pred = ENet.predict(X_test)
 print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Gradient Boosting TEST----------------------------------")
-clf = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
+GBoost = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
                                    max_depth=4, max_features='sqrt',
                                    min_samples_leaf=15, min_samples_split=10,
                                    loss='huber', random_state =5)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+GBoost.fit(X_train,y_train)
+y_pred = GBoost.predict(X_test)
 print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Bagging Experiment---------------------")
+baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,Lasso))
+baggingModel.fit(X_train,y_train)
+y_pred  =baggingModel.predict(X_test)
+print('Bagging squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Stacking Experiment------------------------------")
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,svr,rfr),
+                                                 meta_model = lasso)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is lasso squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (lasso, GBoost, krr,svr,rfr),
+                                                 meta_model = ENet)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is ENet squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, Lasso, krr,svr,rfr),
+                                                 meta_model = GBoost)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, lasso,svr,rfr),
+                                                 meta_model = krr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is krr squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,lasso,rfr),
+                                                 meta_model = svr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is svr squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,svr,lasso),
+                                                 meta_model = rfr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is rfr squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 """
 print('2.3 Fe的相关实验--------------------------')
@@ -1157,24 +1680,24 @@ print('2.4.1 Vector Machine Regression-----------------------')
 X_train, X_test, y_train, y_test = train_test_split(K_x,
                                                     K_y,
                                                     test_size=0.20)
-clf = SVR(C=1.0,epsilon=0.2)
-clf.fit(X_train,y_train)
+svr = SVR(C=1.0,epsilon=0.2)
+svr.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = svr.predict(X_test)
 print('SVR for K Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print()
 print('2.4.2 随机森林测试---------------------------------')
 
-clf = RandomForestRegressor(n_estimators=20,random_state=0)
-clf.fit(X_train,y_train)
+rfr = RandomForestRegressor(n_estimators=20,random_state=0)
+rfr.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = rfr.predict(X_test)
 print('RFR for K Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 #各特征的importance
-importance = clf.feature_importances_
+importance = rfr.feature_importances_
 #根据importance大小排序
 indices = np.argsort(importance)[::-1]
 #打印前十的importance
@@ -1185,33 +1708,77 @@ for i in range(0,10):
 print()
 print('2.4.3 LASSO测试---------------------------------')
 
-clf = Lasso(alpha =0.0005, random_state=1)
-clf.fit(X_train,y_train)
+lasso = Lasso(alpha =0.0005, random_state=1)
+lasso.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = lasso.predict(X_test)
 print('LASSO for K Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("KRR TEST----------------------------------")
-clf = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+krr = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
+krr.fit(X_train,y_train)
+y_pred = krr.predict(X_test)
 print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Elastic Net TEST----------------------------------")
-clf = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+ENet = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+ENet.fit(X_train,y_train)
+y_pred = ENet.predict(X_test)
 print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Gradient Boosting TEST----------------------------------")
-clf = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
+GBoost = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
                                    max_depth=4, max_features='sqrt',
                                    min_samples_leaf=15, min_samples_split=10,
                                    loss='huber', random_state =5)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+GBoost.fit(X_train,y_train)
+y_pred = GBoost.predict(X_test)
 print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Bagging Experiment---------------------")
+baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,Lasso))
+baggingModel.fit(X_train,y_train)
+y_pred  =baggingModel.predict(X_test)
+print('Bagging squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Stacking Experiment------------------------------")
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,svr,rfr),
+                                                 meta_model = lasso)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is lasso squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (lasso, GBoost, krr,svr,rfr),
+                                                 meta_model = ENet)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is ENet squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, Lasso, krr,svr,rfr),
+                                                 meta_model = GBoost)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, lasso,svr,rfr),
+                                                 meta_model = krr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is krr squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,lasso,rfr),
+                                                 meta_model = svr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is svr squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,svr,lasso),
+                                                 meta_model = rfr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is rfr squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print('2.5 Mg的相关实验--------------------------')
 Mg_x = selectFeature('Mg')
@@ -1221,24 +1788,24 @@ print('2.5.1 Vector Machine Regression-----------------------')
 X_train, X_test, y_train, y_test = train_test_split(Mg_x,
                                                     Mg_y,
                                                     test_size=0.20)
-clf = SVR(C=1.0,epsilon=0.2)
-clf.fit(X_train,y_train)
+svr = SVR(C=1.0,epsilon=0.2)
+svr.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = svr.predict(X_test)
 print('SVR for Mg Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print()
 print('2.5.2 随机森林测试---------------------------------')
 
-clf = RandomForestRegressor(n_estimators=20,random_state=0)
-clf.fit(X_train,y_train)
+rfr = RandomForestRegressor(n_estimators=20,random_state=0)
+rfr.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = rfr.predict(X_test)
 print('RFR for Mg Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 #各特征的importance
-importance = clf.feature_importances_
+importance = rfr.feature_importances_
 #根据importance大小排序
 indices = np.argsort(importance)[::-1]
 #打印前十的importance
@@ -1249,33 +1816,76 @@ for i in range(0,10):
 print()
 print('2.5.3 LASSO测试---------------------------------')
 
-clf = Lasso(alpha =0.0005, random_state=1)
-clf.fit(X_train,y_train)
+lasso = Lasso(alpha =0.0005, random_state=1)
+lasso.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = lasso.predict(X_test)
 print('LASSO for Mg Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
-
 print("KRR TEST----------------------------------")
-clf = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+krr = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
+krr.fit(X_train,y_train)
+y_pred = krr.predict(X_test)
 print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Elastic Net TEST----------------------------------")
-clf = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+ENet = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+ENet.fit(X_train,y_train)
+y_pred = ENet.predict(X_test)
 print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Gradient Boosting TEST----------------------------------")
-clf = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
+GBoost = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
                                    max_depth=4, max_features='sqrt',
                                    min_samples_leaf=15, min_samples_split=10,
                                    loss='huber', random_state =5)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+GBoost.fit(X_train,y_train)
+y_pred = GBoost.predict(X_test)
 print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Bagging Experiment---------------------")
+baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,Lasso))
+baggingModel.fit(X_train,y_train)
+y_pred  =baggingModel.predict(X_test)
+print('Bagging squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Stacking Experiment------------------------------")
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,svr,rfr),
+                                                 meta_model = lasso)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is lasso squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (lasso, GBoost, krr,svr,rfr),
+                                                 meta_model = ENet)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is ENet squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, Lasso, krr,svr,rfr),
+                                                 meta_model = GBoost)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, lasso,svr,rfr),
+                                                 meta_model = krr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is krr squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,lasso,rfr),
+                                                 meta_model = svr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is svr squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,svr,lasso),
+                                                 meta_model = rfr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is rfr squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 
 print('2.6 Mn的相关实验--------------------------')
@@ -1286,24 +1896,24 @@ print('2.6.1 Vector Machine Regression-----------------------')
 X_train, X_test, y_train, y_test = train_test_split(Mn_x,
                                                     Mn_y,
                                                     test_size=0.20)
-clf = SVR(C=1.0,epsilon=0.2)
-clf.fit(X_train,y_train)
+svr = SVR(C=1.0,epsilon=0.2)
+svr.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = svr.predict(X_test)
 print('SVR for Mn Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print()
 print('2.6.2 随机森林测试---------------------------------')
 
-clf = RandomForestRegressor(n_estimators=20,random_state=0)
-clf.fit(X_train,y_train)
+rfr = RandomForestRegressor(n_estimators=20,random_state=0)
+rfr.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = rfr.predict(X_test)
 print('RFR for Mn Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 #各特征的importance
-importance = clf.feature_importances_
+importance = rfr.feature_importances_
 #根据importance大小排序
 indices = np.argsort(importance)[::-1]
 #打印前十的importance
@@ -1314,33 +1924,76 @@ for i in range(0,10):
 print()
 print('2.6.3 LASSO测试---------------------------------')
 
-clf = Lasso(alpha =0.0005, random_state=1)
-clf.fit(X_train,y_train)
+lasso = Lasso(alpha =0.0005, random_state=1)
+lasso.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = lasso.predict(X_test)
 print('LASSO for Mn Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
-
 print("KRR TEST----------------------------------")
-clf = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+krr = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
+krr.fit(X_train,y_train)
+y_pred = krr.predict(X_test)
 print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Elastic Net TEST----------------------------------")
-clf = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+ENet = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+ENet.fit(X_train,y_train)
+y_pred = ENet.predict(X_test)
 print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Gradient Boosting TEST----------------------------------")
-clf = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
+GBoost = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
                                    max_depth=4, max_features='sqrt',
                                    min_samples_leaf=15, min_samples_split=10,
                                    loss='huber', random_state =5)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+GBoost.fit(X_train,y_train)
+y_pred = GBoost.predict(X_test)
 print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Bagging Experiment---------------------")
+baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,Lasso))
+baggingModel.fit(X_train,y_train)
+y_pred  =baggingModel.predict(X_test)
+print('Bagging squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Stacking Experiment------------------------------")
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,svr,rfr),
+                                                 meta_model = lasso)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is lasso squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (lasso, GBoost, krr,svr,rfr),
+                                                 meta_model = ENet)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is ENet squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, Lasso, krr,svr,rfr),
+                                                 meta_model = GBoost)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, lasso,svr,rfr),
+                                                 meta_model = krr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is krr squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,lasso,rfr),
+                                                 meta_model = svr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is svr squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,svr,lasso),
+                                                 meta_model = rfr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is rfr squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print('2.7 Na的相关实验--------------------------')
 Na_x = selectFeature('Na')
@@ -1350,24 +2003,24 @@ print('2.7.1 Vector Machine Regression-----------------------')
 X_train, X_test, y_train, y_test = train_test_split(Na_x,
                                                     Na_y,
                                                     test_size=0.20)
-clf = SVR(C=1.0,epsilon=0.2)
-clf.fit(X_train,y_train)
+svr = SVR(C=1.0,epsilon=0.2)
+svr.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = svr.predict(X_test)
 print('SVR for Na Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print()
 print('2.7.2 随机森林测试---------------------------------')
 
-clf = RandomForestRegressor(n_estimators=20,random_state=0)
-clf.fit(X_train,y_train)
+rfr = RandomForestRegressor(n_estimators=20,random_state=0)
+rfr.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = rfr.predict(X_test)
 print('RFR for Na Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 #各特征的importance
-importance = clf.feature_importances_
+importance = rfr.feature_importances_
 #根据importance大小排序
 indices = np.argsort(importance)[::-1]
 #打印前十的importance
@@ -1378,33 +2031,76 @@ for i in range(0,10):
 print()
 print('2.7.3 LASSO测试---------------------------------')
 
-clf = Lasso(alpha =0.0005, random_state=1)
-clf.fit(X_train,y_train)
+lasso = Lasso(alpha =0.0005, random_state=1)
+lasso.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = lasso.predict(X_test)
 print('LASSO for Na Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
-
 print("KRR TEST----------------------------------")
-clf = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+krr = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
+krr.fit(X_train,y_train)
+y_pred = krr.predict(X_test)
 print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Elastic Net TEST----------------------------------")
-clf = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+ENet = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+ENet.fit(X_train,y_train)
+y_pred =ENet.predict(X_test)
 print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Gradient Boosting TEST----------------------------------")
-clf = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
+GBoost = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
                                    max_depth=4, max_features='sqrt',
                                    min_samples_leaf=15, min_samples_split=10,
                                    loss='huber', random_state =5)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+GBoost.fit(X_train,y_train)
+y_pred = GBoost.predict(X_test)
 print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Bagging Experiment---------------------")
+baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,Lasso))
+baggingModel.fit(X_train,y_train)
+y_pred  =baggingModel.predict(X_test)
+print('Bagging squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Stacking Experiment------------------------------")
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,svr,rfr),
+                                                 meta_model = lasso)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is lasso squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (lasso, GBoost, krr,svr,rfr),
+                                                 meta_model = ENet)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is ENet squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, Lasso, krr,svr,rfr),
+                                                 meta_model = GBoost)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, lasso,svr,rfr),
+                                                 meta_model = krr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is krr squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,lasso,rfr),
+                                                 meta_model = svr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is svr squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,svr,lasso),
+                                                 meta_model = rfr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is rfr squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 
 print('2.8 Si的相关实验--------------------------')
@@ -1415,24 +2111,24 @@ print('2.8.1 Vector Machine Regression-----------------------')
 X_train, X_test, y_train, y_test = train_test_split(Si_x,
                                                     Si_y,
                                                     test_size=0.20)
-clf = SVR(C=1.0,epsilon=0.2)
-clf.fit(X_train,y_train)
+svr = SVR(C=1.0,epsilon=0.2)
+svr.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = svr.predict(X_test)
 print('SVR for Si Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print()
 print('2.8.2 随机森林测试---------------------------------')
 
-clf = RandomForestRegressor(n_estimators=20,random_state=0)
-clf.fit(X_train,y_train)
+rfr = RandomForestRegressor(n_estimators=20,random_state=0)
+rfr.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = rfr.predict(X_test)
 print('RFR for Si Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 #各特征的importance
-importance = clf.feature_importances_
+importance = rfr.feature_importances_
 #根据importance大小排序
 indices = np.argsort(importance)[::-1]
 #打印前十的importance
@@ -1443,33 +2139,76 @@ for i in range(0,10):
 print()
 print('2.8.3 LASSO测试---------------------------------')
 
-clf = Lasso(alpha =0.0005, random_state=1)
-clf.fit(X_train,y_train)
+lasso = Lasso(alpha =0.0005, random_state=1)
+lasso.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = lasso.predict(X_test)
 print('LASSO for Si Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
-
 print("KRR TEST----------------------------------")
-clf = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+krr = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
+krr.fit(X_train,y_train)
+y_pred = krr.predict(X_test)
 print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Elastic Net TEST----------------------------------")
-clf = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+ENet = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+ENet.fit(X_train,y_train)
+y_pred = ENet.predict(X_test)
 print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Gradient Boosting TEST----------------------------------")
-clf = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
+GBoost = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
                                    max_depth=4, max_features='sqrt',
                                    min_samples_leaf=15, min_samples_split=10,
                                    loss='huber', random_state =5)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+GBoost.fit(X_train,y_train)
+y_pred = GBoost.predict(X_test)
 print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Bagging Experiment---------------------")
+baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,Lasso))
+baggingModel.fit(X_train,y_train)
+y_pred  =baggingModel.predict(X_test)
+print('Bagging squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Stacking Experiment------------------------------")
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,svr,rfr),
+                                                 meta_model = lasso)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is lasso squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (lasso, GBoost, krr,svr,rfr),
+                                                 meta_model = ENet)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is ENet squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, Lasso, krr,svr,rfr),
+                                                 meta_model = GBoost)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, lasso,svr,rfr),
+                                                 meta_model = krr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is krr squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,lasso,rfr),
+                                                 meta_model = svr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is svr squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,svr,lasso),
+                                                 meta_model = rfr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is rfr squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 
 
@@ -1481,24 +2220,24 @@ print('2.9.1 Vector Machine Regression-----------------------')
 X_train, X_test, y_train, y_test = train_test_split(Ti_x,
                                                     Ti_y,
                                                     test_size=0.20)
-clf = SVR(C=1.0,epsilon=0.2)
-clf.fit(X_train,y_train)
+svr = SVR(C=1.0,epsilon=0.2)
+svr.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = svr.predict(X_test)
 print('SVR for Ti Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print()
 print('2.9.2 随机森林测试---------------------------------')
 
-clf = RandomForestRegressor(n_estimators=20,random_state=0)
-clf.fit(X_train,y_train)
+rfr = RandomForestRegressor(n_estimators=20,random_state=0)
+rfr.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = rfr.predict(X_test)
 print('RFR for Ti Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 #各特征的importance
-importance = clf.feature_importances_
+importance = rfr.feature_importances_
 #根据importance大小排序
 indices = np.argsort(importance)[::-1]
 #打印前十的importance
@@ -1509,33 +2248,76 @@ for i in range(0,10):
 print()
 print('2.9.3 LASSO测试---------------------------------')
 
-clf = Lasso(alpha =0.0005, random_state=1)
-clf.fit(X_train,y_train)
+lasso = Lasso(alpha =0.0005, random_state=1)
+lasso.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = lasso.predict(X_test)
 print('LASSO for Ti Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
-
 print("KRR TEST----------------------------------")
-clf = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+krr = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
+krr.fit(X_train,y_train)
+y_pred = krr.predict(X_test)
 print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Elastic Net TEST----------------------------------")
-clf = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+ENet = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+ENet.fit(X_train,y_train)
+y_pred = ENet.predict(X_test)
 print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Gradient Boosting TEST----------------------------------")
-clf = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
+GBoost = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
                                    max_depth=4, max_features='sqrt',
                                    min_samples_leaf=15, min_samples_split=10,
                                    loss='huber', random_state =5)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+GBoost.fit(X_train,y_train)
+y_pred = GBoost.predict(X_test)
 print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Bagging Experiment---------------------")
+baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,Lasso))
+baggingModel.fit(X_train,y_train)
+y_pred  =baggingModel.predict(X_test)
+print('Bagging squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Stacking Experiment------------------------------")
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,svr,rfr),
+                                                 meta_model = lasso)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is lasso squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (lasso, GBoost, krr,svr,rfr),
+                                                 meta_model = ENet)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is ENet squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, Lasso, krr,svr,rfr),
+                                                 meta_model = GBoost)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, lasso,svr,rfr),
+                                                 meta_model = krr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is krr squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,lasso,rfr),
+                                                 meta_model = svr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is svr squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,svr,lasso),
+                                                 meta_model = rfr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is rfr squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 
 print('2.10 P的相关实验--------------------------')
@@ -1546,24 +2328,24 @@ print('2.10.1 Vector Machine Regression-----------------------')
 X_train, X_test, y_train, y_test = train_test_split(P_x,
                                                     P_y,
                                                     test_size=0.20)
-clf = SVR(C=1.0,epsilon=0.2)
-clf.fit(X_train,y_train)
+svr = SVR(C=1.0,epsilon=0.2)
+svr.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = svr.predict(X_test)
 print('SVR for P Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print()
 print('2.10.2 随机森林测试---------------------------------')
 
-clf = RandomForestRegressor(n_estimators=20,random_state=0)
-clf.fit(X_train,y_train)
+rfr = RandomForestRegressor(n_estimators=20,random_state=0)
+rfr.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = rfr.predict(X_test)
 print('RFR for P Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 #各特征的importance
-importance = clf.feature_importances_
+importance = rfr.feature_importances_
 #根据importance大小排序
 indices = np.argsort(importance)[::-1]
 #打印前十的importance
@@ -1574,30 +2356,74 @@ for i in range(0,10):
 print()
 print('2.10.3 LASSO测试---------------------------------')
 
-clf = Lasso(alpha =0.0005, random_state=1)
-clf.fit(X_train,y_train)
+lasso = Lasso(alpha =0.0005, random_state=1)
+lasso.fit(X_train,y_train)
 
 
-y_pred = clf.predict(X_test)
+y_pred = lasso.predict(X_test)
 print('LASSO for P Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("KRR TEST----------------------------------")
-clf = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+krr = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
+krr.fit(X_train,y_train)
+y_pred = krr.predict(X_test)
 print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Elastic Net TEST----------------------------------")
-clf = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+ENet = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+ENet.fit(X_train,y_train)
+y_pred = ENet.predict(X_test)
 print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Gradient Boosting TEST----------------------------------")
-clf = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
+GBoost = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
                                    max_depth=4, max_features='sqrt',
                                    min_samples_leaf=15, min_samples_split=10,
                                    loss='huber', random_state =5)
-clf.fit(X_train,y_train)
-y_pred = clf.predict(X_test)
+GBoost.fit(X_train,y_train)
+y_pred = GBoost.predict(X_test)
 print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Bagging Experiment---------------------")
+baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,Lasso))
+baggingModel.fit(X_train,y_train)
+y_pred  =baggingModel.predict(X_test)
+print('Bagging squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print("Stacking Experiment------------------------------")
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,svr,rfr),
+                                                 meta_model = lasso)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is lasso squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (lasso, GBoost, krr,svr,rfr),
+                                                 meta_model = ENet)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is ENet squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, Lasso, krr,svr,rfr),
+                                                 meta_model = GBoost)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, lasso,svr,rfr),
+                                                 meta_model = krr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is krr squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,lasso,rfr),
+                                                 meta_model = svr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is svr squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,svr,lasso),
+                                                 meta_model = rfr)
+stacked_averaged_models.fit(X_train,y_train)
+y_pred = stacked_averaged_models.predict(X_test)
+print('Stacking with metamodel is rfr squared error is '+str(mean_squared_error(y_test,y_pred)))

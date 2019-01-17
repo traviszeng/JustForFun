@@ -17,8 +17,8 @@
       <file leaf-file-name="LIBStest.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/LIBStest.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="945">
-              <caret line="222" column="9" lean-forward="true" selection-start-line="222" selection-start-column="9" selection-end-line="222" selection-end-column="9" />
+            <state relative-caret-position="1647">
+              <caret line="2415" column="51" lean-forward="false" selection-start-line="2415" selection-start-column="51" selection-end-line="2415" selection-end-column="51" />
               <folding>
                 <element signature="e#36#45#0" expanded="true" />
               </folding>
@@ -64,8 +64,8 @@
     <sorting>DEFINITION_ORDER</sorting>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="62" />
-    <option name="y" value="57" />
+    <option name="x" value="-8" />
+    <option name="y" value="-8" />
     <option name="width" value="697" />
     <option name="height" value="735" />
   </component>
@@ -158,7 +158,7 @@
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.18603411" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.0" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
@@ -192,8 +192,8 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/LIBStest.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="945">
-          <caret line="222" column="9" lean-forward="true" selection-start-line="222" selection-start-column="9" selection-end-line="222" selection-end-column="9" />
+        <state relative-caret-position="1647">
+          <caret line="2415" column="51" lean-forward="false" selection-start-line="2415" selection-start-column="51" selection-end-line="2415" selection-end-column="51" />
           <folding>
             <element signature="e#36#45#0" expanded="true" />
           </folding>
