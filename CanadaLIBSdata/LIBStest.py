@@ -9,6 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.linear_model import ElasticNet, Lasso,  BayesianRidge, LassoLarsIC
 from sklearn.ensemble import RandomForestRegressor,  GradientBoostingRegressor
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.svm import SVR
 from sklearn.kernel_ridge import KernelRidge
 from sklearn.pipeline import make_pipeline
@@ -209,14 +210,14 @@ print('Data preprocessing finished.')
 print()
 print('1.单独学习器实验------------------------------')
 print()
-print('1.1 Support Vector Regression-------------------------')
+print('1.1 Al的实验-------------------------')
 
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import make_pipeline
 from sklearn.metrics import mean_squared_error
 from sklearn.svm import SVR
 
-print('1.1.1 Al的实验-----------------------')
+print('1.1.1 Vector Machine Regression-----------------------')
 
 X_train, X_test, y_train, y_test = train_test_split(X,
                                                     Al_y,
@@ -226,367 +227,435 @@ clf.fit(X_train,y_train)
 
 
 y_pred = clf.predict(X_test)
-print('Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
-
-print('1.1.2 Ca的实验-----------------------')
-del clf
-X_train, X_test, y_train, y_test = train_test_split(X,
-                                                    Ca_y,
-                                                    test_size=0.20)
-clf = SVR(C=1.0,epsilon=0.2)
-clf.fit(X_train,y_train)
-
-
-y_pred = clf.predict(X_test)
-print('Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
-
-
-print('1.1.3 Fe的实验-----------------------')
-del clf
-X_train, X_test, y_train, y_test = train_test_split(X,
-                                                    Fe_y,
-                                                    test_size=0.20)
-clf = SVR(C=1.0,epsilon=0.2)
-clf.fit(X_train,y_train)
-
-
-y_pred = clf.predict(X_test)
-print('Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
-
-
-print('1.1.4 K的实验-----------------------')
-del clf
-X_train, X_test, y_train, y_test = train_test_split(X,
-                                                    K_y,
-                                                    test_size=0.20)
-clf = SVR(C=1.0,epsilon=0.2)
-clf.fit(X_train,y_train)
-
-
-y_pred = clf.predict(X_test)
-print('Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
-
-print('1.1.5 Mg的实验-----------------------')
-del clf
-X_train, X_test, y_train, y_test = train_test_split(X,
-                                                    Mg_y,
-                                                    test_size=0.20)
-clf = SVR(C=1.0,epsilon=0.2)
-clf.fit(X_train,y_train)
-
-
-y_pred = clf.predict(X_test)
-print('Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
-
-print('1.1.6 Mn的实验-----------------------')
-del clf
-X_train, X_test, y_train, y_test = train_test_split(X,
-                                                    Mn_y,
-                                                    test_size=0.20)
-clf = SVR(C=1.0,epsilon=0.2)
-clf.fit(X_train,y_train)
-
-
-y_pred = clf.predict(X_test)
-print('Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
-
-print('1.1.7 Na的实验-----------------------')
-del clf
-X_train, X_test, y_train, y_test = train_test_split(X,
-                                                    Na_y,
-                                                    test_size=0.20)
-clf = SVR(C=1.0,epsilon=0.2)
-clf.fit(X_train,y_train)
-
-
-y_pred = clf.predict(X_test)
-print('Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
-
-print('1.1.8 Si的实验-----------------------')
-del clf
-X_train, X_test, y_train, y_test = train_test_split(X,
-                                                    Si_y,
-                                                    test_size=0.20)
-clf = SVR(C=1.0,epsilon=0.2)
-clf.fit(X_train,y_train)
-
-
-y_pred = clf.predict(X_test)
-print('Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
-
-print('1.1.9 Ti的实验-----------------------')
-del clf
-X_train, X_test, y_train, y_test = train_test_split(X,
-                                                    Ti_y,
-                                                    test_size=0.20)
-clf = SVR(C=1.0,epsilon=0.2)
-clf.fit(X_train,y_train)
-
-
-y_pred = clf.predict(X_test)
-print('Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
-
-print('1.1.10 P的实验-----------------------')
-del clf
-X_train, X_test, y_train, y_test = train_test_split(X,
-                                                    P_y,
-                                                    test_size=0.20)
-clf = SVR(C=1.0,epsilon=0.2)
-clf.fit(X_train,y_train)
-
-
-y_pred = clf.predict(X_test)
-print('Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+print('SVR for AL Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print()
-print('1.2 随机森林测试---------------------------------')
-from sklearn.ensemble import RandomForestRegressor
-print('1.1.1 Al的实验-----------------------')
+print('1.1.2 随机森林测试---------------------------------')
 
-X_train, X_test, y_train, y_test = train_test_split(X,
-                                                    Al_y,
-                                                    test_size=0.20)
 clf = RandomForestRegressor(n_estimators=20,random_state=0)
 clf.fit(X_train,y_train)
 
 
 y_pred = clf.predict(X_test)
-print('Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
-
-print('1.1.2 Ca的实验-----------------------')
-del clf
-X_train, X_test, y_train, y_test = train_test_split(X,
-                                                    Ca_y,
-                                                    test_size=0.20)
-clf = RandomForestRegressor(n_estimators=20,random_state=0)
-clf.fit(X_train,y_train)
-
-
-y_pred = clf.predict(X_test)
-print('Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
-
-
-print('1.1.3 Fe的实验-----------------------')
-del clf
-X_train, X_test, y_train, y_test = train_test_split(X,
-                                                    Fe_y,
-                                                    test_size=0.20)
-clf = RandomForestRegressor(n_estimators=20,random_state=0)
-clf.fit(X_train,y_train)
-
-
-y_pred = clf.predict(X_test)
-print('Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
-
-
-print('1.1.4 K的实验-----------------------')
-del clf
-X_train, X_test, y_train, y_test = train_test_split(X,
-                                                    K_y,
-                                                    test_size=0.20)
-clf = RandomForestRegressor(n_estimators=20,random_state=0)
-clf.fit(X_train,y_train)
-
-
-y_pred = clf.predict(X_test)
-print('Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
-
-print('1.1.5 Mg的实验-----------------------')
-del clf
-X_train, X_test, y_train, y_test = train_test_split(X,
-                                                    Mg_y,
-                                                    test_size=0.20)
-clf = RandomForestRegressor(n_estimators=20,random_state=0)
-clf.fit(X_train,y_train)
-
-
-y_pred = clf.predict(X_test)
-print('Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
-
-print('1.1.6 Mn的实验-----------------------')
-del clf
-X_train, X_test, y_train, y_test = train_test_split(X,
-                                                    Mn_y,
-                                                    test_size=0.20)
-clf = RandomForestRegressor(n_estimators=20,random_state=0)
-clf.fit(X_train,y_train)
-
-
-y_pred = clf.predict(X_test)
-print('Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
-
-print('1.1.7 Na的实验-----------------------')
-del clf
-X_train, X_test, y_train, y_test = train_test_split(X,
-                                                    Na_y,
-                                                    test_size=0.20)
-clf = RandomForestRegressor(n_estimators=20,random_state=0)
-clf.fit(X_train,y_train)
-
-
-y_pred = clf.predict(X_test)
-print('Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
-
-print('1.1.8 Si的实验-----------------------')
-del clf
-X_train, X_test, y_train, y_test = train_test_split(X,
-                                                    Si_y,
-                                                    test_size=0.20)
-clf = RandomForestRegressor(n_estimators=20,random_state=0)
-clf.fit(X_train,y_train)
-
-
-y_pred = clf.predict(X_test)
-print('Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
-
-print('1.1.9 Ti的实验-----------------------')
-del clf
-X_train, X_test, y_train, y_test = train_test_split(X,
-                                                    Ti_y,
-                                                    test_size=0.20)
-clf = RandomForestRegressor(n_estimators=20,random_state=0)
-clf.fit(X_train,y_train)
-
-
-y_pred = clf.predict(X_test)
-print('Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
-
-print('1.1.10 P的实验-----------------------')
-del clf
-X_train, X_test, y_train, y_test = train_test_split(X,
-                                                    P_y,
-                                                    test_size=0.20)
-clf = RandomForestRegressor(n_estimators=20,random_state=0)
-clf.fit(X_train,y_train)
-
-
-y_pred = clf.predict(X_test)
-print('Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+print('RFR for AL Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+#各特征的importance
+importance = clf.feature_importances_
+#根据importance大小排序
+indices = np.argsort(importance)[::-1]
+#打印前十的importance
+for i in range(0,10):
+    print("importance is "+str(importance[indices[i]]))
+    #print("对应的特征峰和importance为 "+str(element_dict['Al'])[indices[i]])
 
 print()
-print('1.3 KRR测试---------------------------------')
+print('1.1.3 KRR测试---------------------------------')
 
-print('1.3.1 Al的实验-----------------------')
-
-X_train, X_test, y_train, y_test = train_test_split(X,
-                                                    Al_y,
-                                                    test_size=0.20)
 clf = Lasso(alpha =0.0005, random_state=1)
 clf.fit(X_train,y_train)
 
 
 y_pred = clf.predict(X_test)
-print('Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+print('KRR for AL Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
-print('1.3.2 Ca的实验-----------------------')
-del clf
+print()
+print('1.2 Ca的实验-------------------------')
+
+
+
+print('1.2.1 Vector Machine Regression-----------------------')
+
 X_train, X_test, y_train, y_test = train_test_split(X,
                                                     Ca_y,
                                                     test_size=0.20)
+clf = SVR(C=1.0,epsilon=0.2)
+clf.fit(X_train,y_train)
+
+
+y_pred = clf.predict(X_test)
+print('SVR for Ca Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print()
+print('1.2.2 随机森林测试---------------------------------')
+
+clf = RandomForestRegressor(n_estimators=20,random_state=0)
+clf.fit(X_train,y_train)
+
+
+y_pred = clf.predict(X_test)
+print('RFR for Ca Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+#各特征的importance
+importance = clf.feature_importances_
+#根据importance大小排序
+indices = np.argsort(importance)[::-1]
+#打印前十的importance
+for i in range(0,10):
+    print("importance is "+str(importance[indices[i]]))
+    #print("对应的特征峰和importance为 "+str(element_dict['Al'])[indices[i]])
+
+print()
+print('1.2.3 KRR测试---------------------------------')
+
 clf = Lasso(alpha =0.0005, random_state=1)
 clf.fit(X_train,y_train)
 
 
 y_pred = clf.predict(X_test)
-print('Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+print('KRR for Ca Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print()
+print('1.3 Fe的实验-------------------------')
 
 
-print('1.3.3 Fe的实验-----------------------')
-del clf
+print('1.3.1 Vector Machine Regression-----------------------')
+
 X_train, X_test, y_train, y_test = train_test_split(X,
                                                     Fe_y,
                                                     test_size=0.20)
+clf = SVR(C=1.0,epsilon=0.2)
+clf.fit(X_train,y_train)
+
+
+y_pred = clf.predict(X_test)
+print('SVR for Fe Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print()
+print('1.3.2 随机森林测试---------------------------------')
+
+clf = RandomForestRegressor(n_estimators=20,random_state=0)
+clf.fit(X_train,y_train)
+
+
+y_pred = clf.predict(X_test)
+print('RFR for Fe Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+#各特征的importance
+importance = clf.feature_importances_
+#根据importance大小排序
+indices = np.argsort(importance)[::-1]
+#打印前十的importance
+for i in range(0,10):
+    print("importance is "+str(importance[indices[i]]))
+    #print("对应的特征峰和importance为 "+str(element_dict['Al'])[indices[i]])
+
+print()
+print('1.3.3 KRR测试---------------------------------')
+
 clf = Lasso(alpha =0.0005, random_state=1)
 clf.fit(X_train,y_train)
 
 
 y_pred = clf.predict(X_test)
-print('Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+print('KRR for Fe Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print()
+print('1.4 K的实验-------------------------')
 
 
-print('1.3.4 K的实验-----------------------')
-del clf
+
+print('1.4.1 Vector Machine Regression-----------------------')
+
 X_train, X_test, y_train, y_test = train_test_split(X,
                                                     K_y,
                                                     test_size=0.20)
+clf = SVR(C=1.0,epsilon=0.2)
+clf.fit(X_train,y_train)
+
+
+y_pred = clf.predict(X_test)
+print('SVR for K Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print()
+print('1.4.2 随机森林测试---------------------------------')
+
+clf = RandomForestRegressor(n_estimators=20,random_state=0)
+clf.fit(X_train,y_train)
+
+
+y_pred = clf.predict(X_test)
+print('RFR for K Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+#各特征的importance
+importance = clf.feature_importances_
+#根据importance大小排序
+indices = np.argsort(importance)[::-1]
+#打印前十的importance
+for i in range(0,10):
+    print("importance is "+str(importance[indices[i]]))
+    #print("对应的特征峰和importance为 "+str(element_dict['Al'])[indices[i]])
+
+print()
+print('1.4.3 KRR测试---------------------------------')
+
 clf = Lasso(alpha =0.0005, random_state=1)
 clf.fit(X_train,y_train)
 
 
 y_pred = clf.predict(X_test)
-print('Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+print('KRR for K Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
-print('1.3.5 Mg的实验-----------------------')
-del clf
+print()
+print('1.5 Mg的实验-------------------------')
+
+
+
+print('1.5.1 Vector Machine Regression-----------------------')
+
 X_train, X_test, y_train, y_test = train_test_split(X,
                                                     Mg_y,
                                                     test_size=0.20)
+clf = SVR(C=1.0,epsilon=0.2)
+clf.fit(X_train,y_train)
+
+
+y_pred = clf.predict(X_test)
+print('SVR for Mg Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print()
+print('1.5.2 随机森林测试---------------------------------')
+
+clf = RandomForestRegressor(n_estimators=20,random_state=0)
+clf.fit(X_train,y_train)
+
+
+y_pred = clf.predict(X_test)
+print('RFR for Mg Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+#各特征的importance
+importance = clf.feature_importances_
+#根据importance大小排序
+indices = np.argsort(importance)[::-1]
+#打印前十的importance
+for i in range(0,10):
+    print("importance is "+str(importance[indices[i]]))
+    #print("对应的特征峰和importance为 "+str(element_dict['Al'])[indices[i]])
+
+print()
+print('1.5.3 KRR测试---------------------------------')
+
 clf = Lasso(alpha =0.0005, random_state=1)
 clf.fit(X_train,y_train)
 
 
 y_pred = clf.predict(X_test)
-print('Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+print('KRR for Mg Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
-print('1.3.6 Mn的实验-----------------------')
-del clf
+print()
+print('1.6 Mn的实验-------------------------')
+
+
+
+print('1.6.1 Vector Machine Regression-----------------------')
+
 X_train, X_test, y_train, y_test = train_test_split(X,
                                                     Mn_y,
                                                     test_size=0.20)
+clf = SVR(C=1.0,epsilon=0.2)
+clf.fit(X_train,y_train)
+
+
+y_pred = clf.predict(X_test)
+print('SVR for Mn Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print()
+print('1.6.2 随机森林测试---------------------------------')
+
+clf = RandomForestRegressor(n_estimators=20,random_state=0)
+clf.fit(X_train,y_train)
+
+
+y_pred = clf.predict(X_test)
+print('RFR for Mn Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+#各特征的importance
+importance = clf.feature_importances_
+#根据importance大小排序
+indices = np.argsort(importance)[::-1]
+#打印前十的importance
+for i in range(0,10):
+    print("importance is "+str(importance[indices[i]]))
+    #print("对应的特征峰和importance为 "+str(element_dict['Al'])[indices[i]])
+
+print()
+print('1.6.3 KRR测试---------------------------------')
+
 clf = Lasso(alpha =0.0005, random_state=1)
 clf.fit(X_train,y_train)
 
 
 y_pred = clf.predict(X_test)
-print('Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+print('KRR for Mn Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
-print('1.3.7 Na的实验-----------------------')
-del clf
+print()
+print('1.7 Na的实验-------------------------')
+
+
+print('1.7.1 Vector Machine Regression-----------------------')
+
 X_train, X_test, y_train, y_test = train_test_split(X,
                                                     Na_y,
                                                     test_size=0.20)
+clf = SVR(C=1.0,epsilon=0.2)
+clf.fit(X_train,y_train)
+
+
+y_pred = clf.predict(X_test)
+print('SVR for Na Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print()
+print('1.7.2 随机森林测试---------------------------------')
+
+clf = RandomForestRegressor(n_estimators=20,random_state=0)
+clf.fit(X_train,y_train)
+
+
+y_pred = clf.predict(X_test)
+print('RFR for Na Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+#各特征的importance
+importance = clf.feature_importances_
+#根据importance大小排序
+indices = np.argsort(importance)[::-1]
+#打印前十的importance
+for i in range(0,10):
+    print("importance is "+str(importance[indices[i]]))
+    #print("对应的特征峰和importance为 "+str(element_dict['Al'])[indices[i]])
+
+print()
+print('1.7.3 KRR测试---------------------------------')
+
 clf = Lasso(alpha =0.0005, random_state=1)
 clf.fit(X_train,y_train)
 
 
 y_pred = clf.predict(X_test)
-print('Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+print('KRR for Na Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
-print('1.3.8 Si的实验-----------------------')
-del clf
+print()
+print('1.8 Si的实验-------------------------')
+
+
+print('1.8.1 Vector Machine Regression-----------------------')
+
 X_train, X_test, y_train, y_test = train_test_split(X,
                                                     Si_y,
                                                     test_size=0.20)
+clf = SVR(C=1.0,epsilon=0.2)
+clf.fit(X_train,y_train)
+
+
+y_pred = clf.predict(X_test)
+print('SVR for Si Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print()
+print('1.8.2 随机森林测试---------------------------------')
+
+clf = RandomForestRegressor(n_estimators=20,random_state=0)
+clf.fit(X_train,y_train)
+
+
+y_pred = clf.predict(X_test)
+print('RFR for Si Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+#各特征的importance
+importance = clf.feature_importances_
+#根据importance大小排序
+indices = np.argsort(importance)[::-1]
+#打印前十的importance
+for i in range(0,10):
+    print("importance is "+str(importance[indices[i]]))
+    #print("对应的特征峰和importance为 "+str(element_dict['Al'])[indices[i]])
+
+print()
+print('1.8.3 KRR测试---------------------------------')
+
 clf = Lasso(alpha =0.0005, random_state=1)
 clf.fit(X_train,y_train)
 
 
 y_pred = clf.predict(X_test)
-print('Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+print('KRR for Si Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
-print('1.3.9 Ti的实验-----------------------')
-del clf
+print()
+print('1.9 Ti的实验-------------------------')
+
+print('1.9.1 Vector Machine Regression-----------------------')
+
 X_train, X_test, y_train, y_test = train_test_split(X,
                                                     Ti_y,
                                                     test_size=0.20)
+clf = SVR(C=1.0,epsilon=0.2)
+clf.fit(X_train,y_train)
+
+
+y_pred = clf.predict(X_test)
+print('SVR for Ti Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print()
+print('1.9.2 随机森林测试---------------------------------')
+
+clf = RandomForestRegressor(n_estimators=20,random_state=0)
+clf.fit(X_train,y_train)
+
+
+y_pred = clf.predict(X_test)
+print('RFR for Ti Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+#各特征的importance
+importance = clf.feature_importances_
+#根据importance大小排序
+indices = np.argsort(importance)[::-1]
+#打印前十的importance
+for i in range(0,10):
+    print("importance is "+str(importance[indices[i]]))
+    #print("对应的特征峰和importance为 "+str(element_dict['Al'])[indices[i]])
+
+print()
+print('1.9.3 KRR测试---------------------------------')
+
 clf = Lasso(alpha =0.0005, random_state=1)
 clf.fit(X_train,y_train)
 
 
 y_pred = clf.predict(X_test)
-print('Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+print('KRR for Ti Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
-print('1.3.10 P的实验-----------------------')
-del clf
+print()
+print('1.10 P的实验-------------------------')
+
+
+print('1.10.1 Vector Machine Regression-----------------------')
+
 X_train, X_test, y_train, y_test = train_test_split(X,
                                                     P_y,
                                                     test_size=0.20)
+clf = SVR(C=1.0,epsilon=0.2)
+clf.fit(X_train,y_train)
+
+
+y_pred = clf.predict(X_test)
+print('SVR for P Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
+print()
+print('1.10.2 随机森林测试---------------------------------')
+
+clf = RandomForestRegressor(n_estimators=20,random_state=0)
+clf.fit(X_train,y_train)
+
+
+y_pred = clf.predict(X_test)
+print('RFR for P Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+#各特征的importance
+importance = clf.feature_importances_
+#根据importance大小排序
+indices = np.argsort(importance)[::-1]
+#打印前十的importance
+for i in range(0,10):
+    print("importance is "+str(importance[indices[i]]))
+    #print("对应的特征峰和importance为 "+str(element_dict['Al'])[indices[i]])
+
+print()
+print('1.10.3 KRR测试---------------------------------')
+
 clf = Lasso(alpha =0.0005, random_state=1)
 clf.fit(X_train,y_train)
 
 
 y_pred = clf.predict(X_test)
-print('Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+print('KRR for P Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
+
 
 #寻找对应元素特征峰作为特征
 """
@@ -620,7 +689,7 @@ def selectFeature(element):
     return featurelist
 
 print('2.根据NIST库筛选特征-------------------------')
-print('2.1 Al的特征--------------------------')
+print('2.1 Al的相关实验--------------------------')
 Al_x = selectFeature('Al')
 
 
