@@ -131,8 +131,22 @@ wavelength = np.array(wavelength)
 plt.plot(wavelength,intensity)
 #plt.show()
 
+print("准备NIST库相关数据")
+nist = pd.read_csv("E:\\JustForFun\\CanadaLIBSdata\\andor.nist",header = None,names = ['WaveLength','Element','Type','Unknown','Importance'])
+nist = nist.loc[1:]
+#删除未知列
+del nist['Unknown']
+#筛选在样本精度范围的nist线
+nist = nist.loc[nist.WaveLength>=198.066]
+nist = nist.loc[nist.WaveLength<=970.142]
+
+
+
+
 #准备训练数据，未作任何处理，将整个光谱输入
 X = []
+#波长
+waveLength = []
 #AL的相关浓度信息
 Al_y = []
 #Fe
@@ -156,6 +170,7 @@ Mn_y = []
 
 for samplename,concentrate in concentrate_set_200AVG.items():
     X.append(np.array(data_set_200AVG[samplename].Intensity))
+    waveLength.append(np.array(data_set_200AVG[samplename].WaveLength))
     Al_y.append(concentrate[0]*100)
     Ca_y.append(concentrate[1]*100)
     Fe_y.append(concentrate[2]*100)
@@ -169,6 +184,7 @@ for samplename,concentrate in concentrate_set_200AVG.items():
 
 for samplename,concentrate in concentrate_set_1000AVG.items():
     X.append(np.array(data_set_1000AVG[samplename].Intensity))
+    waveLength.append(np.array(data_set_1000AVG[samplename].WaveLength))
     Al_y.append(concentrate[0]*100)
     Ca_y.append(concentrate[1]*100)
     Fe_y.append(concentrate[2]*100)
