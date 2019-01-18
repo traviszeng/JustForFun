@@ -21,6 +21,8 @@ from sklearn.pipeline import make_pipeline
 from sklearn.metrics import mean_squared_error
 from sklearn.svm import SVR
 from sklearn.model_selection import KFold, cross_val_score, train_test_split
+import warnings
+warnings.filterwarnings("ignore")
 
 
 
@@ -194,17 +196,20 @@ class StackingAveragedModels(BaseEstimator, RegressorMixin, TransformerMixin):
         kfold = KFold(n_splits=self.n_folds, shuffle=True, random_state=156)
 
         #在拷贝的基本模型上进行out-of-fold预测，并用预测得到的作为meta model的feature
-        out_of_fold_predictions = np.zeros((X.shape[0], len(self.base_models)))
+        out_of_fold_predictions = np.zeros((len(X), len(self.base_models)))
         for i, model in enumerate(self.base_models):
             for train_index, holdout_index in kfold.split(X, y):
+                #print(train_index)
                 instance = clone(model)
                 self.base_models_[i].append(instance)
-                instance.fit(X[train_index], y[train_index])
-                y_pred = instance.predict(X[holdout_index])
+                instance.fit(np.array(X)[train_index], np.array(y)[train_index])
+                y_pred = instance.predict(np.array(X)[holdout_index])
                 out_of_fold_predictions[holdout_index, i] = y_pred
 
         #用out-of-foldfeature训练meta-model
-        self.meta_model_.fit(out_of_fold_predictions, y)
+        #print(type(out_of_fold_predictions))
+        #print(len(y))
+        self.meta_model_.fit(np.array(out_of_fold_predictions), y)
         return self
 
     # 使用基学习器预测测试数据，并将各基学习器预测值平均后作为meta-data feed给meta-model在做预测
@@ -293,7 +298,7 @@ print('SVR for AL Mean squared error is '+str(mean_squared_error(y_test,y_pred))
 print()
 print('1.1.2 随机森林测试---------------------------------')
 
-rfr = RandomForestRegressor(n_estimators=20,random_state=0)
+rfr = RandomForestRegressor(n_estimators=200,random_state=0)
 rfr.fit(X_train,y_train)
 
 
@@ -311,7 +316,7 @@ for i in range(0,10):
 print()
 print('1.1.3 LASSO测试---------------------------------')
 
-lasso = Lasso(alpha =0.0005, random_state=1)
+lasso = Lasso(alpha =0.05, random_state=1)
 lasso.fit(X_train,y_train)
 
 
@@ -324,7 +329,7 @@ y_pred = krr.predict(X_test)
 print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Elastic Net TEST----------------------------------")
-ENet = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+ENet = ElasticNet(alpha=0.05, l1_ratio=.9, random_state=3)
 ENet.fit(X_train,y_train)
 y_pred = ENet.predict(X_test)
 print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
@@ -339,7 +344,7 @@ y_pred = GBoost.predict(X_test)
 print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Bagging Experiment---------------------")
-baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,Lasso))
+baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,lasso))
 baggingModel.fit(X_train,y_train)
 y_pred  =baggingModel.predict(X_test)
 print('Bagging squared error is '+str(mean_squared_error(y_test,y_pred)))
@@ -357,7 +362,7 @@ stacked_averaged_models.fit(X_train,y_train)
 y_pred = stacked_averaged_models.predict(X_test)
 print('Stacking with metamodel is ENet squared error is '+str(mean_squared_error(y_test,y_pred)))
 
-stacked_averaged_models = StackingAveragedModels(base_models = (ENet, Lasso, krr,svr,rfr),
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, lasso, krr,svr,rfr),
                                                  meta_model = GBoost)
 stacked_averaged_models.fit(X_train,y_train)
 y_pred = stacked_averaged_models.predict(X_test)
@@ -421,7 +426,7 @@ for i in range(0,10):
 print()
 print('1.2.3 LASSO测试---------------------------------')
 
-lasso = Lasso(alpha =0.0005, random_state=1)
+lasso = Lasso(alpha =0.05, random_state=1)
 lasso.fit(X_train,y_train)
 
 
@@ -434,7 +439,7 @@ y_pred = krr.predict(X_test)
 print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Elastic Net TEST----------------------------------")
-ENet = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+ENet = ElasticNet(alpha=0.05, l1_ratio=.9, random_state=3)
 ENet.fit(X_train,y_train)
 y_pred = ENet.predict(X_test)
 print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
@@ -448,7 +453,7 @@ GBoost.fit(X_train,y_train)
 y_pred = GBoost.predict(X_test)
 print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
 print("Bagging Experiment---------------------")
-baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,Lasso))
+baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,lasso))
 baggingModel.fit(X_train,y_train)
 y_pred  =baggingModel.predict(X_test)
 print('Bagging squared error is '+str(mean_squared_error(y_test,y_pred)))
@@ -466,7 +471,7 @@ stacked_averaged_models.fit(X_train,y_train)
 y_pred = stacked_averaged_models.predict(X_test)
 print('Stacking with metamodel is ENet squared error is '+str(mean_squared_error(y_test,y_pred)))
 
-stacked_averaged_models = StackingAveragedModels(base_models = (ENet, Lasso, krr,svr,rfr),
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, lasso, krr,svr,rfr),
                                                  meta_model = GBoost)
 stacked_averaged_models.fit(X_train,y_train)
 y_pred = stacked_averaged_models.predict(X_test)
@@ -528,7 +533,7 @@ for i in range(0,10):
 print()
 print('1.3.3 LASSO测试---------------------------------')
 
-lasso = Lasso(alpha =0.0005, random_state=1)
+lasso = Lasso(alpha =0.05, random_state=1)
 lasso.fit(X_train,y_train)
 
 
@@ -541,7 +546,7 @@ y_pred = krr.predict(X_test)
 print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Elastic Net TEST----------------------------------")
-ENet = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+ENet = ElasticNet(alpha=0.05, l1_ratio=.9, random_state=3)
 ENet.fit(X_train,y_train)
 y_pred = ENet.predict(X_test)
 print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
@@ -555,7 +560,7 @@ GBoost.fit(X_train,y_train)
 y_pred = GBoost.predict(X_test)
 print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
 print("Bagging Experiment---------------------")
-baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,Lasso))
+baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,lasso))
 baggingModel.fit(X_train,y_train)
 y_pred  =baggingModel.predict(X_test)
 print('Bagging squared error is '+str(mean_squared_error(y_test,y_pred)))
@@ -573,7 +578,7 @@ stacked_averaged_models.fit(X_train,y_train)
 y_pred = stacked_averaged_models.predict(X_test)
 print('Stacking with metamodel is ENet squared error is '+str(mean_squared_error(y_test,y_pred)))
 
-stacked_averaged_models = StackingAveragedModels(base_models = (ENet, Lasso, krr,svr,rfr),
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, lasso, krr,svr,rfr),
                                                  meta_model = GBoost)
 stacked_averaged_models.fit(X_train,y_train)
 y_pred = stacked_averaged_models.predict(X_test)
@@ -636,7 +641,7 @@ for i in range(0,10):
 print()
 print('1.4.3 LASSO测试---------------------------------')
 
-lasso = Lasso(alpha =0.0005, random_state=1)
+lasso = Lasso(alpha =0.05, random_state=1)
 lasso.fit(X_train,y_train)
 
 
@@ -649,7 +654,7 @@ y_pred = krr.predict(X_test)
 print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Elastic Net TEST----------------------------------")
-ENet = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+ENet = ElasticNet(alpha=0.05, l1_ratio=.9, random_state=3)
 ENet.fit(X_train,y_train)
 y_pred = ENet.predict(X_test)
 print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
@@ -664,7 +669,7 @@ y_pred = GBoost.predict(X_test)
 print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Bagging Experiment---------------------")
-baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,Lasso))
+baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,lasso))
 baggingModel.fit(X_train,y_train)
 y_pred  =baggingModel.predict(X_test)
 print('Bagging squared error is '+str(mean_squared_error(y_test,y_pred)))
@@ -682,7 +687,7 @@ stacked_averaged_models.fit(X_train,y_train)
 y_pred = stacked_averaged_models.predict(X_test)
 print('Stacking with metamodel is ENet squared error is '+str(mean_squared_error(y_test,y_pred)))
 
-stacked_averaged_models = StackingAveragedModels(base_models = (ENet, Lasso, krr,svr,rfr),
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, lasso, krr,svr,rfr),
                                                  meta_model = GBoost)
 stacked_averaged_models.fit(X_train,y_train)
 y_pred = stacked_averaged_models.predict(X_test)
@@ -745,7 +750,7 @@ for i in range(0,10):
 print()
 print('1.5.3 LASSO测试---------------------------------')
 
-lasso = Lasso(alpha =0.0005, random_state=1)
+lasso = Lasso(alpha =0.05, random_state=1)
 lasso.fit(X_train,y_train)
 
 
@@ -758,7 +763,7 @@ y_pred = krr.predict(X_test)
 print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Elastic Net TEST----------------------------------")
-ENet = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+ENet = ElasticNet(alpha=0.05, l1_ratio=.9, random_state=3)
 ENet.fit(X_train,y_train)
 y_pred = ENet.predict(X_test)
 print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
@@ -773,7 +778,7 @@ y_pred = GBoost.predict(X_test)
 print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Bagging Experiment---------------------")
-baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,Lasso))
+baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,lasso))
 baggingModel.fit(X_train,y_train)
 y_pred  =baggingModel.predict(X_test)
 print('Bagging squared error is '+str(mean_squared_error(y_test,y_pred)))
@@ -791,7 +796,7 @@ stacked_averaged_models.fit(X_train,y_train)
 y_pred = stacked_averaged_models.predict(X_test)
 print('Stacking with metamodel is ENet squared error is '+str(mean_squared_error(y_test,y_pred)))
 
-stacked_averaged_models = StackingAveragedModels(base_models = (ENet, Lasso, krr,svr,rfr),
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, lasso, krr,svr,rfr),
                                                  meta_model = GBoost)
 stacked_averaged_models.fit(X_train,y_train)
 y_pred = stacked_averaged_models.predict(X_test)
@@ -854,7 +859,7 @@ for i in range(0,10):
 print()
 print('1.6.3 LASSO测试---------------------------------')
 
-lasso = Lasso(alpha =0.0005, random_state=1)
+lasso = Lasso(alpha =0.05, random_state=1)
 lasso.fit(X_train,y_train)
 
 
@@ -867,7 +872,7 @@ y_pred = krr.predict(X_test)
 print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Elastic Net TEST----------------------------------")
-ENet = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+ENet = ElasticNet(alpha=0.05, l1_ratio=.9, random_state=3)
 ENet.fit(X_train,y_train)
 y_pred = ENet.predict(X_test)
 print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
@@ -882,7 +887,7 @@ y_pred = GBoost.predict(X_test)
 print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Bagging Experiment---------------------")
-baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,Lasso))
+baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,lasso))
 baggingModel.fit(X_train,y_train)
 y_pred  =baggingModel.predict(X_test)
 print('Bagging squared error is '+str(mean_squared_error(y_test,y_pred)))
@@ -900,7 +905,7 @@ stacked_averaged_models.fit(X_train,y_train)
 y_pred = stacked_averaged_models.predict(X_test)
 print('Stacking with metamodel is ENet squared error is '+str(mean_squared_error(y_test,y_pred)))
 
-stacked_averaged_models = StackingAveragedModels(base_models = (ENet, Lasso, krr,svr,rfr),
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, lasso, krr,svr,rfr),
                                                  meta_model = GBoost)
 stacked_averaged_models.fit(X_train,y_train)
 y_pred = stacked_averaged_models.predict(X_test)
@@ -962,7 +967,7 @@ for i in range(0,10):
 print()
 print('1.7.3 LASSO测试---------------------------------')
 
-lasso = Lasso(alpha =0.0005, random_state=1)
+lasso = Lasso(alpha =0.05, random_state=1)
 lasso.fit(X_train,y_train)
 
 
@@ -975,7 +980,7 @@ y_pred = krr.predict(X_test)
 print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Elastic Net TEST----------------------------------")
-ENet = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+ENet = ElasticNet(alpha=0.05, l1_ratio=.9, random_state=3)
 ENet.fit(X_train,y_train)
 y_pred =ENet.predict(X_test)
 print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
@@ -990,7 +995,7 @@ y_pred = GBoost.predict(X_test)
 print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Bagging Experiment---------------------")
-baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,Lasso))
+baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,lasso))
 baggingModel.fit(X_train,y_train)
 y_pred  =baggingModel.predict(X_test)
 print('Bagging squared error is '+str(mean_squared_error(y_test,y_pred)))
@@ -1008,7 +1013,7 @@ stacked_averaged_models.fit(X_train,y_train)
 y_pred = stacked_averaged_models.predict(X_test)
 print('Stacking with metamodel is ENet squared error is '+str(mean_squared_error(y_test,y_pred)))
 
-stacked_averaged_models = StackingAveragedModels(base_models = (ENet, Lasso, krr,svr,rfr),
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, lasso, krr,svr,rfr),
                                                  meta_model = GBoost)
 stacked_averaged_models.fit(X_train,y_train)
 y_pred = stacked_averaged_models.predict(X_test)
@@ -1070,7 +1075,7 @@ for i in range(0,10):
 print()
 print('1.8.3 LASSO测试---------------------------------')
 
-lasso = Lasso(alpha =0.0005, random_state=1)
+lasso = Lasso(alpha =0.05, random_state=1)
 lasso.fit(X_train,y_train)
 
 
@@ -1083,7 +1088,7 @@ y_pred = krr.predict(X_test)
 print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Elastic Net TEST----------------------------------")
-ENet = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+ENet = ElasticNet(alpha=0.05, l1_ratio=.9, random_state=3)
 ENet.fit(X_train,y_train)
 y_pred = ENet.predict(X_test)
 print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
@@ -1098,7 +1103,7 @@ y_pred = GBoost.predict(X_test)
 print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Bagging Experiment---------------------")
-baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,Lasso))
+baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,lasso))
 baggingModel.fit(X_train,y_train)
 y_pred  =baggingModel.predict(X_test)
 print('Bagging squared error is '+str(mean_squared_error(y_test,y_pred)))
@@ -1116,7 +1121,7 @@ stacked_averaged_models.fit(X_train,y_train)
 y_pred = stacked_averaged_models.predict(X_test)
 print('Stacking with metamodel is ENet squared error is '+str(mean_squared_error(y_test,y_pred)))
 
-stacked_averaged_models = StackingAveragedModels(base_models = (ENet, Lasso, krr,svr,rfr),
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, lasso, krr,svr,rfr),
                                                  meta_model = GBoost)
 stacked_averaged_models.fit(X_train,y_train)
 y_pred = stacked_averaged_models.predict(X_test)
@@ -1177,7 +1182,7 @@ for i in range(0,10):
 print()
 print('1.9.3 LASSO测试---------------------------------')
 
-lasso = Lasso(alpha =0.0005, random_state=1)
+lasso = Lasso(alpha =0.05, random_state=1)
 lasso.fit(X_train,y_train)
 
 
@@ -1190,7 +1195,7 @@ y_pred = krr.predict(X_test)
 print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Elastic Net TEST----------------------------------")
-ENet = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+ENet = ElasticNet(alpha=0.05, l1_ratio=.9, random_state=3)
 ENet.fit(X_train,y_train)
 y_pred = ENet.predict(X_test)
 print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
@@ -1205,7 +1210,7 @@ y_pred = GBoost.predict(X_test)
 print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Bagging Experiment---------------------")
-baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,Lasso))
+baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,lasso))
 baggingModel.fit(X_train,y_train)
 y_pred  =baggingModel.predict(X_test)
 print('Bagging squared error is '+str(mean_squared_error(y_test,y_pred)))
@@ -1223,7 +1228,7 @@ stacked_averaged_models.fit(X_train,y_train)
 y_pred = stacked_averaged_models.predict(X_test)
 print('Stacking with metamodel is ENet squared error is '+str(mean_squared_error(y_test,y_pred)))
 
-stacked_averaged_models = StackingAveragedModels(base_models = (ENet, Lasso, krr,svr,rfr),
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, lasso, krr,svr,rfr),
                                                  meta_model = GBoost)
 stacked_averaged_models.fit(X_train,y_train)
 y_pred = stacked_averaged_models.predict(X_test)
@@ -1285,7 +1290,7 @@ for i in range(0,10):
 print()
 print('1.10.3 LASSO测试---------------------------------')
 
-lasso = Lasso(alpha =0.0005, random_state=1)
+lasso = Lasso(alpha =0.05, random_state=1)
 lasso.fit(X_train,y_train)
 
 
@@ -1299,7 +1304,7 @@ y_pred = krr.predict(X_test)
 print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Elastic Net TEST----------------------------------")
-ENet = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+ENet = ElasticNet(alpha=0.05, l1_ratio=.9, random_state=3)
 ENet.fit(X_train,y_train)
 y_pred = ENet.predict(X_test)
 print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
@@ -1313,7 +1318,7 @@ GBoost.fit(X_train,y_train)
 y_pred = GBoost.predict(X_test)
 print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
 print("Bagging Experiment---------------------")
-baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,Lasso))
+baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,lasso))
 baggingModel.fit(X_train,y_train)
 y_pred  =baggingModel.predict(X_test)
 print('Bagging squared error is '+str(mean_squared_error(y_test,y_pred)))
@@ -1331,7 +1336,7 @@ stacked_averaged_models.fit(X_train,y_train)
 y_pred = stacked_averaged_models.predict(X_test)
 print('Stacking with metamodel is ENet squared error is '+str(mean_squared_error(y_test,y_pred)))
 
-stacked_averaged_models = StackingAveragedModels(base_models = (ENet, Lasso, krr,svr,rfr),
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, lasso, krr,svr,rfr),
                                                  meta_model = GBoost)
 stacked_averaged_models.fit(X_train,y_train)
 y_pred = stacked_averaged_models.predict(X_test)
@@ -1426,7 +1431,7 @@ for i in range(0,10):
 print()
 print('2.1.3 LASSO测试---------------------------------')
 
-lasso = Lasso(alpha =0.0005, random_state=1)
+lasso = Lasso(alpha =0.05, random_state=1)
 lasso.fit(X_train,y_train)
 
 
@@ -1440,7 +1445,7 @@ y_pred = krr.predict(X_test)
 print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Elastic Net TEST----------------------------------")
-ENet = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+ENet = ElasticNet(alpha=0.05, l1_ratio=.9, random_state=3)
 ENet.fit(X_train,y_train)
 y_pred = ENet.predict(X_test)
 print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
@@ -1455,7 +1460,7 @@ y_pred = GBoost.predict(X_test)
 print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Bagging Experiment---------------------")
-baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,Lasso))
+baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,lasso))
 baggingModel.fit(X_train,y_train)
 y_pred  =baggingModel.predict(X_test)
 print('Bagging squared error is '+str(mean_squared_error(y_test,y_pred)))
@@ -1473,7 +1478,7 @@ stacked_averaged_models.fit(X_train,y_train)
 y_pred = stacked_averaged_models.predict(X_test)
 print('Stacking with metamodel is ENet squared error is '+str(mean_squared_error(y_test,y_pred)))
 
-stacked_averaged_models = StackingAveragedModels(base_models = (ENet, Lasso, krr,svr,rfr),
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, lasso, krr,svr,rfr),
                                                  meta_model = GBoost)
 stacked_averaged_models.fit(X_train,y_train)
 y_pred = stacked_averaged_models.predict(X_test)
@@ -1534,7 +1539,7 @@ for i in range(0,10):
 print()
 print('2.2.3 LASSO测试---------------------------------')
 
-lasso = Lasso(alpha =0.0005, random_state=1)
+lasso = Lasso(alpha =0.05, random_state=1)
 lasso.fit(X_train,y_train)
 
 
@@ -1548,7 +1553,7 @@ y_pred = krr.predict(X_test)
 print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Elastic Net TEST----------------------------------")
-ENet = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+ENet = ElasticNet(alpha=0.05, l1_ratio=.9, random_state=3)
 ENet.fit(X_train,y_train)
 y_pred = ENet.predict(X_test)
 print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
@@ -1563,7 +1568,7 @@ y_pred = GBoost.predict(X_test)
 print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Bagging Experiment---------------------")
-baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,Lasso))
+baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,lasso))
 baggingModel.fit(X_train,y_train)
 y_pred  =baggingModel.predict(X_test)
 print('Bagging squared error is '+str(mean_squared_error(y_test,y_pred)))
@@ -1581,7 +1586,7 @@ stacked_averaged_models.fit(X_train,y_train)
 y_pred = stacked_averaged_models.predict(X_test)
 print('Stacking with metamodel is ENet squared error is '+str(mean_squared_error(y_test,y_pred)))
 
-stacked_averaged_models = StackingAveragedModels(base_models = (ENet, Lasso, krr,svr,rfr),
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, lasso, krr,svr,rfr),
                                                  meta_model = GBoost)
 stacked_averaged_models.fit(X_train,y_train)
 y_pred = stacked_averaged_models.predict(X_test)
@@ -1708,7 +1713,7 @@ for i in range(0,10):
 print()
 print('2.4.3 LASSO测试---------------------------------')
 
-lasso = Lasso(alpha =0.0005, random_state=1)
+lasso = Lasso(alpha =0.05, random_state=1)
 lasso.fit(X_train,y_train)
 
 
@@ -1722,7 +1727,7 @@ y_pred = krr.predict(X_test)
 print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Elastic Net TEST----------------------------------")
-ENet = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+ENet = ElasticNet(alpha=0.05, l1_ratio=.9, random_state=3)
 ENet.fit(X_train,y_train)
 y_pred = ENet.predict(X_test)
 print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
@@ -1737,7 +1742,7 @@ y_pred = GBoost.predict(X_test)
 print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Bagging Experiment---------------------")
-baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,Lasso))
+baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,lasso))
 baggingModel.fit(X_train,y_train)
 y_pred  =baggingModel.predict(X_test)
 print('Bagging squared error is '+str(mean_squared_error(y_test,y_pred)))
@@ -1755,7 +1760,7 @@ stacked_averaged_models.fit(X_train,y_train)
 y_pred = stacked_averaged_models.predict(X_test)
 print('Stacking with metamodel is ENet squared error is '+str(mean_squared_error(y_test,y_pred)))
 
-stacked_averaged_models = StackingAveragedModels(base_models = (ENet, Lasso, krr,svr,rfr),
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, lasso, krr,svr,rfr),
                                                  meta_model = GBoost)
 stacked_averaged_models.fit(X_train,y_train)
 y_pred = stacked_averaged_models.predict(X_test)
@@ -1816,7 +1821,7 @@ for i in range(0,10):
 print()
 print('2.5.3 LASSO测试---------------------------------')
 
-lasso = Lasso(alpha =0.0005, random_state=1)
+lasso = Lasso(alpha =0.05, random_state=1)
 lasso.fit(X_train,y_train)
 
 
@@ -1829,7 +1834,7 @@ y_pred = krr.predict(X_test)
 print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Elastic Net TEST----------------------------------")
-ENet = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+ENet = ElasticNet(alpha=0.05, l1_ratio=.9, random_state=3)
 ENet.fit(X_train,y_train)
 y_pred = ENet.predict(X_test)
 print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
@@ -1844,7 +1849,7 @@ y_pred = GBoost.predict(X_test)
 print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Bagging Experiment---------------------")
-baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,Lasso))
+baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,lasso))
 baggingModel.fit(X_train,y_train)
 y_pred  =baggingModel.predict(X_test)
 print('Bagging squared error is '+str(mean_squared_error(y_test,y_pred)))
@@ -1862,7 +1867,7 @@ stacked_averaged_models.fit(X_train,y_train)
 y_pred = stacked_averaged_models.predict(X_test)
 print('Stacking with metamodel is ENet squared error is '+str(mean_squared_error(y_test,y_pred)))
 
-stacked_averaged_models = StackingAveragedModels(base_models = (ENet, Lasso, krr,svr,rfr),
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, lasso, krr,svr,rfr),
                                                  meta_model = GBoost)
 stacked_averaged_models.fit(X_train,y_train)
 y_pred = stacked_averaged_models.predict(X_test)
@@ -1924,7 +1929,7 @@ for i in range(0,10):
 print()
 print('2.6.3 LASSO测试---------------------------------')
 
-lasso = Lasso(alpha =0.0005, random_state=1)
+lasso = Lasso(alpha =0.05, random_state=1)
 lasso.fit(X_train,y_train)
 
 
@@ -1937,7 +1942,7 @@ y_pred = krr.predict(X_test)
 print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Elastic Net TEST----------------------------------")
-ENet = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+ENet = ElasticNet(alpha=0.05, l1_ratio=.9, random_state=3)
 ENet.fit(X_train,y_train)
 y_pred = ENet.predict(X_test)
 print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
@@ -1952,7 +1957,7 @@ y_pred = GBoost.predict(X_test)
 print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Bagging Experiment---------------------")
-baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,Lasso))
+baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,lasso))
 baggingModel.fit(X_train,y_train)
 y_pred  =baggingModel.predict(X_test)
 print('Bagging squared error is '+str(mean_squared_error(y_test,y_pred)))
@@ -1970,7 +1975,7 @@ stacked_averaged_models.fit(X_train,y_train)
 y_pred = stacked_averaged_models.predict(X_test)
 print('Stacking with metamodel is ENet squared error is '+str(mean_squared_error(y_test,y_pred)))
 
-stacked_averaged_models = StackingAveragedModels(base_models = (ENet, Lasso, krr,svr,rfr),
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, lasso, krr,svr,rfr),
                                                  meta_model = GBoost)
 stacked_averaged_models.fit(X_train,y_train)
 y_pred = stacked_averaged_models.predict(X_test)
@@ -2031,7 +2036,7 @@ for i in range(0,10):
 print()
 print('2.7.3 LASSO测试---------------------------------')
 
-lasso = Lasso(alpha =0.0005, random_state=1)
+lasso = Lasso(alpha =0.05, random_state=1)
 lasso.fit(X_train,y_train)
 
 
@@ -2044,7 +2049,7 @@ y_pred = krr.predict(X_test)
 print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Elastic Net TEST----------------------------------")
-ENet = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+ENet = ElasticNet(alpha=0.05, l1_ratio=.9, random_state=3)
 ENet.fit(X_train,y_train)
 y_pred =ENet.predict(X_test)
 print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
@@ -2059,7 +2064,7 @@ y_pred = GBoost.predict(X_test)
 print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Bagging Experiment---------------------")
-baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,Lasso))
+baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,lasso))
 baggingModel.fit(X_train,y_train)
 y_pred  =baggingModel.predict(X_test)
 print('Bagging squared error is '+str(mean_squared_error(y_test,y_pred)))
@@ -2077,7 +2082,7 @@ stacked_averaged_models.fit(X_train,y_train)
 y_pred = stacked_averaged_models.predict(X_test)
 print('Stacking with metamodel is ENet squared error is '+str(mean_squared_error(y_test,y_pred)))
 
-stacked_averaged_models = StackingAveragedModels(base_models = (ENet, Lasso, krr,svr,rfr),
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, lasso, krr,svr,rfr),
                                                  meta_model = GBoost)
 stacked_averaged_models.fit(X_train,y_train)
 y_pred = stacked_averaged_models.predict(X_test)
@@ -2139,7 +2144,7 @@ for i in range(0,10):
 print()
 print('2.8.3 LASSO测试---------------------------------')
 
-lasso = Lasso(alpha =0.0005, random_state=1)
+lasso = Lasso(alpha =0.05, random_state=1)
 lasso.fit(X_train,y_train)
 
 
@@ -2152,7 +2157,7 @@ y_pred = krr.predict(X_test)
 print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Elastic Net TEST----------------------------------")
-ENet = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+ENet = ElasticNet(alpha=0.05, l1_ratio=.9, random_state=3)
 ENet.fit(X_train,y_train)
 y_pred = ENet.predict(X_test)
 print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
@@ -2167,7 +2172,7 @@ y_pred = GBoost.predict(X_test)
 print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Bagging Experiment---------------------")
-baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,Lasso))
+baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,lasso))
 baggingModel.fit(X_train,y_train)
 y_pred  =baggingModel.predict(X_test)
 print('Bagging squared error is '+str(mean_squared_error(y_test,y_pred)))
@@ -2185,7 +2190,7 @@ stacked_averaged_models.fit(X_train,y_train)
 y_pred = stacked_averaged_models.predict(X_test)
 print('Stacking with metamodel is ENet squared error is '+str(mean_squared_error(y_test,y_pred)))
 
-stacked_averaged_models = StackingAveragedModels(base_models = (ENet, Lasso, krr,svr,rfr),
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, lasso, krr,svr,rfr),
                                                  meta_model = GBoost)
 stacked_averaged_models.fit(X_train,y_train)
 y_pred = stacked_averaged_models.predict(X_test)
@@ -2248,7 +2253,7 @@ for i in range(0,10):
 print()
 print('2.9.3 LASSO测试---------------------------------')
 
-lasso = Lasso(alpha =0.0005, random_state=1)
+lasso = Lasso(alpha =0.05, random_state=1)
 lasso.fit(X_train,y_train)
 
 
@@ -2261,7 +2266,7 @@ y_pred = krr.predict(X_test)
 print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Elastic Net TEST----------------------------------")
-ENet = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+ENet = ElasticNet(alpha=0.05, l1_ratio=.9, random_state=3)
 ENet.fit(X_train,y_train)
 y_pred = ENet.predict(X_test)
 print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
@@ -2276,7 +2281,7 @@ y_pred = GBoost.predict(X_test)
 print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Bagging Experiment---------------------")
-baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,Lasso))
+baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,lasso))
 baggingModel.fit(X_train,y_train)
 y_pred  =baggingModel.predict(X_test)
 print('Bagging squared error is '+str(mean_squared_error(y_test,y_pred)))
@@ -2294,7 +2299,7 @@ stacked_averaged_models.fit(X_train,y_train)
 y_pred = stacked_averaged_models.predict(X_test)
 print('Stacking with metamodel is ENet squared error is '+str(mean_squared_error(y_test,y_pred)))
 
-stacked_averaged_models = StackingAveragedModels(base_models = (ENet, Lasso, krr,svr,rfr),
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, lasso, krr,svr,rfr),
                                                  meta_model = GBoost)
 stacked_averaged_models.fit(X_train,y_train)
 y_pred = stacked_averaged_models.predict(X_test)
@@ -2356,7 +2361,7 @@ for i in range(0,10):
 print()
 print('2.10.3 LASSO测试---------------------------------')
 
-lasso = Lasso(alpha =0.0005, random_state=1)
+lasso = Lasso(alpha =0.05, random_state=1)
 lasso.fit(X_train,y_train)
 
 
@@ -2370,7 +2375,7 @@ y_pred = krr.predict(X_test)
 print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Elastic Net TEST----------------------------------")
-ENet = ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+ENet = ElasticNet(alpha=0.05, l1_ratio=.9, random_state=3)
 ENet.fit(X_train,y_train)
 y_pred = ENet.predict(X_test)
 print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
@@ -2385,7 +2390,7 @@ y_pred = GBoost.predict(X_test)
 print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
 
 print("Bagging Experiment---------------------")
-baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,Lasso))
+baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,lasso))
 baggingModel.fit(X_train,y_train)
 y_pred  =baggingModel.predict(X_test)
 print('Bagging squared error is '+str(mean_squared_error(y_test,y_pred)))
@@ -2403,7 +2408,7 @@ stacked_averaged_models.fit(X_train,y_train)
 y_pred = stacked_averaged_models.predict(X_test)
 print('Stacking with metamodel is ENet squared error is '+str(mean_squared_error(y_test,y_pred)))
 
-stacked_averaged_models = StackingAveragedModels(base_models = (ENet, Lasso, krr,svr,rfr),
+stacked_averaged_models = StackingAveragedModels(base_models = (ENet, lasso, krr,svr,rfr),
                                                  meta_model = GBoost)
 stacked_averaged_models.fit(X_train,y_train)
 y_pred = stacked_averaged_models.predict(X_test)
