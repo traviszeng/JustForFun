@@ -137,7 +137,7 @@ wavelength = data_set_200AVG[s_name].WaveLength
 intensity = np.array(intensity)
 wavelength = np.array(wavelength)
 plt.plot(wavelength, intensity)
-# plt.show()
+plt.show()
 
 print("准备NIST库相关数据")
 nist = pd.read_csv("E:\\JustForFun\\CanadaLIBSdata\\andor.nist", header=None,

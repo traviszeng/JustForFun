@@ -30,6 +30,13 @@ concentrate_data = pd.read_csv("E:\\JustForFun\\CanadaLIBSdata\\LIBS OpenData cs
 #前81行为数据
 concentrate_data = concentrate_data.loc[0:81]
 
+print('Data preprocessing begins.')
+"""
+数据预处理流程：
+1.填补空白值
+2.处理异常值，Nan value处理
+3.str转float
+"""
 #数据清洗
 for indexs in concentrate_data.index:
     for i in range(1,12):
