@@ -11,6 +11,7 @@ from sklearn.linear_model import ElasticNet, Lasso,  BayesianRidge, LassoLarsIC
 from sklearn.kernel_ridge import KernelRidge
 from sklearn.ensemble import RandomForestRegressor,  GradientBoostingRegressor
 from sklearn.base import BaseEstimator, TransformerMixin, RegressorMixin, clone
+from sklearn.feature_selection import f_regression,SelectPercentile
 
 from sklearn.ensemble import RandomForestRegressor
 import xgboost as xgb
@@ -338,10 +339,16 @@ def elementTest(element,X,y,flag,times = 5):
     KRR_MSE = 0
     stacking_MSE = 0
     bagging_MSE =0
+    X = np.array(X)
+    y = np.array(y)
+    X = SelectPercentile(f_regression, percentile=10).fit_transform(X, y)
 
     for i in range(0,10):
         print()
         print("第"+str(i+1)+"次"+str(element)+"的实验----------------------")
+        #特征选择，先选取前10%的特征进行训练
+
+
         X_train, X_test, y_train, y_test = train_test_split(X,
                                                             y,
                                                             test_size=0.20)
@@ -364,13 +371,15 @@ def elementTest(element,X,y,flag,times = 5):
         print('RFR Mean squared error is ' + str(mean_squared_error(y_test, y_pred)))
         # 各特征的importance
         importance = rfr.feature_importances_
+        print(importance)
         # 根据importance大小排序
         indices = np.argsort(importance)[::-1]
+        print(indices)
         # 打印前十的importance
         for i in range(0, 10):
             print("importance is " + str(importance[indices[i]]))
             if flag:
-                print("对应的特征峰和importance为 "+str(element_dict['Al'])[indices[i]])
+                print("对应的特征峰和importance为 "+str(element_dict['Al'][indices[i]]))
 
         print()
         print('Part 3 LASSO experiment ---------------------------------')
@@ -458,7 +467,7 @@ def elementTest(element,X,y,flag,times = 5):
 
 
 
-
+"""
 elementTest('Al',X,Al_y,0)
 elementTest('Ca',X,Ca_y,0)
 elementTest('Fe',X,Fe_y,0)
@@ -470,14 +479,11 @@ elementTest('Si',X,Si_y,0)
 elementTest('Ti',X,Ti_y,0)
 elementTest('P',X,P_y,0)
 
-
-
-
 print('2.根据NIST库筛选特征-------------------------')
-
+"""
 Al_x = selectFeature('Al')
 elementTest('Al',Al_x,Al_y,1)
-
+"""
 Ca_x = selectFeature('Ca')
 elementTest('Ca',Ca_x,Ca_y,1)
 
@@ -504,3 +510,5 @@ elementTest('Ti',Ti_x,Ti_y,1)
 
 P_x = selectFeature('P')
 elementTest('P',P_x,P_y,1)
+
+"""
