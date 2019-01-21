@@ -12,11 +12,12 @@
   <component name="CoverageDataManager">
     <SUITE FILE_PATH="coverage/CanadaLIBSdata$LIBS_Mntest.coverage" NAME="LIBS_Mntest Coverage Results" MODIFIED="1547777714752" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/CanadaLIBSdata$LIBS_Titest.coverage" NAME="LIBS_Titest Coverage Results" MODIFIED="1547777629020" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/CanadaLIBSdata$featureSelectionTest.coverage" NAME="featureSelectionTest Coverage Results" MODIFIED="1548040772478" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/CanadaLIBSdata$LIBS_Altest.coverage" NAME="LIBS_Altest Coverage Results" MODIFIED="1547779460507" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/CanadaLIBSdata$LIBS_Catest.coverage" NAME="LIBS_Catest Coverage Results" MODIFIED="1547779464058" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/CanadaLIBSdata$LIBS_Sitest.coverage" NAME="LIBS_Sitest Coverage Results" MODIFIED="1547777708922" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/CanadaLIBSdata$LIBS_Natest.coverage" NAME="LIBS_Natest Coverage Results" MODIFIED="1547778559944" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/CanadaLIBSdata$LIBStest.coverage" NAME="LIBStest Coverage Results" MODIFIED="1547878588579" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/CanadaLIBSdata$LIBStest.coverage" NAME="LIBStest Coverage Results" MODIFIED="1547888253406" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/CanadaLIBSdata$LIBS_ktest.coverage" NAME="LIBS_ktest Coverage Results" MODIFIED="1547780018531" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
   <component name="FileEditorManager">
@@ -117,11 +118,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="LIBStest.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="LIBStest.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/LIBStest.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-588">
-              <caret line="32" column="35" lean-forward="true" selection-start-line="32" selection-start-column="35" selection-end-line="32" selection-end-column="35" />
+            <state relative-caret-position="260">
+              <caret line="210" column="40" lean-forward="false" selection-start-line="210" selection-start-column="40" selection-end-line="210" selection-end-column="40" />
               <folding>
                 <element signature="e#36#45#0" expanded="true" />
               </folding>
@@ -129,7 +130,26 @@
           </provider>
         </entry>
       </file>
+      <file leaf-file-name="featureSelectionTest.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/featureSelectionTest.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1239">
+              <caret line="59" column="71" lean-forward="true" selection-start-line="59" selection-start-column="71" selection-end-line="59" selection-end-column="71" />
+              <folding>
+                <element signature="e#15#34#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
     </leaf>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
@@ -165,6 +185,7 @@
         <option value="$PROJECT_DIR$/LIBS_Natest.py" />
         <option value="$PROJECT_DIR$/LIBS_ktest.py" />
         <option value="$PROJECT_DIR$/LIBStest.py" />
+        <option value="$PROJECT_DIR$/featureSelectionTest.py" />
       </list>
     </option>
   </component>
@@ -227,7 +248,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.LIBStest">
+  <component name="RunManager" selected="Python.featureSelectionTest">
     <configuration name="LIBS_Altest" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -260,24 +281,6 @@
       <module name="CanadaLIBSdata" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/LIBS_Catest.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-    </configuration>
-    <configuration name="LIBS_Natest" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="CanadaLIBSdata" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/LIBS_Natest.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -318,20 +321,38 @@
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
     </configuration>
+    <configuration name="featureSelectionTest" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="CanadaLIBSdata" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/featureSelectionTest.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+    </configuration>
     <list size="5">
-      <item index="0" class="java.lang.String" itemvalue="Python.LIBS_Natest" />
-      <item index="1" class="java.lang.String" itemvalue="Python.LIBS_Altest" />
-      <item index="2" class="java.lang.String" itemvalue="Python.LIBS_Catest" />
-      <item index="3" class="java.lang.String" itemvalue="Python.LIBS_ktest" />
-      <item index="4" class="java.lang.String" itemvalue="Python.LIBStest" />
+      <item index="0" class="java.lang.String" itemvalue="Python.LIBS_Altest" />
+      <item index="1" class="java.lang.String" itemvalue="Python.LIBS_Catest" />
+      <item index="2" class="java.lang.String" itemvalue="Python.LIBS_ktest" />
+      <item index="3" class="java.lang.String" itemvalue="Python.LIBStest" />
+      <item index="4" class="java.lang.String" itemvalue="Python.featureSelectionTest" />
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="Python.LIBStest" />
-        <item index="1" class="java.lang.String" itemvalue="Python.LIBS_ktest" />
-        <item index="2" class="java.lang.String" itemvalue="Python.LIBS_Catest" />
-        <item index="3" class="java.lang.String" itemvalue="Python.LIBS_Altest" />
-        <item index="4" class="java.lang.String" itemvalue="Python.LIBS_Natest" />
+        <item index="0" class="java.lang.String" itemvalue="Python.featureSelectionTest" />
+        <item index="1" class="java.lang.String" itemvalue="Python.LIBStest" />
+        <item index="2" class="java.lang.String" itemvalue="Python.LIBS_ktest" />
+        <item index="3" class="java.lang.String" itemvalue="Python.LIBS_Catest" />
+        <item index="4" class="java.lang.String" itemvalue="Python.LIBS_Altest" />
       </list>
     </recent_temporary>
   </component>
@@ -466,10 +487,20 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/LIBStest.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-588">
-          <caret line="32" column="35" lean-forward="true" selection-start-line="32" selection-start-column="35" selection-end-line="32" selection-end-column="35" />
+        <state relative-caret-position="260">
+          <caret line="210" column="40" lean-forward="false" selection-start-line="210" selection-start-column="40" selection-end-line="210" selection-end-column="40" />
           <folding>
             <element signature="e#36#45#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/featureSelectionTest.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1239">
+          <caret line="59" column="71" lean-forward="true" selection-start-line="59" selection-start-column="71" selection-end-line="59" selection-end-column="71" />
+          <folding>
+            <element signature="e#15#34#0" expanded="true" />
           </folding>
         </state>
       </provider>

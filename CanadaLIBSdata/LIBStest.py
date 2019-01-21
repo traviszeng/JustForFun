@@ -24,7 +24,10 @@ from sklearn.model_selection import KFold, cross_val_score, train_test_split
 import warnings
 warnings.filterwarnings("ignore")
 
-
+"""
+Todo:
+1.ch
+"""
 
 concentrate_data = pd.read_csv("E:\\JustForFun\\CanadaLIBSdata\\LIBS OpenData csv\\Sample_Composition_Data.csv")
 #前81行为数据
@@ -327,6 +330,15 @@ print()
 :param times 重复次数
 """
 def elementTest(element,X,y,flag,times = 5):
+    SVR_MSE = 0
+    RFR_MSE = 0
+    LASSO_MSE = 0
+    GBoost_MSE = 0
+    ENet_MSE = 0
+    KRR_MSE = 0
+    stacking_MSE = 0
+    bagging_MSE =0
+
     for i in range(0,10):
         print()
         print("第"+str(i+1)+"次"+str(element)+"的实验----------------------")
@@ -338,6 +350,7 @@ def elementTest(element,X,y,flag,times = 5):
         svr.fit(X_train, y_train)
 
         y_pred = svr.predict(X_test)
+        SVR_MSE +=mean_squared_error(y_test, y_pred)
         print('SVR Mean squared error is ' + str(mean_squared_error(y_test, y_pred)))
 
         print()
@@ -347,6 +360,7 @@ def elementTest(element,X,y,flag,times = 5):
         rfr.fit(X_train, y_train)
 
         y_pred = rfr.predict(X_test)
+        RFR_MSE +=mean_squared_error(y_test, y_pred)
         print('RFR Mean squared error is ' + str(mean_squared_error(y_test, y_pred)))
         # 各特征的importance
         importance = rfr.feature_importances_
@@ -366,10 +380,12 @@ def elementTest(element,X,y,flag,times = 5):
 
         y_pred = lasso.predict(X_test)
         print('LASSO  Mean squared error is ' + str(mean_squared_error(y_test, y_pred)))
+        LASSO_MSE+=mean_squared_error(y_test, y_pred)
         print("Part 4 KRR TEST----------------------------------")
         krr = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
         krr.fit(X_train, y_train)
         y_pred = krr.predict(X_test)
+        KRR_MSE+=mean_squared_error(y_test, y_pred)
         print('KRR Mean squared error is ' + str(mean_squared_error(y_test, y_pred)))
 
         print("Part 5 Elastic Net TEST----------------------------------")
@@ -377,7 +393,7 @@ def elementTest(element,X,y,flag,times = 5):
         ENet.fit(X_train, y_train)
         y_pred = ENet.predict(X_test)
         print('Elastic Net Mean squared error is ' + str(mean_squared_error(y_test, y_pred)))
-
+        ENet_MSE+=mean_squared_error(y_test, y_pred)
         print("Part 6 Gradient Boosting TEST----------------------------------")
         GBoost = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
                                            max_depth=4, max_features='sqrt',
@@ -385,12 +401,14 @@ def elementTest(element,X,y,flag,times = 5):
                                            loss='huber', random_state=5)
         GBoost.fit(X_train, y_train)
         y_pred = GBoost.predict(X_test)
+        GBoost_MSE+=mean_squared_error(y_test, y_pred)
         print('GBoost squared error is ' + str(mean_squared_error(y_test, y_pred)))
 
         print("Part 7 Bagging Experiment---------------------")
         baggingModel = baggingAveragingModels(models=(krr, rfr, svr, GBoost, ENet, lasso))
         baggingModel.fit(X_train, y_train)
         y_pred = baggingModel.predict(X_test)
+        bagging_MSE+=mean_squared_error(y_test, y_pred)
         print('Bagging squared error is ' + str(mean_squared_error(y_test, y_pred)))
 
         print("Part 8 Stacking Experiment------------------------------")
@@ -429,6 +447,14 @@ def elementTest(element,X,y,flag,times = 5):
         stacked_averaged_models.fit(X_train, y_train)
         y_pred = stacked_averaged_models.predict(X_test)
         print('Stacking with metamodel is rfr squared error is ' + str(mean_squared_error(y_test, y_pred)))
+
+    print(str(SVR_MSE/times))
+    print(str(RFR_MSE/times))
+    print(str(LASSO_MSE/times))
+    print(str(KRR_MSE/times))
+    print(str(ENet_MSE/times))
+    print(str(GBoost_MSE/times))
+    print(str(bagging_MSE/times))
 
 
 
