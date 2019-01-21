@@ -74,8 +74,8 @@ def traverseFolder(add):
                 add_key+='\\'
                 #add_key+='\\'
             #add_key+=obj['href'].split('/')[-1]
-            if not os.path.exists(pc_add):
-                os.mkdir(pc_add)
+                if not os.path.exists(pc_add):
+                    os.mkdir(pc_add)
 
             #pc_add ----》'E:\\JustForFun\\nasaLIBSdata\\mslccm_0xxx\\data\\sol00564\\'
             #print(add_key)
@@ -123,7 +123,7 @@ def readMD5File(filename):
 
 
 
-libs2_add = "http://pds-geosciences.wustl.edu/msl/msl-m-chemcam-libs-2-edr-v1/"
+libs2_add = "http://pds-geosciences.wustl.edu/msl/msl-m-chemcam-libs-2-edr-v1/mslccm_0xxx/calib/"
 dir_list = []
 hash_dict = {}
 readMD5File('mslccm_0xxx_181207.md5')
