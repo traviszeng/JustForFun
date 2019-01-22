@@ -330,6 +330,7 @@ print()
 :param flag 用来区分输入的X是全光谱还是特征峰，用来区分是否需要输出rfr的importance 对应的特征峰波长
 :param times 重复次数
 """
+import copy
 def elementTest(element,X,y,flag,times = 5):
     SVR_MSE = 0
     RFR_MSE = 0
@@ -339,9 +340,21 @@ def elementTest(element,X,y,flag,times = 5):
     KRR_MSE = 0
     stacking_MSE = 0
     bagging_MSE =0
+    oldX = copy.deepcopy(X)
+    extract_element_dict = {}
     X = np.array(X)
     y = np.array(y)
     X = SelectPercentile(f_regression, percentile=10).fit_transform(X, y)
+    originalfeature_indice = []
+    for i in range(0,len(X[0])):
+        originalfeature_indice.append(np.where((oldX[0]==X[0][i]) & (oldX[5]==X[5][i]) & (oldX[10]==X[10][i]))[0][0])
+
+    for f_indice in originalfeature_indice:
+        if element in extract_element_dict:
+            extract_element_dict[element].append(element_dict[element][f_indice])
+        else:
+            extract_element_dict[element] = [element_dict[element][f_indice]]
+
 
     for i in range(0,10):
         print()
@@ -379,7 +392,7 @@ def elementTest(element,X,y,flag,times = 5):
         for i in range(0, 10):
             print("importance is " + str(importance[indices[i]]))
             if flag:
-                print("对应的特征峰和importance为 "+str(element_dict['Al'][indices[i]]))
+                print("对应的特征峰和importance为 "+str(extract_element_dict['Al'][indices[i]]))
 
         print()
         print('Part 3 LASSO experiment ---------------------------------')
@@ -482,8 +495,9 @@ elementTest('P',X,P_y,0)
 print('2.根据NIST库筛选特征-------------------------')
 """
 Al_x = selectFeature('Al')
-elementTest('Al',Al_x,Al_y,1)
 """
+elementTest('Al',Al_x,Al_y,1)
+
 Ca_x = selectFeature('Ca')
 elementTest('Ca',Ca_x,Ca_y,1)
 
