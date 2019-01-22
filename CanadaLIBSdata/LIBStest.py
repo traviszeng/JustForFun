@@ -146,7 +146,7 @@ wavelength = data_set_200AVG[s_name].WaveLength
 intensity = np.array(intensity)
 wavelength = np.array(wavelength)
 plt.plot(wavelength,intensity)
-#plt.show()
+plt.show()
 
 print("准备NIST库相关数据")
 nist = pd.read_csv("E:\\JustForFun\\CanadaLIBSdata\\andor.nist",header = None,names = ['WaveLength','Element','Type','Unknown','Importance'])
@@ -332,7 +332,7 @@ print()
 :param times 重复次数
 """
 import copy
-def elementTest(element,X,y,flag,times = 5):
+def elementTest(element,X,y,flag,times = 10):
     SVR_MSE = []
     RFR_MSE = []
     LASSO_MSE = []
@@ -478,28 +478,30 @@ def elementTest(element,X,y,flag,times = 5):
         stacking_MSE.append(mean_squared_error(y_test, y_pred))
 
 
-    plot_x = np.linespace(1,10,1)
-    plt.plot(plot_x,SVR_MSE,'b')
-    plt.plot(plot_x, RFR_MSE, 'r')
-    plt.plot(plot_x, LASSO_MSE, 'g')
-    plt.plot(plot_x, ENet_MSE, 'y')
-    plt.plot(plot_x, KRR_MSE, 'k')
-    plt.plot(plot_x, bagging_MSE, 'M')
-    plt.plot(plot_x, GBoost_MSE, 'c')
+    plot_x = np.linspace(1,10,10)
+    plt.plot(plot_x,SVR_MSE,'b',label = 'SVR')
+    plt.plot(plot_x, RFR_MSE, 'r',label ='RFR')
+    plt.plot(plot_x, LASSO_MSE, 'g',label = 'LASSO')
+    plt.plot(plot_x, ENet_MSE, 'y',label='ENet')
+    plt.plot(plot_x, KRR_MSE, 'k',label ='KRR')
+    plt.plot(plot_x, bagging_MSE, 'M',label = 'Bagging')
+    plt.plot(plot_x, GBoost_MSE, 'c',label = 'GBoost')
+    plt.legend(['SVR','RFR','LASSO','ENet','KRR','Bagging','GBoost'])
     plt.show()
 
     sub = stacking_MSE[0::6]
-    plt.plot(plot_x,sub,'b')
+    plt.plot(plot_x,sub,'b',label = 'meta is lasso')
     sub = stacking_MSE[1::6]
-    plt.plot(plot_x, sub, 'r')
+    plt.plot(plot_x, sub, 'r',label = 'meta is ENet')
     sub = stacking_MSE[2::6]
-    plt.plot(plot_x, sub, 'g')
+    plt.plot(plot_x, sub, 'g',label = 'meta is GBoost')
     sub = stacking_MSE[3::6]
-    plt.plot(plot_x, sub, 'y')
+    plt.plot(plot_x, sub, 'y',label = 'meta is krr')
     sub = stacking_MSE[4::6]
-    plt.plot(plot_x, sub, 'k')
+    plt.plot(plot_x, sub, 'k',label = 'meta is svr')
     sub = stacking_MSE[5::6]
-    plt.plot(plot_x, sub, 'm')
+    plt.plot(plot_x, sub, 'm',label = 'meta is rfr')
+    plt.legend(['meta is lasso','meta is ENet','meta is GBoost','meta is krr','meta is svr','meta is rfr'])
     plt.show()
 
 
@@ -524,9 +526,9 @@ elementTest('Na',X,Na_y,0)
 elementTest('Si',X,Si_y,0)
 elementTest('Ti',X,Ti_y,0)
 elementTest('P',X,P_y,0)
-
-print('2.根据NIST库筛选特征-------------------------')
 """
+print('2.根据NIST库筛选特征-------------------------')
+
 Al_x = selectFeature('Al')
 
 elementTest('Al',Al_x,Al_y,1)
