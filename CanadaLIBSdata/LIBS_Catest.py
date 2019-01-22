@@ -7,10 +7,12 @@ import pandas as pd
 import re
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.linear_model import ElasticNet, Lasso, BayesianRidge, LassoLarsIC
+from sklearn.linear_model import ElasticNet, Lasso,  BayesianRidge, LassoLarsIC
 from sklearn.kernel_ridge import KernelRidge
-from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
+from sklearn.ensemble import RandomForestRegressor,  GradientBoostingRegressor
 from sklearn.base import BaseEstimator, TransformerMixin, RegressorMixin, clone
+from sklearn.feature_selection import f_regression,SelectPercentile
+import matplotlib.pyplot as plt
 
 from sklearn.ensemble import RandomForestRegressor
 import xgboost as xgb
@@ -22,37 +24,49 @@ from sklearn.metrics import mean_squared_error
 from sklearn.svm import SVR
 from sklearn.model_selection import KFold, cross_val_score, train_test_split
 import warnings
-
 warnings.filterwarnings("ignore")
 
+"""
+Todo:
+1.ch
+"""
+
 concentrate_data = pd.read_csv("E:\\JustForFun\\CanadaLIBSdata\\LIBS OpenData csv\\Sample_Composition_Data.csv")
-# 前81行为数据
+#前81行为数据
 concentrate_data = concentrate_data.loc[0:81]
 
-# 数据清洗
+print('Data preprocessing begins.')
+"""
+数据预处理流程：
+1.填补空白值
+2.处理异常值，Nan value处理
+3.str转float
+"""
+#数据清洗
 for indexs in concentrate_data.index:
-    for i in range(1, 12):
-        if concentrate_data.loc[indexs].values[i] == '-':
+    for i in range(1,12):
+        if concentrate_data.loc[indexs].values[i]=='-':
             concentrate_data.loc[indexs].values[i] = 0.0
 
         else:
             try:
                 concentrate_data.loc[indexs].values[i] = float(concentrate_data.loc[indexs].values[i])
-                if float(concentrate_data.loc[indexs].values[i]) > 1:
-                    concentrate_data.loc[indexs].values[i] = concentrate_data.loc[indexs].values[i] / 100
+                if float(concentrate_data.loc[indexs].values[i])>1:
+                    concentrate_data.loc[indexs].values[i] = concentrate_data.loc[indexs].values[i]/100
             except ValueError:
                 concentrate_data.loc[indexs].values[i] = float(concentrate_data.loc[indexs].values[i][1:])
-                if float(concentrate_data.loc[indexs].values[i]) > 1:
-                    concentrate_data.loc[indexs].values[i] = concentrate_data.loc[indexs].values[i] / 100
+                if float(concentrate_data.loc[indexs].values[i])>1:
+                    concentrate_data.loc[indexs].values[i] = concentrate_data.loc[indexs].values[i]/100
 
-# 检查是否将所有非数字处理好
+#检查是否将所有非数字处理好
 for column in concentrate_data.columns:
-    print(concentrate_data[column].isna().value_counts())
+	print(concentrate_data[column].isna().value_counts())
+
 
 route_200_AVG = "E:\\JustForFun\\CanadaLIBSdata\\LIBS OpenData csv\\csv Material Large Set 200pulseaverage"
 route_1000_AVG = "E:\\JustForFun\\CanadaLIBSdata\\LIBS OpenData csv\\csv Certified Samples Subset 1000pulseaverage"
 
-postfix_200AVG = "_200AVG.csv"
+postfix_200AVG ="_200AVG.csv"
 postfix_1000AVG = "_1000AVG.csv"
 
 """
@@ -61,105 +75,98 @@ postfix_1000AVG = "_1000AVG.csv"
 
 data_set_200AVG = {}
 concentrate_set_200AVG = {}
-# 加载200AVG的样本，并将其存到data_set_200AVG中
+#加载200AVG的样本，并将其存到data_set_200AVG中
 os.chdir(route_200_AVG)
 num = 0
 for indexs in concentrate_data.index:
-    if os.path.exists(concentrate_data.loc[indexs].values[0] + postfix_200AVG):
-        num += 1
-        print("Get data file:" + concentrate_data.loc[indexs].values[0] + postfix_200AVG)
-        data = pd.read_csv(concentrate_data.loc[indexs].values[0] + postfix_200AVG, header=None,
-                           names=['WaveLength', 'Intensity'])
-        # data中强度<0的统统变为0
+    if os.path.exists(concentrate_data.loc[indexs].values[0]+postfix_200AVG):
+        num+=1
+        print("Get data file:"+concentrate_data.loc[indexs].values[0]+postfix_200AVG)
+        data = pd.read_csv(concentrate_data.loc[indexs].values[0]+postfix_200AVG,header = None,names = ['WaveLength','Intensity'])
+        #data中强度<0的统统变为0
         data.loc[data.Intensity < 0, 'Intensity'] = 0
-        data_set_200AVG[concentrate_data.loc[indexs].values[0] + "_200AVG"] = data
-        concentrate_set_200AVG[concentrate_data.loc[indexs].values[0] + "_200AVG"] = concentrate_data.loc[
-                                                                                         indexs].values[1:]
-    # 处理hand sample类型的样本
-    if re.match('hand sample*', concentrate_data.loc[indexs].values[0]):
+        data_set_200AVG[concentrate_data.loc[indexs].values[0]+"_200AVG"] = data
+        concentrate_set_200AVG[concentrate_data.loc[indexs].values[0]+"_200AVG"] = concentrate_data.loc[indexs].values[1:]
+    #处理hand sample类型的样本
+    if re.match('hand sample*',concentrate_data.loc[indexs].values[0]):
 
         f_list = concentrate_data.loc[indexs].values[0].split()
-        filename = f_list[0] + " " + f_list[1] + postfix_200AVG
+        filename = f_list[0]+" "+f_list[1]+postfix_200AVG
         if os.path.exists(filename):
-            num += 1
-            print("Get data file:" + filename)
-            data = pd.read_csv(filename, header=None, names=['WaveLength', 'Intensity'])
+            num+=1
+            print("Get data file:"+filename)
+            data = pd.read_csv(filename,header = None,names = ['WaveLength','Intensity'])
             # data中强度<0的统统变为0
             data.loc[data.Intensity < 0, 'Intensity'] = 0
-            data_set_200AVG[concentrate_data.loc[indexs].values[0] + "_200AVG"] = data
-            concentrate_set_200AVG[concentrate_data.loc[indexs].values[0] + "_200AVG"] = concentrate_data.loc[
-                                                                                             indexs].values[1:]
+            data_set_200AVG[concentrate_data.loc[indexs].values[0]+"_200AVG"] = data
+            concentrate_set_200AVG[concentrate_data.loc[indexs].values[0]+"_200AVG"] = concentrate_data.loc[indexs].values[1:]
 
-print("Get " + str(num) + " 200_AVG files.")
+
+print("Get "+str(num)+" 200_AVG files.")
 print()
 
 data_set_1000AVG = {}
 concentrate_set_1000AVG = {}
 num = 0
-# 加载1000AVG的样本，并将其存到data_set_1000AVG中
+#加载1000AVG的样本，并将其存到data_set_1000AVG中
 os.chdir(route_1000_AVG)
 for indexs in concentrate_data.index:
-    if os.path.exists(concentrate_data.loc[indexs].values[0] + postfix_1000AVG):
-        num += 1
-        print("Get data file:" + concentrate_data.loc[indexs].values[0] + postfix_1000AVG)
-        data = pd.read_csv(concentrate_data.loc[indexs].values[0] + postfix_1000AVG, header=None,
-                           names=['WaveLength', 'Intensity'])
+    if os.path.exists(concentrate_data.loc[indexs].values[0]+postfix_1000AVG):
+        num+=1
+        print("Get data file:"+concentrate_data.loc[indexs].values[0]+postfix_1000AVG)
+        data = pd.read_csv(concentrate_data.loc[indexs].values[0]+postfix_1000AVG,header = None,names = ['WaveLength','Intensity'])
         # data中强度<0的统统变为0
         data.loc[data.Intensity < 0, 'Intensity'] = 0
-        data_set_1000AVG[concentrate_data.loc[indexs].values[0] + "_1000AVG"] = data
-        concentrate_set_1000AVG[concentrate_data.loc[indexs].values[0] + "_1000AVG"] = concentrate_data.loc[
-                                                                                           indexs].values[1:]
-    # 处理hand sample类型的样本
-    if re.match('hand sample*', concentrate_data.loc[indexs].values[0]):
+        data_set_1000AVG[concentrate_data.loc[indexs].values[0]+"_1000AVG"] = data
+        concentrate_set_1000AVG[concentrate_data.loc[indexs].values[0]+"_1000AVG"] = concentrate_data.loc[indexs].values[1:]
+    #处理hand sample类型的样本
+    if re.match('hand sample*',concentrate_data.loc[indexs].values[0]):
 
         f_list = concentrate_data.loc[indexs].values[0].split()
-        filename = f_list[0] + " " + f_list[1] + postfix_1000AVG
+        filename = f_list[0]+" "+f_list[1]+postfix_1000AVG
         if os.path.exists(filename):
-            num += 1
-            print("Get data file:" + filename)
-            data = pd.read_csv(filename, header=None, names=['WaveLength', 'Intensity'])
+            num+=1
+            print("Get data file:"+filename)
+            data = pd.read_csv(filename,header = None,names = ['WaveLength','Intensity'])
             # data中强度<0的统统变为0
             data.loc[data.Intensity < 0, 'Intensity'] = 0
-            data_set_1000AVG[concentrate_data.loc[indexs].values[0] + "_1000AVG"] = data
-            concentrate_set_1000AVG[concentrate_data.loc[indexs].values[0] + "_1000AVG"] = concentrate_data.loc[
-                                                                                               indexs].values[1:]
+            data_set_1000AVG[concentrate_data.loc[indexs].values[0]+"_1000AVG"] = data
+            concentrate_set_1000AVG[concentrate_data.loc[indexs].values[0]+"_1000AVG"] = concentrate_data.loc[indexs].values[1:]
 
-print("Get " + str(num) + " 1000_AVG files.")
+print("Get "+str(num)+" 1000_AVG files.")
 
-# 去掉hand sample34的记录（全为0）
+#去掉hand sample34的记录（全为0）
 del concentrate_set_200AVG['hand sample37 barite_200AVG']
 del data_set_200AVG['hand sample37 barite_200AVG']
 
-# 画一个折线图尝试看看
+#画一个折线图尝试看看
 s_name = "RockFer2_200AVG"
 intensity = data_set_200AVG[s_name].Intensity
 wavelength = data_set_200AVG[s_name].WaveLength
 intensity = np.array(intensity)
 wavelength = np.array(wavelength)
-plt.plot(wavelength, intensity)
-# plt.show()
+plt.plot(wavelength,intensity)
+plt.show()
 
 print("准备NIST库相关数据")
-nist = pd.read_csv("E:\\JustForFun\\CanadaLIBSdata\\andor.nist", header=None,
-                   names=['WaveLength', 'Element', 'Type', 'Unknown', 'Importance'])
+nist = pd.read_csv("E:\\JustForFun\\CanadaLIBSdata\\andor.nist",header = None,names = ['WaveLength','Element','Type','Unknown','Importance'])
 nist = nist.loc[1:]
-# 删除未知列
+#删除未知列
 del nist['Unknown']
-# 筛选在样本精度范围的nist线
-nist = nist.loc[nist.WaveLength >= 198.066]
-nist = nist.loc[nist.WaveLength <= 970.142]
+#筛选在样本精度范围的nist线
+nist = nist.loc[nist.WaveLength>=198.066]
+nist = nist.loc[nist.WaveLength<=970.142]
 element_dict = {}
 for indexs in nist.index:
     if nist.loc[indexs].Element in element_dict:
-        element_dict[nist.loc[indexs].Element].append([nist.loc[indexs].WaveLength, nist.loc[indexs].Importance])
+        element_dict[nist.loc[indexs].Element].append([nist.loc[indexs].WaveLength,nist.loc[indexs].Importance])
     else:
-        element_dict[nist.loc[indexs].Element] = [[nist.loc[indexs].WaveLength, nist.loc[indexs].Importance]]
+        element_dict[nist.loc[indexs].Element] = [[nist.loc[indexs].WaveLength,nist.loc[indexs].Importance]]
 
 """
     Ensemble bagging method
     using average
 """
-
 
 class baggingAveragingModels(BaseEstimator, RegressorMixin, TransformerMixin):
     def __init__(self, models):
@@ -182,7 +189,6 @@ class baggingAveragingModels(BaseEstimator, RegressorMixin, TransformerMixin):
         ])
         return np.mean(predictions, axis=1)
 
-
 """
     Ensemble stacking method
     一层stacking
@@ -201,20 +207,20 @@ class StackingAveragedModels(BaseEstimator, RegressorMixin, TransformerMixin):
         self.meta_model_ = clone(self.meta_model)
         kfold = KFold(n_splits=self.n_folds, shuffle=True, random_state=156)
 
-        # 在拷贝的基本模型上进行out-of-fold预测，并用预测得到的作为meta model的feature
+        #在拷贝的基本模型上进行out-of-fold预测，并用预测得到的作为meta model的feature
         out_of_fold_predictions = np.zeros((len(X), len(self.base_models)))
         for i, model in enumerate(self.base_models):
             for train_index, holdout_index in kfold.split(X, y):
-                # print(train_index)
+                #print(train_index)
                 instance = clone(model)
                 self.base_models_[i].append(instance)
                 instance.fit(np.array(X)[train_index], np.array(y)[train_index])
                 y_pred = instance.predict(np.array(X)[holdout_index])
                 out_of_fold_predictions[holdout_index, i] = y_pred
 
-        # 用out-of-foldfeature训练meta-model
-        # print(type(out_of_fold_predictions))
-        # print(len(y))
+        #用out-of-foldfeature训练meta-model
+        #print(type(out_of_fold_predictions))
+        #print(len(y))
         self.meta_model_.fit(np.array(out_of_fold_predictions), y)
         return self
 
@@ -226,167 +232,58 @@ class StackingAveragedModels(BaseEstimator, RegressorMixin, TransformerMixin):
         return self.meta_model_.predict(meta_features)
 
 
-# 准备训练数据，未作任何处理，将整个光谱输入
+#准备训练数据，未作任何处理，将整个光谱输入
 X = []
-# 波长
+#波长
 waveLength = []
-# AL的相关浓度信息
+#AL的相关浓度信息
 Al_y = []
-# Fe
+#Fe
 Fe_y = []
-# Ca
+#Ca
 Ca_y = []
-# K
+#K
 K_y = []
-# Mg
+#Mg
 Mg_y = []
-# Na
+#Na
 Na_y = []
-# Si
+#Si
 Si_y = []
-# Ti
+#Ti
 Ti_y = []
-# P
+#P
 P_y = []
-# Mn
+#Mn
 Mn_y = []
 
-for samplename, concentrate in concentrate_set_200AVG.items():
+for samplename,concentrate in concentrate_set_200AVG.items():
     X.append(np.array(data_set_200AVG[samplename].Intensity))
     waveLength.append(np.array(data_set_200AVG[samplename].WaveLength))
-    Al_y.append(concentrate[0] * 100)
-    Ca_y.append(concentrate[1] * 100)
-    Fe_y.append(concentrate[2] * 100)
-    K_y.append(concentrate[3] * 100)
-    Mg_y.append(concentrate[4] * 100)
-    Mn_y.append(concentrate[5] * 100)
-    Na_y.append(concentrate[6] * 100)
-    Si_y.append(concentrate[7] * 100)
-    Ti_y.append(concentrate[8] * 100)
-    P_y.append(concentrate[9] * 100)
+    Al_y.append(concentrate[0]*100)
+    Ca_y.append(concentrate[1]*100)
+    Fe_y.append(concentrate[2]*100)
+    K_y.append(concentrate[3]*100)
+    Mg_y.append(concentrate[4]*100)
+    Mn_y.append(concentrate[5]*100)
+    Na_y.append(concentrate[6]*100)
+    Si_y.append(concentrate[7]*100)
+    Ti_y.append(concentrate[8]*100)
+    P_y.append(concentrate[9]*100)
 
-for samplename, concentrate in concentrate_set_1000AVG.items():
+for samplename,concentrate in concentrate_set_1000AVG.items():
     X.append(np.array(data_set_1000AVG[samplename].Intensity))
     waveLength.append(np.array(data_set_1000AVG[samplename].WaveLength))
-    Al_y.append(concentrate[0] * 100)
-    Ca_y.append(concentrate[1] * 100)
-    Fe_y.append(concentrate[2] * 100)
-    K_y.append(concentrate[3] * 100)
-    Mg_y.append(concentrate[4] * 100)
-    Mn_y.append(concentrate[5] * 100)
-    Na_y.append(concentrate[6] * 100)
-    Si_y.append(concentrate[7] * 100)
-    Ti_y.append(concentrate[8] * 100)
-    P_y.append(concentrate[9] * 100)
-
-print('Data preprocessing finished.')
-
-print('1.2 Ca的实验-------------------------')
-
-
-
-print('1.2.1 Vector Machine Regression-----------------------')
-
-X_train, X_test, y_train, y_test = train_test_split(X,
-                                                    Ca_y,
-                                                    test_size=0.20)
-svr = SVR(C=1.0,epsilon=0.2)
-svr.fit(X_train,y_train)
-
-
-y_pred = svr.predict(X_test)
-print('SVR for Ca Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
-
-print()
-print('1.2.2 随机森林测试---------------------------------')
-
-rfr = RandomForestRegressor(n_estimators=20,random_state=0)
-rfr.fit(X_train,y_train)
-
-
-y_pred = rfr.predict(X_test)
-print('RFR for Ca Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
-#各特征的importance
-importance = rfr.feature_importances_
-#根据importance大小排序
-indices = np.argsort(importance)[::-1]
-#打印前十的importance
-for i in range(0,10):
-    print("importance is "+str(importance[indices[i]]))
-    #print("对应的特征峰和importance为 "+str(element_dict['Al'])[indices[i]])
-
-print()
-print('1.2.3 LASSO测试---------------------------------')
-
-lasso = Lasso(alpha =0.05, random_state=1)
-lasso.fit(X_train,y_train)
-
-
-y_pred = lasso.predict(X_test)
-print('LASSO for Ca Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
-print("KRR TEST----------------------------------")
-krr = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
-krr.fit(X_train,y_train)
-y_pred = krr.predict(X_test)
-print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
-
-print("Elastic Net TEST----------------------------------")
-ENet = ElasticNet(alpha=0.05, l1_ratio=.9, random_state=3)
-ENet.fit(X_train,y_train)
-y_pred = ENet.predict(X_test)
-print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
-
-print("Gradient Boosting TEST----------------------------------")
-GBoost = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
-                                   max_depth=4, max_features='sqrt',
-                                   min_samples_leaf=15, min_samples_split=10,
-                                   loss='huber', random_state =5)
-GBoost.fit(X_train,y_train)
-y_pred = GBoost.predict(X_test)
-print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
-print("Bagging Experiment---------------------")
-baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,lasso))
-baggingModel.fit(X_train,y_train)
-y_pred  =baggingModel.predict(X_test)
-print('Bagging squared error is '+str(mean_squared_error(y_test,y_pred)))
-
-print("Stacking Experiment------------------------------")
-stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,svr,rfr),
-                                                 meta_model = lasso)
-stacked_averaged_models.fit(X_train,y_train)
-y_pred = stacked_averaged_models.predict(X_test)
-print('Stacking with metamodel is lasso squared error is '+str(mean_squared_error(y_test,y_pred)))
-
-stacked_averaged_models = StackingAveragedModels(base_models = (lasso, GBoost, krr,svr,rfr),
-                                                 meta_model = ENet)
-stacked_averaged_models.fit(X_train,y_train)
-y_pred = stacked_averaged_models.predict(X_test)
-print('Stacking with metamodel is ENet squared error is '+str(mean_squared_error(y_test,y_pred)))
-
-stacked_averaged_models = StackingAveragedModels(base_models = (ENet, lasso, krr,svr,rfr),
-                                                 meta_model = GBoost)
-stacked_averaged_models.fit(X_train,y_train)
-y_pred = stacked_averaged_models.predict(X_test)
-print('Stacking with metamodel is GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
-
-stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, lasso,svr,rfr),
-                                                 meta_model = krr)
-stacked_averaged_models.fit(X_train,y_train)
-y_pred = stacked_averaged_models.predict(X_test)
-print('Stacking with metamodel is krr squared error is '+str(mean_squared_error(y_test,y_pred)))
-
-
-stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,lasso,rfr),
-                                                 meta_model = svr)
-stacked_averaged_models.fit(X_train,y_train)
-y_pred = stacked_averaged_models.predict(X_test)
-print('Stacking with metamodel is svr squared error is '+str(mean_squared_error(y_test,y_pred)))
-
-stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,svr,lasso),
-                                                 meta_model = rfr)
-stacked_averaged_models.fit(X_train,y_train)
-y_pred = stacked_averaged_models.predict(X_test)
-print('Stacking with metamodel is rfr squared error is '+str(mean_squared_error(y_test,y_pred)))
+    Al_y.append(concentrate[0]*100)
+    Ca_y.append(concentrate[1]*100)
+    Fe_y.append(concentrate[2]*100)
+    K_y.append(concentrate[3]*100)
+    Mg_y.append(concentrate[4]*100)
+    Mn_y.append(concentrate[5]*100)
+    Na_y.append(concentrate[6]*100)
+    Si_y.append(concentrate[7]*100)
+    Ti_y.append(concentrate[8]*100)
+    P_y.append(concentrate[9]*100)
 
 #寻找对应元素特征峰作为特征
 """
@@ -419,110 +316,228 @@ def selectFeature(element):
         featurelist.append(templist)
     return featurelist
 
-print('2.2 Ca的相关实验--------------------------')
+
+
+
+print('Data preprocessing finished.')
+print()
+print('1.未处理X实验，输入整个光谱------------------------------')
+print()
+
+"""
+:param element 需要训练的元素名称 str
+:param X 训练使用的X
+:param y 训练使用的y
+:param flag 用来区分输入的X是全光谱还是特征峰，用来区分是否需要输出rfr的importance 对应的特征峰波长
+:param times 重复次数
+"""
+import copy
+def elementTest(element,X,y,flag,times = 10):
+    SVR_MSE = []
+    RFR_MSE = []
+    LASSO_MSE = []
+    GBoost_MSE = []
+    ENet_MSE = []
+    KRR_MSE = []
+    stacking_MSE = []
+    bagging_MSE =[]
+    oldX = copy.deepcopy(X)
+    extract_element_dict = {}
+    X = np.array(X)
+    y = np.array(y)
+    X = SelectPercentile(f_regression, percentile=10).fit_transform(X, y)
+    originalfeature_indice = []
+    for i in range(0,len(X[0])):
+        originalfeature_indice.append(np.where((oldX[0]==X[0][i]) & (oldX[5]==X[5][i]) & (oldX[10]==X[10][i]))[0][0])
+
+    for f_indice in originalfeature_indice:
+        if element in extract_element_dict:
+            extract_element_dict[element].append(element_dict[element][f_indice])
+        else:
+            extract_element_dict[element] = [element_dict[element][f_indice]]
+
+
+    for i in range(0,10):
+        print()
+        print("第"+str(i+1)+"次"+str(element)+"的实验----------------------")
+        #特征选择，先选取前10%的特征进行训练
+
+
+        X_train, X_test, y_train, y_test = train_test_split(X,
+                                                            y,
+                                                            test_size=0.20)
+        print("Part 1 Experiment with Support Vector Machine Regression-------------")
+        svr = SVR(C=1.0, epsilon=0.2)
+        svr.fit(X_train, y_train)
+
+        y_pred = svr.predict(X_test)
+        SVR_MSE.append(mean_squared_error(y_test, y_pred))
+        print('SVR Mean squared error is ' + str(mean_squared_error(y_test, y_pred)))
+
+        print()
+        print('Part 2 Experiment with Random forest regression---------------------------------')
+
+        rfr = RandomForestRegressor(n_estimators=200, random_state=0)
+        rfr.fit(X_train, y_train)
+
+        y_pred = rfr.predict(X_test)
+        RFR_MSE .append(mean_squared_error(y_test, y_pred))
+        print('RFR Mean squared error is ' + str(mean_squared_error(y_test, y_pred)))
+        # 各特征的importance
+        importance = rfr.feature_importances_
+        #print(importance)
+        # 根据importance大小排序
+        indices = np.argsort(importance)[::-1]
+        #print(indices)
+        # 打印前十的importance
+        for i in range(0, 10):
+            print("importance is " + str(importance[indices[i]]))
+            if flag:
+                print("对应的特征峰和importance为 "+str(extract_element_dict[element][indices[i]]))
+
+        print()
+        print('Part 3 LASSO experiment ---------------------------------')
+
+        lasso = Lasso(alpha=0.05, random_state=1)
+        lasso.fit(X_train, y_train)
+
+        y_pred = lasso.predict(X_test)
+        print('LASSO  Mean squared error is ' + str(mean_squared_error(y_test, y_pred)))
+        LASSO_MSE.append(mean_squared_error(y_test, y_pred))
+        print("Part 4 KRR TEST----------------------------------")
+
+        krr = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
+        krr.fit(X_train, y_train)
+        y_pred = krr.predict(X_test)
+        KRR_MSE.append(mean_squared_error(y_test, y_pred))
+        print('KRR Mean squared error is ' + str(mean_squared_error(y_test, y_pred)))
+
+        print("Part 5 Elastic Net TEST----------------------------------")
+        ENet = ElasticNet(alpha=0.05, l1_ratio=.9, random_state=3)
+        ENet.fit(X_train, y_train)
+        y_pred = ENet.predict(X_test)
+        print('Elastic Net Mean squared error is ' + str(mean_squared_error(y_test, y_pred)))
+        ENet_MSE.append(mean_squared_error(y_test, y_pred))
+        print("Part 6 Gradient Boosting TEST----------------------------------")
+        GBoost = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
+                                           max_depth=4, max_features='sqrt',
+                                           min_samples_leaf=15, min_samples_split=10,
+                                           loss='huber', random_state=5)
+        GBoost.fit(X_train, y_train)
+        y_pred = GBoost.predict(X_test)
+        GBoost_MSE.append(mean_squared_error(y_test, y_pred))
+        print('GBoost squared error is ' + str(mean_squared_error(y_test, y_pred)))
+
+        print("Part 7 Bagging Experiment---------------------")
+
+        baggingModel = baggingAveragingModels(models=(krr, rfr, svr, GBoost, ENet, lasso))
+        baggingModel.fit(X_train, y_train)
+        y_pred = baggingModel.predict(X_test)
+        bagging_MSE.append(mean_squared_error(y_test, y_pred))
+
+
+        print('Bagging squared error is ' + str(mean_squared_error(y_test, y_pred)))
+
+        print("Part 8 Stacking Experiment------------------------------")
+        stacked_averaged_models = StackingAveragedModels(base_models=(ENet, GBoost, krr, svr, rfr),
+                                                         meta_model=lasso)
+        stacked_averaged_models.fit(X_train, y_train)
+        y_pred = stacked_averaged_models.predict(X_test)
+        print('Stacking with metamodel is lasso squared error is ' + str(mean_squared_error(y_test, y_pred)))
+        stacking_MSE.append(mean_squared_error(y_test, y_pred))
+
+        stacked_averaged_models = StackingAveragedModels(base_models=(lasso, GBoost, krr, svr, rfr),
+                                                         meta_model=ENet)
+        stacked_averaged_models.fit(X_train, y_train)
+        y_pred = stacked_averaged_models.predict(X_test)
+        print('Stacking with metamodel is ENet squared error is ' + str(mean_squared_error(y_test, y_pred)))
+        stacking_MSE.append(mean_squared_error(y_test, y_pred))
+
+        stacked_averaged_models = StackingAveragedModels(base_models=(ENet, lasso, krr, svr, rfr),
+                                                         meta_model=GBoost)
+        stacked_averaged_models.fit(X_train, y_train)
+        y_pred = stacked_averaged_models.predict(X_test)
+        print('Stacking with metamodel is GBoost squared error is ' + str(mean_squared_error(y_test, y_pred)))
+        stacking_MSE.append(mean_squared_error(y_test, y_pred))
+
+        stacked_averaged_models = StackingAveragedModels(base_models=(ENet, GBoost, lasso, svr, rfr),
+                                                         meta_model=krr)
+        stacked_averaged_models.fit(X_train, y_train)
+        y_pred = stacked_averaged_models.predict(X_test)
+        print('Stacking with metamodel is krr squared error is ' + str(mean_squared_error(y_test, y_pred)))
+        stacking_MSE.append(mean_squared_error(y_test, y_pred))
+
+        stacked_averaged_models = StackingAveragedModels(base_models=(ENet, GBoost, krr, lasso, rfr),
+                                                         meta_model=svr)
+        stacked_averaged_models.fit(X_train, y_train)
+        y_pred = stacked_averaged_models.predict(X_test)
+        print('Stacking with metamodel is svr squared error is ' + str(mean_squared_error(y_test, y_pred)))
+        stacking_MSE.append(mean_squared_error(y_test, y_pred))
+
+        stacked_averaged_models = StackingAveragedModels(base_models=(ENet, GBoost, krr, svr, lasso),
+                                                         meta_model=rfr)
+        stacked_averaged_models.fit(X_train, y_train)
+        y_pred = stacked_averaged_models.predict(X_test)
+        print('Stacking with metamodel is rfr squared error is ' + str(mean_squared_error(y_test, y_pred)))
+        stacking_MSE.append(mean_squared_error(y_test, y_pred))
+
+
+    plot_x = np.linspace(1,10,10)
+    plt.plot(plot_x,SVR_MSE,'b',label = 'SVR')
+    plt.plot(plot_x, RFR_MSE, 'r',label ='RFR')
+    plt.plot(plot_x, LASSO_MSE, 'g',label = 'LASSO')
+    plt.plot(plot_x, ENet_MSE, 'y',label='ENet')
+
+    plt.plot(plot_x, KRR_MSE, 'k',label ='KRR')
+    plt.plot(plot_x, bagging_MSE, 'M',label = 'Bagging')
+    plt.plot(plot_x, GBoost_MSE, 'c',label = 'GBoost')
+    plt.legend(['SVR','RFR','LASSO','ENet','KRR','Bagging','GBoost'])
+    plt.show()
+
+    sub = stacking_MSE[0::6]
+    plt.plot(plot_x,sub,'b',label = 'meta is lasso')
+    sub = stacking_MSE[1::6]
+    plt.plot(plot_x, sub, 'r',label = 'meta is ENet')
+    sub = stacking_MSE[2::6]
+    plt.plot(plot_x, sub, 'g',label = 'meta is GBoost')
+    sub = stacking_MSE[3::6]
+    plt.plot(plot_x, sub, 'y',label = 'meta is krr')
+    sub = stacking_MSE[4::6]
+    plt.plot(plot_x, sub, 'k',label = 'meta is svr')
+    sub = stacking_MSE[5::6]
+    plt.plot(plot_x, sub, 'm',label = 'meta is rfr')
+    plt.legend(['meta is lasso','meta is ENet','meta is GBoost','meta is krr','meta is svr','meta is rfr'])
+    plt.show()
+
+
+    print(str(np.average(SVR_MSE)))
+    print(str(np.average(RFR_MSE)))
+    print(str(np.average(LASSO_MSE)))
+    print(str(np.average(KRR_MSE)))
+    print(str(np.average(ENet_MSE)))
+    print(str(np.average(GBoost_MSE)))
+    print(str(np.average(bagging_MSE)))
+
+
+
+"""
+elementTest('Al',X,Al_y,0)
+elementTest('Ca',X,Ca_y,0)
+elementTest('Fe',X,Fe_y,0)
+elementTest('K',X,K_y,0)
+elementTest('Mg',X,Mg_y,0)
+elementTest('Mn',X,Mn_y,0)
+elementTest('Na',X,Na_y,0)
+elementTest('Si',X,Si_y,0)
+elementTest('Ti',X,Ti_y,0)
+elementTest('P',X,P_y,0)
+"""
+print('2.根据NIST库筛选特征-------------------------')
+
+
+
 Ca_x = selectFeature('Ca')
-
-print('2.2.1 Vector Machine Regression-----------------------')
-
-X_train, X_test, y_train, y_test = train_test_split(Ca_x,
-                                                    Ca_y,
-                                                    test_size=0.20)
-svr = SVR(C=1.0,epsilon=0.2)
-svr.fit(X_train,y_train)
+elementTest('Ca',Ca_x,Ca_y,1)
 
 
-y_pred = svr.predict(X_test)
-print('SVR for Ca Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
 
-print()
-print('2.2.2 随机森林测试---------------------------------')
-
-rfr = RandomForestRegressor(n_estimators=20,random_state=0)
-rfr.fit(X_train,y_train)
-
-
-y_pred = rfr.predict(X_test)
-print('RFR for Ca Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
-#各特征的importance
-importance = rfr.feature_importances_
-#根据importance大小排序
-indices = np.argsort(importance)[::-1]
-#打印前十的importance
-for i in range(0,10):
-    print("importance is "+str(importance[indices[i]]))
-    print("对应的特征峰和importance为 " + str(element_dict['Ca'][indices[i]]))
-
-print()
-print('2.2.3 LASSO测试---------------------------------')
-
-lasso = Lasso(alpha =0.05, random_state=1)
-lasso.fit(X_train,y_train)
-
-
-y_pred = lasso.predict(X_test)
-print('LASSO for Ca Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
-
-print("KRR TEST----------------------------------")
-krr = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
-krr.fit(X_train,y_train)
-y_pred = krr.predict(X_test)
-print('KRR Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
-
-print("Elastic Net TEST----------------------------------")
-ENet = ElasticNet(alpha=0.05, l1_ratio=.9, random_state=3)
-ENet.fit(X_train,y_train)
-y_pred = ENet.predict(X_test)
-print('Elastic Net Mean squared error is '+str(mean_squared_error(y_test,y_pred)))
-
-print("Gradient Boosting TEST----------------------------------")
-GBoost = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
-                                   max_depth=4, max_features='sqrt',
-                                   min_samples_leaf=15, min_samples_split=10,
-                                   loss='huber', random_state =5)
-GBoost.fit(X_train,y_train)
-y_pred = GBoost.predict(X_test)
-print('GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
-
-print("Bagging Experiment---------------------")
-baggingModel = baggingAveragingModels(models=(krr,rfr,svr,GBoost,ENet,lasso))
-baggingModel.fit(X_train,y_train)
-y_pred  =baggingModel.predict(X_test)
-print('Bagging squared error is '+str(mean_squared_error(y_test,y_pred)))
-
-print("Stacking Experiment------------------------------")
-stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,svr,rfr),
-                                                 meta_model = lasso)
-stacked_averaged_models.fit(X_train,y_train)
-y_pred = stacked_averaged_models.predict(X_test)
-print('Stacking with metamodel is lasso squared error is '+str(mean_squared_error(y_test,y_pred)))
-
-stacked_averaged_models = StackingAveragedModels(base_models = (lasso, GBoost, krr,svr,rfr),
-                                                 meta_model = ENet)
-stacked_averaged_models.fit(X_train,y_train)
-y_pred = stacked_averaged_models.predict(X_test)
-print('Stacking with metamodel is ENet squared error is '+str(mean_squared_error(y_test,y_pred)))
-
-stacked_averaged_models = StackingAveragedModels(base_models = (ENet, lasso, krr,svr,rfr),
-                                                 meta_model = GBoost)
-stacked_averaged_models.fit(X_train,y_train)
-y_pred = stacked_averaged_models.predict(X_test)
-print('Stacking with metamodel is GBoost squared error is '+str(mean_squared_error(y_test,y_pred)))
-
-stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, lasso,svr,rfr),
-                                                 meta_model = krr)
-stacked_averaged_models.fit(X_train,y_train)
-y_pred = stacked_averaged_models.predict(X_test)
-print('Stacking with metamodel is krr squared error is '+str(mean_squared_error(y_test,y_pred)))
-
-
-stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,lasso,rfr),
-                                                 meta_model = svr)
-stacked_averaged_models.fit(X_train,y_train)
-y_pred = stacked_averaged_models.predict(X_test)
-print('Stacking with metamodel is svr squared error is '+str(mean_squared_error(y_test,y_pred)))
-
-stacked_averaged_models = StackingAveragedModels(base_models = (ENet, GBoost, krr,svr,lasso),
-                                                 meta_model = rfr)
-stacked_averaged_models.fit(X_train,y_train)
-y_pred = stacked_averaged_models.predict(X_test)
-print('Stacking with metamodel is rfr squared error is '+str(mean_squared_error(y_test,y_pred)))

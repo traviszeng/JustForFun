@@ -542,8 +542,8 @@ print('2.根据NIST库筛选特征-------------------------')
 
 
 
-Ti_x = selectFeature('Ti')
-elementTest('Ti',Ti_x,Ti_y,1)
+Fe_x = selectFeature('Fe')
+#elementTest('Fe',Fe_x,Fe_y,1)
 
 
 

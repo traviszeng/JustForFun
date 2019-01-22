@@ -393,7 +393,7 @@ def elementTest(element,X,y,flag,times = 10):
         for i in range(0, 10):
             print("importance is " + str(importance[indices[i]]))
             if flag:
-                print("对应的特征峰和importance为 "+str(extract_element_dict['Al'][indices[i]]))
+                print("对应的特征峰和importance为 "+str(extract_element_dict[element][indices[i]]))
 
         print()
         print('Part 3 LASSO experiment ---------------------------------')
@@ -405,11 +405,12 @@ def elementTest(element,X,y,flag,times = 10):
         print('LASSO  Mean squared error is ' + str(mean_squared_error(y_test, y_pred)))
         LASSO_MSE.append(mean_squared_error(y_test, y_pred))
         print("Part 4 KRR TEST----------------------------------")
-        krr = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
-        krr.fit(X_train, y_train)
-        y_pred = krr.predict(X_test)
-        KRR_MSE.append(mean_squared_error(y_test, y_pred))
-        print('KRR Mean squared error is ' + str(mean_squared_error(y_test, y_pred)))
+        if not element=='Al':
+            krr = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
+            krr.fit(X_train, y_train)
+            y_pred = krr.predict(X_test)
+            KRR_MSE.append(mean_squared_error(y_test, y_pred))
+            print('KRR Mean squared error is ' + str(mean_squared_error(y_test, y_pred)))
 
         print("Part 5 Elastic Net TEST----------------------------------")
         ENet = ElasticNet(alpha=0.05, l1_ratio=.9, random_state=3)
@@ -428,10 +429,16 @@ def elementTest(element,X,y,flag,times = 10):
         print('GBoost squared error is ' + str(mean_squared_error(y_test, y_pred)))
 
         print("Part 7 Bagging Experiment---------------------")
-        baggingModel = baggingAveragingModels(models=(krr, rfr, svr, GBoost, ENet, lasso))
-        baggingModel.fit(X_train, y_train)
-        y_pred = baggingModel.predict(X_test)
-        bagging_MSE.append(mean_squared_error(y_test, y_pred))
+        if not element == 'Al':
+            baggingModel = baggingAveragingModels(models=(krr, rfr, svr, GBoost, ENet, lasso))
+            baggingModel.fit(X_train, y_train)
+            y_pred = baggingModel.predict(X_test)
+            bagging_MSE.append(mean_squared_error(y_test, y_pred))
+        else:
+            baggingModel = baggingAveragingModels(models=( rfr, svr, GBoost, ENet, lasso))
+            baggingModel.fit(X_train, y_train)
+            y_pred = baggingModel.predict(X_test)
+            bagging_MSE.append(mean_squared_error(y_test, y_pred))
         print('Bagging squared error is ' + str(mean_squared_error(y_test, y_pred)))
 
         print("Part 8 Stacking Experiment------------------------------")
@@ -483,7 +490,8 @@ def elementTest(element,X,y,flag,times = 10):
     plt.plot(plot_x, RFR_MSE, 'r',label ='RFR')
     plt.plot(plot_x, LASSO_MSE, 'g',label = 'LASSO')
     plt.plot(plot_x, ENet_MSE, 'y',label='ENet')
-    plt.plot(plot_x, KRR_MSE, 'k',label ='KRR')
+    if not element =='Al':
+        plt.plot(plot_x, KRR_MSE, 'k',label ='KRR')
     plt.plot(plot_x, bagging_MSE, 'M',label = 'Bagging')
     plt.plot(plot_x, GBoost_MSE, 'c',label = 'GBoost')
     plt.legend(['SVR','RFR','LASSO','ENet','KRR','Bagging','GBoost'])
@@ -532,7 +540,7 @@ print('2.根据NIST库筛选特征-------------------------')
 Al_x = selectFeature('Al')
 
 elementTest('Al',Al_x,Al_y,1)
-"""
+
 Ca_x = selectFeature('Ca')
 elementTest('Ca',Ca_x,Ca_y,1)
 
@@ -560,4 +568,4 @@ elementTest('Ti',Ti_x,Ti_y,1)
 P_x = selectFeature('P')
 elementTest('P',P_x,P_y,1)
 
-"""
+

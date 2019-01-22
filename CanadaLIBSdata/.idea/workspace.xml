@@ -10,23 +10,25 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="CoverageDataManager">
-    <SUITE FILE_PATH="coverage/CanadaLIBSdata$LIBS_Mntest.coverage" NAME="LIBS_Mntest Coverage Results" MODIFIED="1547777714752" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/CanadaLIBSdata$LIBS_Titest.coverage" NAME="LIBS_Titest Coverage Results" MODIFIED="1547777629020" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/CanadaLIBSdata$LIBS_Mntest.coverage" NAME="LIBS_Mntest Coverage Results" MODIFIED="1548149016471" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/CanadaLIBSdata$featureSelectionTest.coverage" NAME="featureSelectionTest Coverage Results" MODIFIED="1548060662683" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/CanadaLIBSdata$LIBS_Altest.coverage" NAME="LIBS_Altest Coverage Results" MODIFIED="1547779460507" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/CanadaLIBSdata$LIBS_Catest.coverage" NAME="LIBS_Catest Coverage Results" MODIFIED="1547779464058" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/CanadaLIBSdata$LIBS_Sitest.coverage" NAME="LIBS_Sitest Coverage Results" MODIFIED="1547777708922" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/CanadaLIBSdata$LIBS_Natest.coverage" NAME="LIBS_Natest Coverage Results" MODIFIED="1547778559944" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/CanadaLIBSdata$LIBStest.coverage" NAME="LIBStest Coverage Results" MODIFIED="1548143882892" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/CanadaLIBSdata$LIBS_ktest.coverage" NAME="LIBS_ktest Coverage Results" MODIFIED="1547780018531" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/CanadaLIBSdata$LIBS_Titest.coverage" NAME="LIBS_Titest Coverage Results" MODIFIED="1548150751696" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/CanadaLIBSdata$LIBS_Altest.coverage" NAME="LIBS_Altest Coverage Results" MODIFIED="1548147333156" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/CanadaLIBSdata$LIBS_Catest.coverage" NAME="LIBS_Catest Coverage Results" MODIFIED="1548148787814" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/CanadaLIBSdata$LIBS_Mgtest.coverage" NAME="LIBS_Mgtest Coverage Results" MODIFIED="1548149044511" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/CanadaLIBSdata$LIBStest.coverage" NAME="LIBStest Coverage Results" MODIFIED="1548147205033" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/CanadaLIBSdata$LIBS_Natest.coverage" NAME="LIBS_Natest Coverage Results" MODIFIED="1548149097794" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/CanadaLIBSdata$LIBS_Fetest.coverage" NAME="LIBS_Fetest Coverage Results" MODIFIED="1548150652482" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/CanadaLIBSdata$LIBS_Sitest.coverage" NAME="LIBS_Sitest Coverage Results" MODIFIED="1548150688748" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/CanadaLIBSdata$LIBS_ktest.coverage" NAME="LIBS_ktest Coverage Results" MODIFIED="1548150736432" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
   <component name="FileEditorManager">
     <leaf>
       <file leaf-file-name="LIBS_Altest.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/LIBS_Altest.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="357">
-              <caret line="62" column="27" lean-forward="true" selection-start-line="62" selection-start-column="27" selection-end-line="62" selection-end-column="27" />
+            <state relative-caret-position="2077">
+              <caret line="433" column="49" lean-forward="true" selection-start-line="433" selection-start-column="49" selection-end-line="433" selection-end-column="49" />
               <folding>
                 <element signature="e#36#45#0" expanded="true" />
               </folding>
@@ -37,8 +39,8 @@
       <file leaf-file-name="LIBS_Catest.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/LIBS_Catest.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="682">
-              <caret line="527" column="96" lean-forward="false" selection-start-line="527" selection-start-column="96" selection-end-line="527" selection-end-column="96" />
+            <state relative-caret-position="166">
+              <caret line="357" column="0" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="543" selection-end-column="0" />
               <folding>
                 <element signature="e#36#45#0" expanded="true" />
               </folding>
@@ -49,8 +51,8 @@
       <file leaf-file-name="LIBS_ktest.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/LIBS_ktest.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="341">
-              <caret line="143" column="29" lean-forward="false" selection-start-line="143" selection-start-column="29" selection-end-line="143" selection-end-column="29" />
+            <state relative-caret-position="243">
+              <caret line="542" column="0" lean-forward="true" selection-start-line="542" selection-start-column="0" selection-end-line="542" selection-end-column="0" />
               <folding>
                 <element signature="e#36#45#0" expanded="true" />
               </folding>
@@ -61,8 +63,8 @@
       <file leaf-file-name="LIBS_Mgtest.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/LIBS_Mgtest.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-242">
-              <caret line="487" column="5" lean-forward="false" selection-start-line="487" selection-start-column="5" selection-end-line="487" selection-end-column="5" />
+            <state relative-caret-position="306">
+              <caret line="545" column="29" lean-forward="true" selection-start-line="545" selection-start-column="29" selection-end-line="545" selection-end-column="29" />
               <folding>
                 <element signature="e#36#45#0" expanded="true" />
               </folding>
@@ -73,8 +75,8 @@
       <file leaf-file-name="LIBS_Mntest.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/LIBS_Mntest.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="682">
-              <caret line="528" column="96" lean-forward="false" selection-start-line="528" selection-start-column="96" selection-end-line="528" selection-end-column="96" />
+            <state relative-caret-position="336">
+              <caret line="154" column="19" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="549" selection-end-column="0" />
               <folding>
                 <element signature="e#36#45#0" expanded="true" />
               </folding>
@@ -85,8 +87,8 @@
       <file leaf-file-name="LIBS_Natest.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/LIBS_Natest.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1119">
-              <caret line="356" column="37" lean-forward="false" selection-start-line="356" selection-start-column="37" selection-end-line="356" selection-end-column="37" />
+            <state relative-caret-position="243">
+              <caret line="542" column="0" lean-forward="true" selection-start-line="542" selection-start-column="0" selection-end-line="542" selection-end-column="0" />
               <folding>
                 <element signature="e#36#45#0" expanded="true" />
               </folding>
@@ -94,11 +96,23 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="LIBS_Titest.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="LIBS_Fetest.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/LIBS_Fetest.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="306">
+              <caret line="545" column="0" lean-forward="false" selection-start-line="545" selection-start-column="0" selection-end-line="545" selection-end-column="0" />
+              <folding>
+                <element signature="e#36#45#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="LIBS_Titest.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/LIBS_Titest.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="277">
-              <caret line="281" column="37" lean-forward="true" selection-start-line="281" selection-start-column="37" selection-end-line="281" selection-end-column="37" />
+            <state relative-caret-position="-3018">
+              <caret line="60" column="14" lean-forward="true" selection-start-line="60" selection-start-column="14" selection-end-line="60" selection-end-column="14" />
               <folding>
                 <element signature="e#36#45#0" expanded="true" />
               </folding>
@@ -106,25 +120,25 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="LIBStest.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="LIBS_Sitest.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/LIBS_Sitest.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="348">
+              <caret line="520" column="25" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="549" selection-end-column="0" />
+              <folding>
+                <element signature="e#36#45#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="LIBStest.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/LIBStest.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="357">
-              <caret line="494" column="16" lean-forward="false" selection-start-line="494" selection-start-column="16" selection-end-line="494" selection-end-column="16" />
+            <state relative-caret-position="231">
+              <caret line="515" column="35" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="571" selection-end-column="0" />
               <folding>
                 <element signature="e#36#45#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="featureSelectionTest.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/featureSelectionTest.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="231">
-              <caret line="11" column="30" lean-forward="false" selection-start-line="11" selection-start-column="30" selection-end-line="11" selection-end-column="30" />
-              <folding>
-                <element signature="e#15#34#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -164,17 +178,18 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
+        <option value="$PROJECT_DIR$/featureSelectionTest.py" />
+        <option value="$PROJECT_DIR$/myDataPreprocess.py" />
+        <option value="$PROJECT_DIR$/LIBStest.py" />
         <option value="$PROJECT_DIR$/LIBS_Altest.py" />
         <option value="$PROJECT_DIR$/LIBS_Catest.py" />
-        <option value="$PROJECT_DIR$/LIBS_Mgtest.py" />
         <option value="$PROJECT_DIR$/LIBS_Mntest.py" />
-        <option value="$PROJECT_DIR$/LIBS_Sitest.py" />
-        <option value="$PROJECT_DIR$/LIBS_Titest.py" />
+        <option value="$PROJECT_DIR$/LIBS_Mgtest.py" />
         <option value="$PROJECT_DIR$/LIBS_Natest.py" />
+        <option value="$PROJECT_DIR$/LIBS_Sitest.py" />
+        <option value="$PROJECT_DIR$/LIBS_Fetest.py" />
+        <option value="$PROJECT_DIR$/LIBS_Titest.py" />
         <option value="$PROJECT_DIR$/LIBS_ktest.py" />
-        <option value="$PROJECT_DIR$/featureSelectionTest.py" />
-        <option value="$PROJECT_DIR$/LIBStest.py" />
-        <option value="$PROJECT_DIR$/myDataPreprocess.py" />
       </list>
     </option>
   </component>
@@ -185,8 +200,8 @@
     <sorting>DEFINITION_ORDER</sorting>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="158" />
-    <option name="y" value="84" />
+    <option name="x" value="1836" />
+    <option name="y" value="122" />
     <option name="width" value="697" />
     <option name="height" value="735" />
   </component>
@@ -247,8 +262,8 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.LIBStest">
-    <configuration name="LIBS_Altest" type="PythonConfigurationType" factoryName="Python" temporary="true">
+  <component name="RunManager" selected="Python.LIBS_Titest">
+    <configuration name="LIBS_Fetest" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -261,12 +276,12 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="CanadaLIBSdata" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/LIBS_Altest.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/LIBS_Fetest.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
     </configuration>
-    <configuration name="LIBS_Catest" type="PythonConfigurationType" factoryName="Python" temporary="true">
+    <configuration name="LIBS_Natest" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -279,7 +294,43 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="CanadaLIBSdata" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/LIBS_Catest.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/LIBS_Natest.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+    </configuration>
+    <configuration name="LIBS_Sitest" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="CanadaLIBSdata" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/LIBS_Sitest.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+    </configuration>
+    <configuration name="LIBS_Titest" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="CanadaLIBSdata" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/LIBS_Titest.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -302,56 +353,20 @@
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
     </configuration>
-    <configuration name="LIBStest" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="CanadaLIBSdata" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/LIBStest.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-    </configuration>
-    <configuration name="featureSelectionTest" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="CanadaLIBSdata" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/featureSelectionTest.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-    </configuration>
     <list size="5">
-      <item index="0" class="java.lang.String" itemvalue="Python.LIBS_Altest" />
-      <item index="1" class="java.lang.String" itemvalue="Python.LIBS_Catest" />
+      <item index="0" class="java.lang.String" itemvalue="Python.LIBS_Natest" />
+      <item index="1" class="java.lang.String" itemvalue="Python.LIBS_Fetest" />
       <item index="2" class="java.lang.String" itemvalue="Python.LIBS_ktest" />
-      <item index="3" class="java.lang.String" itemvalue="Python.LIBStest" />
-      <item index="4" class="java.lang.String" itemvalue="Python.featureSelectionTest" />
+      <item index="3" class="java.lang.String" itemvalue="Python.LIBS_Sitest" />
+      <item index="4" class="java.lang.String" itemvalue="Python.LIBS_Titest" />
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="Python.LIBStest" />
-        <item index="1" class="java.lang.String" itemvalue="Python.featureSelectionTest" />
-        <item index="2" class="java.lang.String" itemvalue="Python.LIBS_ktest" />
-        <item index="3" class="java.lang.String" itemvalue="Python.LIBS_Catest" />
-        <item index="4" class="java.lang.String" itemvalue="Python.LIBS_Altest" />
+        <item index="0" class="java.lang.String" itemvalue="Python.LIBS_Titest" />
+        <item index="1" class="java.lang.String" itemvalue="Python.LIBS_ktest" />
+        <item index="2" class="java.lang.String" itemvalue="Python.LIBS_Sitest" />
+        <item index="3" class="java.lang.String" itemvalue="Python.LIBS_Fetest" />
+        <item index="4" class="java.lang.String" itemvalue="Python.LIBS_Natest" />
       </list>
     </recent_temporary>
   </component>
@@ -369,16 +384,16 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
+    <frame x="1912" y="-8" width="1456" height="876" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.14872068" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.19985673" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2804348" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.34864864" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.18603411" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
@@ -404,92 +419,12 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/LIBS_Sitest.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2761">
-          <caret line="526" column="96" lean-forward="false" selection-start-line="526" selection-start-column="96" selection-end-line="526" selection-end-column="96" />
-          <folding>
-            <element signature="e#36#45#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/LIBS_Mntest.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="682">
-          <caret line="528" column="96" lean-forward="false" selection-start-line="528" selection-start-column="96" selection-end-line="528" selection-end-column="96" />
-          <folding>
-            <element signature="e#36#45#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/LIBS_Mgtest.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-242">
-          <caret line="487" column="5" lean-forward="false" selection-start-line="487" selection-start-column="5" selection-end-line="487" selection-end-column="5" />
-          <folding>
-            <element signature="e#36#45#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/LIBS_Natest.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1119">
-          <caret line="356" column="37" lean-forward="false" selection-start-line="356" selection-start-column="37" selection-end-line="356" selection-end-column="37" />
-          <folding>
-            <element signature="e#36#45#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/LIBS_Catest.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="682">
-          <caret line="527" column="96" lean-forward="false" selection-start-line="527" selection-start-column="96" selection-end-line="527" selection-end-column="96" />
-          <folding>
-            <element signature="e#36#45#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/LIBS_ktest.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="341">
-          <caret line="143" column="29" lean-forward="false" selection-start-line="143" selection-start-column="29" selection-end-line="143" selection-end-column="29" />
-          <folding>
-            <element signature="e#36#45#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/LIBS_Altest.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="357">
-          <caret line="62" column="27" lean-forward="true" selection-start-line="62" selection-start-column="27" selection-end-line="62" selection-end-column="27" />
-          <folding>
-            <element signature="e#36#45#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/LIBS_Titest.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="277">
-          <caret line="281" column="37" lean-forward="true" selection-start-line="281" selection-start-column="37" selection-end-line="281" selection-end-column="37" />
-          <folding>
-            <element signature="e#36#45#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/featureSelectionTest.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="231">
           <caret line="11" column="30" lean-forward="false" selection-start-line="11" selection-start-column="30" selection-end-line="11" selection-end-column="30" />
           <folding>
-            <element signature="e#15#34#0" expanded="true" />
+            <element signature="e#15#34#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -502,10 +437,100 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/LIBS_Altest.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2077">
+          <caret line="433" column="49" lean-forward="true" selection-start-line="433" selection-start-column="49" selection-end-line="433" selection-end-column="49" />
+          <folding>
+            <element signature="e#36#45#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/LIBStest.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="357">
-          <caret line="494" column="16" lean-forward="false" selection-start-line="494" selection-start-column="16" selection-end-line="494" selection-end-column="16" />
+        <state relative-caret-position="231">
+          <caret line="515" column="35" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="571" selection-end-column="0" />
+          <folding>
+            <element signature="e#36#45#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/LIBS_Catest.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="166">
+          <caret line="357" column="0" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="543" selection-end-column="0" />
+          <folding>
+            <element signature="e#36#45#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/LIBS_Mgtest.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="306">
+          <caret line="545" column="29" lean-forward="true" selection-start-line="545" selection-start-column="29" selection-end-line="545" selection-end-column="29" />
+          <folding>
+            <element signature="e#36#45#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/LIBS_Mntest.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="336">
+          <caret line="154" column="19" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="549" selection-end-column="0" />
+          <folding>
+            <element signature="e#36#45#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/LIBS_Natest.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="243">
+          <caret line="542" column="0" lean-forward="true" selection-start-line="542" selection-start-column="0" selection-end-line="542" selection-end-column="0" />
+          <folding>
+            <element signature="e#36#45#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/LIBS_Fetest.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="306">
+          <caret line="545" column="0" lean-forward="false" selection-start-line="545" selection-start-column="0" selection-end-line="545" selection-end-column="0" />
+          <folding>
+            <element signature="e#36#45#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/LIBS_Sitest.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="348">
+          <caret line="520" column="25" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="549" selection-end-column="0" />
+          <folding>
+            <element signature="e#36#45#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/LIBS_ktest.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="243">
+          <caret line="542" column="0" lean-forward="true" selection-start-line="542" selection-start-column="0" selection-end-line="542" selection-end-column="0" />
+          <folding>
+            <element signature="e#36#45#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/LIBS_Titest.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-3018">
+          <caret line="60" column="14" lean-forward="true" selection-start-line="60" selection-start-column="14" selection-end-line="60" selection-end-column="14" />
           <folding>
             <element signature="e#36#45#0" expanded="true" />
           </folding>
