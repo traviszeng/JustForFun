@@ -13,6 +13,7 @@ from sklearn.ensemble import RandomForestRegressor,  GradientBoostingRegressor
 from sklearn.base import BaseEstimator, TransformerMixin, RegressorMixin, clone
 from sklearn.feature_selection import f_regression,SelectPercentile
 import matplotlib.pyplot as plt
+from pandas.core.frame import DataFrame
 
 from sklearn.ensemble import RandomForestRegressor
 import xgboost as xgb
@@ -317,6 +318,12 @@ def selectFeature(element):
             templist.append(feature_value)
 
         featurelist.append(templist)
+
+
+    #处理一些元素中存在nan强度的问题
+    featurelist = DataFrame(featurelist)
+    featurelist = featurelist.fillna(0)
+    featurelist = featurelist.values.tolist()
     return featurelist
 
 
@@ -513,6 +520,7 @@ def elementTest(element,x,y,flag,times = 10):
     plt.legend(['SVR','RFR','LASSO','ENet','KRR','Bagging','GBoost'])
     plt.title(element+"元素bagging和单独的学习器的对比")
     plt.savefig(element + str(1) + ".png")
+    plt.clf()
     #plt.show()
 
     sub = stacking_MSE[0::6]
@@ -556,7 +564,6 @@ elementTest('Ti',X,Ti_y,0)
 elementTest('P',X,P_y,0)
 """
 print('2.根据NIST库筛选特征-------------------------')
-
 
 Ca_x = selectFeature('Ca')
 elementTest('Ca',Ca_x,Ca_y,1)

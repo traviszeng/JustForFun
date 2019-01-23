@@ -1,0 +1,10 @@
+import os
+os.system("python LIBS_Altest.py")
+os.system("python LIBS_Catest.py")
+os.system("python LIBS_Fetest.py")
+os.system("python LIBS_ktest.py")
+os.system("python LIBS_Mgtest.py")
+os.system("python LIBS_Mntest.py")
+os.system("python LIBS_Natest.py")
+os.system("python LIBS_Sitest.py")
+os.system("python LIBS_Titest.py")
