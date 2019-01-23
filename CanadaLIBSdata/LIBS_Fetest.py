@@ -543,7 +543,15 @@ print('2.根据NIST库筛选特征-------------------------')
 
 
 Fe_x = selectFeature('Fe')
-#elementTest('Fe',Fe_x,Fe_y,1)
+"""
+Fe中含有大量nan 因此需要数据预处理
+"""
+from pandas.core.frame import DataFrame
+Fe_x =DataFrame(Fe_x)
+#将nan处理为0
+Fe_x = Fe_x.fillna(0)
+Fe_x = Fe_x.values.tolist()
+elementTest('Fe',Fe_x,Fe_y,1)
 
 
 

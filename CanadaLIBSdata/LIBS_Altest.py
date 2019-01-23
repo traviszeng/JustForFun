@@ -357,7 +357,7 @@ def elementTest(element,X,y,flag,times = 10):
             extract_element_dict[element] = [element_dict[element][f_indice]]
 
 
-    for i in range(0,10):
+    for i in range(0,times):
         print()
         print("第"+str(i+1)+"次"+str(element)+"的实验----------------------")
         #特征选择，先选取前10%的特征进行训练

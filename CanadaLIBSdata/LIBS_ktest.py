@@ -543,7 +543,7 @@ print('2.根据NIST库筛选特征-------------------------')
 
 
 K_x = selectFeature('K')
-elementTest('K',K_x,K_y,1)
+#elementTest('K',K_x,K_y,1)
 
 
 
