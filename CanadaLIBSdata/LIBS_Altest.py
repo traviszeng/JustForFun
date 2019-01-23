@@ -339,12 +339,12 @@ extract_element_dict = {}
 update 20190123
 使用selectPercentile选择相关度高的特征
 """
-def compressFeature(element,x,y):
+def compressFeature(element,x,y,compressRate=10):
     oldX = copy.deepcopy(x)
 
     x = np.array(x)
     y = np.array(y)
-    x = SelectPercentile(f_regression, percentile=10).fit_transform(x, y)
+    x = SelectPercentile(f_regression, percentile=compressRate).fit_transform(x, y)
     originalfeature_indice = []
     for i in range(0, len(x[0])):
         indice = np.where((oldX[0] == x[0][i]) & (oldX[5] == x[5][i]) & (oldX[10] == x[10][i]) & (oldX[15] == x[15][i]))[0]
@@ -368,20 +368,21 @@ def compressFeature(element,x,y):
 :param X 训练使用的X
 :param y 训练使用的y
 :param flag 用来区分输入的X是全光谱还是特征峰，用来区分是否需要输出rfr的importance 对应的特征峰波长
+:param featureCompressRate 特征压缩比
 :param times 重复次数
 """
 import copy
-def elementTest(element,x,y,flag,times = 10):
+def elementTest(element,x,y,flag,featureCompressRate,times = 10):
     SVR_MSE = []
     RFR_MSE = []
     LASSO_MSE = []
     GBoost_MSE = []
     ENet_MSE = []
-    KRR_MSE = []
+    #KRR_MSE = []
     stacking_MSE = []
     bagging_MSE =[]
-    x,y = compressFeature(element,x,y)
-
+    
+    x,y = compressFeature('Al',x,y,featureCompressRate)
 
     for i in range(0,10):
         print()
@@ -431,13 +432,14 @@ def elementTest(element,x,y,flag,times = 10):
         print('LASSO  Mean squared error is ' + str(mean_squared_error(y_test, y_pred)))
         LASSO_MSE.append(mean_squared_error(y_test, y_pred))
         print("Part 4 KRR TEST----------------------------------")
-
+        """
         krr = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
         krr.fit(X_train, y_train)
         y_pred = krr.predict(X_test)
         KRR_MSE.append(mean_squared_error(y_test, y_pred))
+       
         print('KRR Mean squared error is ' + str(mean_squared_error(y_test, y_pred)))
-
+        """
         print("Part 5 Elastic Net TEST----------------------------------")
         ENet = ElasticNet(alpha=0.05, l1_ratio=.9, random_state=3)
         ENet.fit(X_train, y_train)
@@ -456,7 +458,7 @@ def elementTest(element,x,y,flag,times = 10):
 
         print("Part 7 Bagging Experiment---------------------")
 
-        baggingModel = baggingAveragingModels(models=(krr, rfr, svr, GBoost, ENet, lasso))
+        baggingModel = baggingAveragingModels(models=(rfr, svr, GBoost, ENet, lasso))
         baggingModel.fit(X_train, y_train)
         y_pred = baggingModel.predict(X_test)
         bagging_MSE.append(mean_squared_error(y_test, y_pred))
@@ -465,27 +467,27 @@ def elementTest(element,x,y,flag,times = 10):
         print('Bagging squared error is ' + str(mean_squared_error(y_test, y_pred)))
 
         print("Part 8 Stacking Experiment------------------------------")
-        stacked_averaged_models = StackingAveragedModels(base_models=(ENet, GBoost, krr, svr, rfr),
+        stacked_averaged_models = StackingAveragedModels(base_models=(ENet, GBoost, svr, rfr),
                                                          meta_model=lasso)
         stacked_averaged_models.fit(X_train, y_train)
         y_pred = stacked_averaged_models.predict(X_test)
         print('Stacking with metamodel is lasso squared error is ' + str(mean_squared_error(y_test, y_pred)))
         stacking_MSE.append(mean_squared_error(y_test, y_pred))
 
-        stacked_averaged_models = StackingAveragedModels(base_models=(lasso, GBoost, krr, svr, rfr),
+        stacked_averaged_models = StackingAveragedModels(base_models=(lasso, GBoost,  svr, rfr),
                                                          meta_model=ENet)
         stacked_averaged_models.fit(X_train, y_train)
         y_pred = stacked_averaged_models.predict(X_test)
         print('Stacking with metamodel is ENet squared error is ' + str(mean_squared_error(y_test, y_pred)))
         stacking_MSE.append(mean_squared_error(y_test, y_pred))
 
-        stacked_averaged_models = StackingAveragedModels(base_models=(ENet, lasso, krr, svr, rfr),
+        stacked_averaged_models = StackingAveragedModels(base_models=(ENet, lasso,  svr, rfr),
                                                          meta_model=GBoost)
         stacked_averaged_models.fit(X_train, y_train)
         y_pred = stacked_averaged_models.predict(X_test)
         print('Stacking with metamodel is GBoost squared error is ' + str(mean_squared_error(y_test, y_pred)))
         stacking_MSE.append(mean_squared_error(y_test, y_pred))
-
+        krr = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
         stacked_averaged_models = StackingAveragedModels(base_models=(ENet, GBoost, lasso, svr, rfr),
                                                          meta_model=krr)
         stacked_averaged_models.fit(X_train, y_train)
@@ -493,14 +495,14 @@ def elementTest(element,x,y,flag,times = 10):
         print('Stacking with metamodel is krr squared error is ' + str(mean_squared_error(y_test, y_pred)))
         stacking_MSE.append(mean_squared_error(y_test, y_pred))
 
-        stacked_averaged_models = StackingAveragedModels(base_models=(ENet, GBoost, krr, lasso, rfr),
+        stacked_averaged_models = StackingAveragedModels(base_models=(ENet, GBoost,  lasso, rfr),
                                                          meta_model=svr)
         stacked_averaged_models.fit(X_train, y_train)
         y_pred = stacked_averaged_models.predict(X_test)
         print('Stacking with metamodel is svr squared error is ' + str(mean_squared_error(y_test, y_pred)))
         stacking_MSE.append(mean_squared_error(y_test, y_pred))
 
-        stacked_averaged_models = StackingAveragedModels(base_models=(ENet, GBoost, krr, svr, lasso),
+        stacked_averaged_models = StackingAveragedModels(base_models=(ENet, GBoost,  svr, lasso),
                                                          meta_model=rfr)
         stacked_averaged_models.fit(X_train, y_train)
         y_pred = stacked_averaged_models.predict(X_test)
@@ -514,12 +516,12 @@ def elementTest(element,x,y,flag,times = 10):
     plt.plot(plot_x, LASSO_MSE, 'g',label = 'LASSO')
     plt.plot(plot_x, ENet_MSE, 'y',label='ENet')
 
-    plt.plot(plot_x, KRR_MSE, 'k',label ='KRR')
+    #plt.plot(plot_x, KRR_MSE, 'k',label ='KRR')
     plt.plot(plot_x, bagging_MSE, 'M',label = 'Bagging')
     plt.plot(plot_x, GBoost_MSE, 'c',label = 'GBoost')
-    plt.legend(['SVR','RFR','LASSO','ENet','KRR','Bagging','GBoost'])
-    plt.title(element+"元素bagging和单独的学习器的对比")
-    plt.savefig(element + str(1) + ".png")
+    plt.legend(['SVR','RFR','LASSO','ENet','Bagging','GBoost'])
+    plt.title(element+" bagging vs other learner")
+    plt.savefig(element +"with compressRate = "+ str(featureCompressRate) + ".png")
     plt.clf()
     #plt.show()
 
@@ -536,19 +538,20 @@ def elementTest(element,x,y,flag,times = 10):
     sub = stacking_MSE[5::6]
     plt.plot(plot_x, sub, 'm',label = 'meta is rfr')
     plt.legend(['meta is lasso','meta is ENet','meta is GBoost','meta is krr','meta is svr','meta is rfr'])
-    plt.title(element + "元素Stacking对比")
-    plt.savefig(element+str(2)+".png")
+    plt.title(element + " Stacking comparison")
+    plt.savefig(element+" stacking with compressRate = "+str(featureCompressRate)+".png")
+    plt.clf()
     #plt.show()
 
 
     print(str(np.average(SVR_MSE)))
     print(str(np.average(RFR_MSE)))
     print(str(np.average(LASSO_MSE)))
-    print(str(np.average(KRR_MSE)))
+
     print(str(np.average(ENet_MSE)))
     print(str(np.average(GBoost_MSE)))
     print(str(np.average(bagging_MSE)))
-
+    return SVR_MSE,RFR_MSE,LASSO_MSE,ENet_MSE,GBoost_MSE,bagging_MSE,stacking_MSE
 
 
 """
@@ -566,5 +569,33 @@ elementTest('P',X,P_y,0)
 print('2.根据NIST库筛选特征-------------------------')
 
 Al_x = selectFeature('Al')
-elementTest('Al',Al_x,Al_y,1)
+for i in range(1,11):
+
+    svr_avg = []
+    rfr_avg = []
+    lasso_avg = []
+    enet_avg = []
+    gboost_avg = []
+    bag_avg =[]
+    SVR_MSE,RFR_MSE,LASSO_MSE,ENet_MSE,GBoost_MSE,bagging_MSE,stacking_MSE = elementTest('Al',Al_x,Al_y,1,i)
+    svr_avg.append(np.average(SVR_MSE))
+    rfr_avg.append( np.average(RFR_MSE))
+    lasso_avg.append(np.average(LASSO_MSE))
+    enet_avg.append(np.average(ENet_MSE))
+    gboost_avg.append(np.average(GBoost_MSE))
+    bag_avg.append(np.average(bagging_MSE))
+
+plot_x = np.linspace(1,10,10)
+plt.subplot(2,3,1)
+plt.plot(plot_x,svr_avg)
+plt.subplot(2,3,2)
+plt.plot(plot_x,rfr_avg)
+plt.subplot(2,3,3)
+plt.plot(plot_x,lasso_avg)
+plt.subplot(2,3,4)
+plt.plot(plot_x,enet_avg)
+plt.subplot(2,3,5)
+plt.plot(plot_x,gboost_avg)
+plt.subplot(2,3,6)
+plt.plot(plot_x,bag_avg)
 
