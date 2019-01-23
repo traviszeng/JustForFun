@@ -140,6 +140,7 @@ del concentrate_set_200AVG['hand sample37 barite_200AVG']
 del data_set_200AVG['hand sample37 barite_200AVG']
 
 #画一个折线图尝试看看
+"""
 s_name = "RockFer2_200AVG"
 intensity = data_set_200AVG[s_name].Intensity
 wavelength = data_set_200AVG[s_name].WaveLength
@@ -147,6 +148,7 @@ intensity = np.array(intensity)
 wavelength = np.array(wavelength)
 plt.plot(wavelength,intensity)
 plt.show()
+"""
 
 print("准备NIST库相关数据")
 nist = pd.read_csv("E:\\JustForFun\\CanadaLIBSdata\\andor.nist",header = None,names = ['WaveLength','Element','Type','Unknown','Importance'])
@@ -159,7 +161,8 @@ nist = nist.loc[nist.WaveLength<=970.142]
 element_dict = {}
 for indexs in nist.index:
     if nist.loc[indexs].Element in element_dict:
-        element_dict[nist.loc[indexs].Element].append([nist.loc[indexs].WaveLength,nist.loc[indexs].Importance])
+        if [nist.loc[indexs].WaveLength,nist.loc[indexs].Importance] not in element_dict[nist.loc[indexs].Element]:
+            element_dict[nist.loc[indexs].Element].append([nist.loc[indexs].WaveLength,nist.loc[indexs].Importance])
     else:
         element_dict[nist.loc[indexs].Element] = [[nist.loc[indexs].WaveLength,nist.loc[indexs].Importance]]
 
@@ -290,7 +293,7 @@ for samplename,concentrate in concentrate_set_1000AVG.items():
 :param 寻找元素
 :return 对应元素的特征序列
 
-寻峰范围为0.5，即寻找左右0.5的max值作为特征峰
+寻峰范围为0.5，即寻找左右0.2的max值作为特征峰
 """
 def selectFeature(element):
     #取得element_dict里的波长和importance 元祖
@@ -300,8 +303,8 @@ def selectFeature(element):
         templist = []
         #第一项为特征波长，第二项为importance
         for feature_list in element_dict[element]:
-            temp = data_set_200AVG[samplename].loc[data_set_200AVG[samplename].WaveLength<feature_list[0]+0.5]
-            feature_value = temp.loc[temp.WaveLength>feature_list[0]-0.5,'Intensity'].max()
+            temp = data_set_200AVG[samplename].loc[data_set_200AVG[samplename].WaveLength<feature_list[0]+0.2]
+            feature_value = temp.loc[temp.WaveLength>feature_list[0]-0.2,'Intensity'].max()
             templist.append(feature_value)
 
         featurelist.append(templist)
@@ -309,8 +312,8 @@ def selectFeature(element):
         templist = []
         #第一项为特征波长，第二项为importance
         for feature_list in element_dict[element]:
-            temp = data_set_1000AVG[samplename].loc[data_set_1000AVG[samplename].WaveLength<feature_list[0]+0.5]
-            feature_value = temp.loc[temp.WaveLength>feature_list[0]-0.5,'Intensity'].max()
+            temp = data_set_1000AVG[samplename].loc[data_set_1000AVG[samplename].WaveLength<feature_list[0]+0.2]
+            feature_value = temp.loc[temp.WaveLength>feature_list[0]-0.2,'Intensity'].max()
             templist.append(feature_value)
 
         featurelist.append(templist)
@@ -323,6 +326,35 @@ print('Data preprocessing finished.')
 print()
 print('1.未处理X实验，输入整个光谱------------------------------')
 print()
+extract_element_dict = {}
+"""
+压缩特征
+update 20190123
+使用selectPercentile选择相关度高的特征
+"""
+def compressFeature(element,x,y):
+    oldX = copy.deepcopy(x)
+
+    x = np.array(x)
+    y = np.array(y)
+    x = SelectPercentile(f_regression, percentile=10).fit_transform(x, y)
+    originalfeature_indice = []
+    for i in range(0, len(x[0])):
+        indice = np.where((oldX[0] == x[0][i]) & (oldX[5] == x[5][i]) & (oldX[10] == x[10][i]) & (oldX[15] == x[15][i]))[0]
+        for j in range(0,len(indice)):
+            if indice[j] not in originalfeature_indice:
+                originalfeature_indice.append(indice[j])
+
+    print(originalfeature_indice)
+
+    for f_indice in originalfeature_indice:
+        if element in extract_element_dict:
+            extract_element_dict[element].append(element_dict[element][f_indice])
+        else:
+            extract_element_dict[element] = [element_dict[element][f_indice]]
+
+    return x,y
+
 
 """
 :param element 需要训练的元素名称 str
@@ -332,7 +364,7 @@ print()
 :param times 重复次数
 """
 import copy
-def elementTest(element,X,y,flag,times = 10):
+def elementTest(element,x,y,flag,times = 10):
     SVR_MSE = []
     RFR_MSE = []
     LASSO_MSE = []
@@ -341,20 +373,7 @@ def elementTest(element,X,y,flag,times = 10):
     KRR_MSE = []
     stacking_MSE = []
     bagging_MSE =[]
-    oldX = copy.deepcopy(X)
-    extract_element_dict = {}
-    X = np.array(X)
-    y = np.array(y)
-    X = SelectPercentile(f_regression, percentile=10).fit_transform(X, y)
-    originalfeature_indice = []
-    for i in range(0,len(X[0])):
-        originalfeature_indice.append(np.where((oldX[0]==X[0][i]) & (oldX[5]==X[5][i]) & (oldX[10]==X[10][i]))[0][0])
-
-    for f_indice in originalfeature_indice:
-        if element in extract_element_dict:
-            extract_element_dict[element].append(element_dict[element][f_indice])
-        else:
-            extract_element_dict[element] = [element_dict[element][f_indice]]
+    x,y = compressFeature(element,x,y)
 
 
     for i in range(0,10):
@@ -363,7 +382,7 @@ def elementTest(element,X,y,flag,times = 10):
         #特征选择，先选取前10%的特征进行训练
 
 
-        X_train, X_test, y_train, y_test = train_test_split(X,
+        X_train, X_test, y_train, y_test = train_test_split(x,
                                                             y,
                                                             test_size=0.20)
         print("Part 1 Experiment with Support Vector Machine Regression-------------")
@@ -492,7 +511,9 @@ def elementTest(element,X,y,flag,times = 10):
     plt.plot(plot_x, bagging_MSE, 'M',label = 'Bagging')
     plt.plot(plot_x, GBoost_MSE, 'c',label = 'GBoost')
     plt.legend(['SVR','RFR','LASSO','ENet','KRR','Bagging','GBoost'])
-    plt.show()
+    plt.title(element+"元素bagging和单独的学习器的对比")
+    plt.savefig(element + str(1) + ".png")
+    #plt.show()
 
     sub = stacking_MSE[0::6]
     plt.plot(plot_x,sub,'b',label = 'meta is lasso')
@@ -507,7 +528,9 @@ def elementTest(element,X,y,flag,times = 10):
     sub = stacking_MSE[5::6]
     plt.plot(plot_x, sub, 'm',label = 'meta is rfr')
     plt.legend(['meta is lasso','meta is ENet','meta is GBoost','meta is krr','meta is svr','meta is rfr'])
-    plt.show()
+    plt.title(element + "元素Stacking对比")
+    plt.savefig(element+str(2)+".png")
+    #plt.show()
 
 
     print(str(np.average(SVR_MSE)))
@@ -533,7 +556,6 @@ elementTest('Ti',X,Ti_y,0)
 elementTest('P',X,P_y,0)
 """
 print('2.根据NIST库筛选特征-------------------------')
-
 
 
 Ca_x = selectFeature('Ca')
