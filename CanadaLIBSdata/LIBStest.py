@@ -13,6 +13,7 @@ from sklearn.ensemble import RandomForestRegressor,  GradientBoostingRegressor
 from sklearn.base import BaseEstimator, TransformerMixin, RegressorMixin, clone
 from sklearn.feature_selection import f_regression,SelectPercentile
 import matplotlib.pyplot as plt
+from pandas.core.frame import DataFrame
 
 from sklearn.ensemble import RandomForestRegressor
 import xgboost as xgb
@@ -47,12 +48,12 @@ for indexs in concentrate_data.index:
     for i in range(1,12):
         if concentrate_data.loc[indexs].values[i]=='-':
             concentrate_data.loc[indexs].values[i] = 0.0
-        
+
         else:
             try:
                 concentrate_data.loc[indexs].values[i] = float(concentrate_data.loc[indexs].values[i])
                 if float(concentrate_data.loc[indexs].values[i])>1:
-                    concentrate_data.loc[indexs].values[i] = concentrate_data.loc[indexs].values[i]/100 
+                    concentrate_data.loc[indexs].values[i] = concentrate_data.loc[indexs].values[i]/100
             except ValueError:
                 concentrate_data.loc[indexs].values[i] = float(concentrate_data.loc[indexs].values[i][1:])
                 if float(concentrate_data.loc[indexs].values[i])>1:
@@ -61,7 +62,7 @@ for indexs in concentrate_data.index:
 #检查是否将所有非数字处理好
 for column in concentrate_data.columns:
 	print(concentrate_data[column].isna().value_counts())
-	
+
 
 route_200_AVG = "E:\\JustForFun\\CanadaLIBSdata\\LIBS OpenData csv\\csv Material Large Set 200pulseaverage"
 route_1000_AVG = "E:\\JustForFun\\CanadaLIBSdata\\LIBS OpenData csv\\csv Certified Samples Subset 1000pulseaverage"
@@ -89,7 +90,7 @@ for indexs in concentrate_data.index:
         concentrate_set_200AVG[concentrate_data.loc[indexs].values[0]+"_200AVG"] = concentrate_data.loc[indexs].values[1:]
     #处理hand sample类型的样本
     if re.match('hand sample*',concentrate_data.loc[indexs].values[0]):
-        
+
         f_list = concentrate_data.loc[indexs].values[0].split()
         filename = f_list[0]+" "+f_list[1]+postfix_200AVG
         if os.path.exists(filename):
@@ -100,7 +101,7 @@ for indexs in concentrate_data.index:
             data.loc[data.Intensity < 0, 'Intensity'] = 0
             data_set_200AVG[concentrate_data.loc[indexs].values[0]+"_200AVG"] = data
             concentrate_set_200AVG[concentrate_data.loc[indexs].values[0]+"_200AVG"] = concentrate_data.loc[indexs].values[1:]
-        
+
 
 print("Get "+str(num)+" 200_AVG files.")
 print()
@@ -121,7 +122,7 @@ for indexs in concentrate_data.index:
         concentrate_set_1000AVG[concentrate_data.loc[indexs].values[0]+"_1000AVG"] = concentrate_data.loc[indexs].values[1:]
     #处理hand sample类型的样本
     if re.match('hand sample*',concentrate_data.loc[indexs].values[0]):
-        
+
         f_list = concentrate_data.loc[indexs].values[0].split()
         filename = f_list[0]+" "+f_list[1]+postfix_1000AVG
         if os.path.exists(filename):
@@ -140,6 +141,7 @@ del concentrate_set_200AVG['hand sample37 barite_200AVG']
 del data_set_200AVG['hand sample37 barite_200AVG']
 
 #画一个折线图尝试看看
+"""
 s_name = "RockFer2_200AVG"
 intensity = data_set_200AVG[s_name].Intensity
 wavelength = data_set_200AVG[s_name].WaveLength
@@ -147,6 +149,7 @@ intensity = np.array(intensity)
 wavelength = np.array(wavelength)
 plt.plot(wavelength,intensity)
 plt.show()
+"""
 
 print("准备NIST库相关数据")
 nist = pd.read_csv("E:\\JustForFun\\CanadaLIBSdata\\andor.nist",header = None,names = ['WaveLength','Element','Type','Unknown','Importance'])
@@ -159,7 +162,8 @@ nist = nist.loc[nist.WaveLength<=970.142]
 element_dict = {}
 for indexs in nist.index:
     if nist.loc[indexs].Element in element_dict:
-        element_dict[nist.loc[indexs].Element].append([nist.loc[indexs].WaveLength,nist.loc[indexs].Importance])
+        if [nist.loc[indexs].WaveLength,nist.loc[indexs].Importance] not in element_dict[nist.loc[indexs].Element]:
+            element_dict[nist.loc[indexs].Element].append([nist.loc[indexs].WaveLength,nist.loc[indexs].Importance])
     else:
         element_dict[nist.loc[indexs].Element] = [[nist.loc[indexs].WaveLength,nist.loc[indexs].Importance]]
 
@@ -290,7 +294,7 @@ for samplename,concentrate in concentrate_set_1000AVG.items():
 :param 寻找元素
 :return 对应元素的特征序列
 
-寻峰范围为0.5，即寻找左右0.5的max值作为特征峰
+寻峰范围为0.5，即寻找左右0.2的max值作为特征峰
 """
 def selectFeature(element):
     #取得element_dict里的波长和importance 元祖
@@ -300,8 +304,8 @@ def selectFeature(element):
         templist = []
         #第一项为特征波长，第二项为importance
         for feature_list in element_dict[element]:
-            temp = data_set_200AVG[samplename].loc[data_set_200AVG[samplename].WaveLength<feature_list[0]+0.5]
-            feature_value = temp.loc[temp.WaveLength>feature_list[0]-0.5,'Intensity'].max()
+            temp = data_set_200AVG[samplename].loc[data_set_200AVG[samplename].WaveLength<feature_list[0]+0.2]
+            feature_value = temp.loc[temp.WaveLength>feature_list[0]-0.2,'Intensity'].max()
             templist.append(feature_value)
 
         featurelist.append(templist)
@@ -309,11 +313,17 @@ def selectFeature(element):
         templist = []
         #第一项为特征波长，第二项为importance
         for feature_list in element_dict[element]:
-            temp = data_set_1000AVG[samplename].loc[data_set_1000AVG[samplename].WaveLength<feature_list[0]+0.5]
-            feature_value = temp.loc[temp.WaveLength>feature_list[0]-0.5,'Intensity'].max()
+            temp = data_set_1000AVG[samplename].loc[data_set_1000AVG[samplename].WaveLength<feature_list[0]+0.2]
+            feature_value = temp.loc[temp.WaveLength>feature_list[0]-0.2,'Intensity'].max()
             templist.append(feature_value)
 
         featurelist.append(templist)
+
+
+    #处理一些元素中存在nan强度的问题
+    featurelist = DataFrame(featurelist)
+    featurelist = featurelist.fillna(0)
+    featurelist = featurelist.values.tolist()
     return featurelist
 
 
@@ -323,32 +333,26 @@ print('Data preprocessing finished.')
 print()
 print('1.未处理X实验，输入整个光谱------------------------------')
 print()
+extract_element_dict = {}
+"""
+压缩特征
+update 20190123
+使用selectPercentile选择相关度高的特征
+"""
+def compressFeature(element,x,y,compressRate=10):
+    oldX = copy.deepcopy(x)
 
-"""
-:param element 需要训练的元素名称 str
-:param X 训练使用的X
-:param y 训练使用的y
-:param flag 用来区分输入的X是全光谱还是特征峰，用来区分是否需要输出rfr的importance 对应的特征峰波长
-:param times 重复次数
-"""
-import copy
-def elementTest(element,X,y,flag,times = 10):
-    SVR_MSE = []
-    RFR_MSE = []
-    LASSO_MSE = []
-    GBoost_MSE = []
-    ENet_MSE = []
-    KRR_MSE = []
-    stacking_MSE = []
-    bagging_MSE =[]
-    oldX = copy.deepcopy(X)
-    extract_element_dict = {}
-    X = np.array(X)
+    x = np.array(x)
     y = np.array(y)
-    X = SelectPercentile(f_regression, percentile=10).fit_transform(X, y)
+    x = SelectPercentile(f_regression, percentile=compressRate).fit_transform(x, y)
     originalfeature_indice = []
-    for i in range(0,len(X[0])):
-        originalfeature_indice.append(np.where((oldX[0]==X[0][i]) & (oldX[5]==X[5][i]) & (oldX[10]==X[10][i]))[0][0])
+    for i in range(0, len(x[0])):
+        indice = np.where((oldX[0] == x[0][i]) & (oldX[5] == x[5][i]) & (oldX[10] == x[10][i]) & (oldX[15] == x[15][i]))[0]
+        for j in range(0,len(indice)):
+            if indice[j] not in originalfeature_indice:
+                originalfeature_indice.append(indice[j])
+
+    print(originalfeature_indice)
 
     for f_indice in originalfeature_indice:
         if element in extract_element_dict:
@@ -356,6 +360,29 @@ def elementTest(element,X,y,flag,times = 10):
         else:
             extract_element_dict[element] = [element_dict[element][f_indice]]
 
+    return x,y
+
+
+"""
+:param element 需要训练的元素名称 str
+:param X 训练使用的X
+:param y 训练使用的y
+:param flag 用来区分输入的X是全光谱还是特征峰，用来区分是否需要输出rfr的importance 对应的特征峰波长
+:param featureCompressRate 特征压缩比
+:param times 重复次数
+"""
+import copy
+def elementTest(element,x,y,flag,featureCompressRate,times = 10):
+    SVR_MSE = []
+    RFR_MSE = []
+    LASSO_MSE = []
+    GBoost_MSE = []
+    ENet_MSE = []
+    #KRR_MSE = []
+    stacking_MSE = []
+    bagging_MSE =[]
+
+    x,y = compressFeature('Al',x,y,featureCompressRate)
 
     for i in range(0,10):
         print()
@@ -363,7 +390,7 @@ def elementTest(element,X,y,flag,times = 10):
         #特征选择，先选取前10%的特征进行训练
 
 
-        X_train, X_test, y_train, y_test = train_test_split(X,
+        X_train, X_test, y_train, y_test = train_test_split(x,
                                                             y,
                                                             test_size=0.20)
         print("Part 1 Experiment with Support Vector Machine Regression-------------")
@@ -389,11 +416,18 @@ def elementTest(element,X,y,flag,times = 10):
         # 根据importance大小排序
         indices = np.argsort(importance)[::-1]
         #print(indices)
-        # 打印前十的importance
-        for i in range(0, 10):
-            print("importance is " + str(importance[indices[i]]))
-            if flag:
-                print("对应的特征峰和importance为 "+str(extract_element_dict[element][indices[i]]))
+        if len(x[0])<10:
+            # 打印前十的importance
+            for i in range(0, len(x[0])):
+                print("importance is " + str(importance[indices[i]]))
+                if flag:
+                    print("对应的特征峰和importance为 " + str(extract_element_dict[element][indices[i]]))
+        else:
+            # 打印前十的importance
+            for i in range(0, 10):
+                print("importance is " + str(importance[indices[i]]))
+                if flag:
+                    print("对应的特征峰和importance为 "+str(extract_element_dict[element][indices[i]]))
 
         print()
         print('Part 3 LASSO experiment ---------------------------------')
@@ -405,13 +439,14 @@ def elementTest(element,X,y,flag,times = 10):
         print('LASSO  Mean squared error is ' + str(mean_squared_error(y_test, y_pred)))
         LASSO_MSE.append(mean_squared_error(y_test, y_pred))
         print("Part 4 KRR TEST----------------------------------")
-        if not element=='Al':
-            krr = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
-            krr.fit(X_train, y_train)
-            y_pred = krr.predict(X_test)
-            KRR_MSE.append(mean_squared_error(y_test, y_pred))
-            print('KRR Mean squared error is ' + str(mean_squared_error(y_test, y_pred)))
-
+        """
+        krr = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
+        krr.fit(X_train, y_train)
+        y_pred = krr.predict(X_test)
+        KRR_MSE.append(mean_squared_error(y_test, y_pred))
+       
+        print('KRR Mean squared error is ' + str(mean_squared_error(y_test, y_pred)))
+        """
         print("Part 5 Elastic Net TEST----------------------------------")
         ENet = ElasticNet(alpha=0.05, l1_ratio=.9, random_state=3)
         ENet.fit(X_train, y_train)
@@ -429,40 +464,37 @@ def elementTest(element,X,y,flag,times = 10):
         print('GBoost squared error is ' + str(mean_squared_error(y_test, y_pred)))
 
         print("Part 7 Bagging Experiment---------------------")
-        if not element == 'Al':
-            baggingModel = baggingAveragingModels(models=(krr, rfr, svr, GBoost, ENet, lasso))
-            baggingModel.fit(X_train, y_train)
-            y_pred = baggingModel.predict(X_test)
-            bagging_MSE.append(mean_squared_error(y_test, y_pred))
-        else:
-            baggingModel = baggingAveragingModels(models=( rfr, svr, GBoost, ENet, lasso))
-            baggingModel.fit(X_train, y_train)
-            y_pred = baggingModel.predict(X_test)
-            bagging_MSE.append(mean_squared_error(y_test, y_pred))
+
+        baggingModel = baggingAveragingModels(models=(rfr, svr, GBoost, ENet, lasso))
+        baggingModel.fit(X_train, y_train)
+        y_pred = baggingModel.predict(X_test)
+        bagging_MSE.append(mean_squared_error(y_test, y_pred))
+
+
         print('Bagging squared error is ' + str(mean_squared_error(y_test, y_pred)))
 
         print("Part 8 Stacking Experiment------------------------------")
-        stacked_averaged_models = StackingAveragedModels(base_models=(ENet, GBoost, krr, svr, rfr),
+        stacked_averaged_models = StackingAveragedModels(base_models=(ENet, GBoost, svr, rfr),
                                                          meta_model=lasso)
         stacked_averaged_models.fit(X_train, y_train)
         y_pred = stacked_averaged_models.predict(X_test)
         print('Stacking with metamodel is lasso squared error is ' + str(mean_squared_error(y_test, y_pred)))
         stacking_MSE.append(mean_squared_error(y_test, y_pred))
 
-        stacked_averaged_models = StackingAveragedModels(base_models=(lasso, GBoost, krr, svr, rfr),
+        stacked_averaged_models = StackingAveragedModels(base_models=(lasso, GBoost,  svr, rfr),
                                                          meta_model=ENet)
         stacked_averaged_models.fit(X_train, y_train)
         y_pred = stacked_averaged_models.predict(X_test)
         print('Stacking with metamodel is ENet squared error is ' + str(mean_squared_error(y_test, y_pred)))
         stacking_MSE.append(mean_squared_error(y_test, y_pred))
 
-        stacked_averaged_models = StackingAveragedModels(base_models=(ENet, lasso, krr, svr, rfr),
+        stacked_averaged_models = StackingAveragedModels(base_models=(ENet, lasso,  svr, rfr),
                                                          meta_model=GBoost)
         stacked_averaged_models.fit(X_train, y_train)
         y_pred = stacked_averaged_models.predict(X_test)
         print('Stacking with metamodel is GBoost squared error is ' + str(mean_squared_error(y_test, y_pred)))
         stacking_MSE.append(mean_squared_error(y_test, y_pred))
-
+        krr = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
         stacked_averaged_models = StackingAveragedModels(base_models=(ENet, GBoost, lasso, svr, rfr),
                                                          meta_model=krr)
         stacked_averaged_models.fit(X_train, y_train)
@@ -470,14 +502,14 @@ def elementTest(element,X,y,flag,times = 10):
         print('Stacking with metamodel is krr squared error is ' + str(mean_squared_error(y_test, y_pred)))
         stacking_MSE.append(mean_squared_error(y_test, y_pred))
 
-        stacked_averaged_models = StackingAveragedModels(base_models=(ENet, GBoost, krr, lasso, rfr),
+        stacked_averaged_models = StackingAveragedModels(base_models=(ENet, GBoost,  lasso, rfr),
                                                          meta_model=svr)
         stacked_averaged_models.fit(X_train, y_train)
         y_pred = stacked_averaged_models.predict(X_test)
         print('Stacking with metamodel is svr squared error is ' + str(mean_squared_error(y_test, y_pred)))
         stacking_MSE.append(mean_squared_error(y_test, y_pred))
 
-        stacked_averaged_models = StackingAveragedModels(base_models=(ENet, GBoost, krr, svr, lasso),
+        stacked_averaged_models = StackingAveragedModels(base_models=(ENet, GBoost,  svr, lasso),
                                                          meta_model=rfr)
         stacked_averaged_models.fit(X_train, y_train)
         y_pred = stacked_averaged_models.predict(X_test)
@@ -490,12 +522,15 @@ def elementTest(element,X,y,flag,times = 10):
     plt.plot(plot_x, RFR_MSE, 'r',label ='RFR')
     plt.plot(plot_x, LASSO_MSE, 'g',label = 'LASSO')
     plt.plot(plot_x, ENet_MSE, 'y',label='ENet')
-    if not element =='Al':
-        plt.plot(plot_x, KRR_MSE, 'k',label ='KRR')
+
+    #plt.plot(plot_x, KRR_MSE, 'k',label ='KRR')
     plt.plot(plot_x, bagging_MSE, 'M',label = 'Bagging')
     plt.plot(plot_x, GBoost_MSE, 'c',label = 'GBoost')
-    plt.legend(['SVR','RFR','LASSO','ENet','KRR','Bagging','GBoost'])
-    plt.show()
+    plt.legend(['SVR','RFR','LASSO','ENet','Bagging','GBoost'])
+    plt.title(element+" bagging vs other learner")
+    plt.savefig(element +"with compressRate = "+ str(featureCompressRate) + ".png")
+    plt.clf()
+    #plt.show()
 
     sub = stacking_MSE[0::6]
     plt.plot(plot_x,sub,'b',label = 'meta is lasso')
@@ -510,17 +545,20 @@ def elementTest(element,X,y,flag,times = 10):
     sub = stacking_MSE[5::6]
     plt.plot(plot_x, sub, 'm',label = 'meta is rfr')
     plt.legend(['meta is lasso','meta is ENet','meta is GBoost','meta is krr','meta is svr','meta is rfr'])
-    plt.show()
+    plt.title(element + " Stacking comparison")
+    plt.savefig(element+" stacking with compressRate = "+str(featureCompressRate)+".png")
+    plt.clf()
+    #plt.show()
 
 
     print(str(np.average(SVR_MSE)))
     print(str(np.average(RFR_MSE)))
     print(str(np.average(LASSO_MSE)))
-    print(str(np.average(KRR_MSE)))
+
     print(str(np.average(ENet_MSE)))
     print(str(np.average(GBoost_MSE)))
     print(str(np.average(bagging_MSE)))
-
+    return SVR_MSE,RFR_MSE,LASSO_MSE,ENet_MSE,GBoost_MSE,bagging_MSE,stacking_MSE
 
 
 """
@@ -538,34 +576,316 @@ elementTest('P',X,P_y,0)
 print('2.根据NIST库筛选特征-------------------------')
 
 Al_x = selectFeature('Al')
+svr_avg = []
+rfr_avg = []
+lasso_avg = []
+enet_avg = []
+gboost_avg = []
+bag_avg =[]
+for i in range(1,11):
 
-elementTest('Al',Al_x,Al_y,1)
+
+    SVR_MSE,RFR_MSE,LASSO_MSE,ENet_MSE,GBoost_MSE,bagging_MSE,stacking_MSE = elementTest('Al',Al_x,Al_y,1,i)
+    svr_avg.append(np.average(SVR_MSE))
+    rfr_avg.append( np.average(RFR_MSE))
+    lasso_avg.append(np.average(LASSO_MSE))
+    enet_avg.append(np.average(ENet_MSE))
+    gboost_avg.append(np.average(GBoost_MSE))
+    bag_avg.append(np.average(bagging_MSE))
+
+plot_x = np.linspace(1,10,10)
+plt.subplot(2,3,1)
+plt.plot(plot_x,svr_avg)
+plt.subplot(2,3,2)
+plt.plot(plot_x,rfr_avg)
+plt.subplot(2,3,3)
+plt.plot(plot_x,lasso_avg)
+plt.subplot(2,3,4)
+plt.plot(plot_x,enet_avg)
+plt.subplot(2,3,5)
+plt.plot(plot_x,gboost_avg)
+plt.subplot(2,3,6)
+plt.plot(plot_x,bag_avg)
+plt.savefig('Al with different compress rate.png')
+plt.clf()
 
 Ca_x = selectFeature('Ca')
-elementTest('Ca',Ca_x,Ca_y,1)
+svr_avg = []
+rfr_avg = []
+lasso_avg = []
+enet_avg = []
+gboost_avg = []
+bag_avg =[]
+for i in range(1,11):
+
+
+    SVR_MSE,RFR_MSE,LASSO_MSE,ENet_MSE,GBoost_MSE,bagging_MSE,stacking_MSE = elementTest('Ca',Ca_x,Ca_y,1,i)
+    svr_avg.append(np.average(SVR_MSE))
+    rfr_avg.append( np.average(RFR_MSE))
+    lasso_avg.append(np.average(LASSO_MSE))
+    enet_avg.append(np.average(ENet_MSE))
+    gboost_avg.append(np.average(GBoost_MSE))
+    bag_avg.append(np.average(bagging_MSE))
+
+plot_x = np.linspace(1,10,10)
+plt.subplot(2,3,1)
+plt.plot(plot_x,svr_avg)
+plt.subplot(2,3,2)
+plt.plot(plot_x,rfr_avg)
+plt.subplot(2,3,3)
+plt.plot(plot_x,lasso_avg)
+plt.subplot(2,3,4)
+plt.plot(plot_x,enet_avg)
+plt.subplot(2,3,5)
+plt.plot(plot_x,gboost_avg)
+plt.subplot(2,3,6)
+plt.plot(plot_x,bag_avg)
+plt.savefig('Ca with different compress rate.png')
+plt.clf()
 
 Fe_x = selectFeature('Fe')
-elementTest('Fe',Fe_x,Fe_y,1)
+svr_avg = []
+rfr_avg = []
+lasso_avg = []
+enet_avg = []
+gboost_avg = []
+bag_avg =[]
+for i in range(1,11):
+
+    SVR_MSE,RFR_MSE,LASSO_MSE,ENet_MSE,GBoost_MSE,bagging_MSE,stacking_MSE = elementTest('Fe',Fe_x,Fe_y,1,i)
+    svr_avg.append(np.average(SVR_MSE))
+    rfr_avg.append( np.average(RFR_MSE))
+    lasso_avg.append(np.average(LASSO_MSE))
+    enet_avg.append(np.average(ENet_MSE))
+    gboost_avg.append(np.average(GBoost_MSE))
+    bag_avg.append(np.average(bagging_MSE))
+
+plot_x = np.linspace(1,10,10)
+plt.subplot(2,3,1)
+plt.plot(plot_x,svr_avg)
+plt.subplot(2,3,2)
+plt.plot(plot_x,rfr_avg)
+plt.subplot(2,3,3)
+plt.plot(plot_x,lasso_avg)
+plt.subplot(2,3,4)
+plt.plot(plot_x,enet_avg)
+plt.subplot(2,3,5)
+plt.plot(plot_x,gboost_avg)
+plt.subplot(2,3,6)
+plt.plot(plot_x,bag_avg)
+plt.savefig('Fe with different compress rate.png')
+plt.clf()
+
+
 
 K_x = selectFeature('K')
-elementTest('K',K_x,K_y,1)
+svr_avg = []
+rfr_avg = []
+lasso_avg = []
+enet_avg = []
+gboost_avg = []
+bag_avg =[]
+for i in range(1,11):
+
+
+    SVR_MSE,RFR_MSE,LASSO_MSE,ENet_MSE,GBoost_MSE,bagging_MSE,stacking_MSE = elementTest('K',K_x,K_y,1,i)
+    svr_avg.append(np.average(SVR_MSE))
+    rfr_avg.append( np.average(RFR_MSE))
+    lasso_avg.append(np.average(LASSO_MSE))
+    enet_avg.append(np.average(ENet_MSE))
+    gboost_avg.append(np.average(GBoost_MSE))
+    bag_avg.append(np.average(bagging_MSE))
+
+plot_x = np.linspace(1,10,10)
+plt.subplot(2,3,1)
+plt.plot(plot_x,svr_avg)
+plt.subplot(2,3,2)
+plt.plot(plot_x,rfr_avg)
+plt.subplot(2,3,3)
+plt.plot(plot_x,lasso_avg)
+plt.subplot(2,3,4)
+plt.plot(plot_x,enet_avg)
+plt.subplot(2,3,5)
+plt.plot(plot_x,gboost_avg)
+plt.subplot(2,3,6)
+plt.plot(plot_x,bag_avg)
+plt.savefig('K with different compress rate.png')
+plt.clf()
 
 Mg_x = selectFeature('Mg')
-elementTest('Mg',Mg_x,Mg_y,1)
+svr_avg = []
+rfr_avg = []
+lasso_avg = []
+enet_avg = []
+gboost_avg = []
+bag_avg =[]
+for i in range(1,11):
+
+
+    SVR_MSE,RFR_MSE,LASSO_MSE,ENet_MSE,GBoost_MSE,bagging_MSE,stacking_MSE = elementTest('Mg',Mg_x,Mg_y,1,i)
+    svr_avg.append(np.average(SVR_MSE))
+    rfr_avg.append( np.average(RFR_MSE))
+    lasso_avg.append(np.average(LASSO_MSE))
+    enet_avg.append(np.average(ENet_MSE))
+    gboost_avg.append(np.average(GBoost_MSE))
+    bag_avg.append(np.average(bagging_MSE))
+
+plot_x = np.linspace(1,10,10)
+plt.subplot(2,3,1)
+plt.plot(plot_x,svr_avg)
+plt.subplot(2,3,2)
+plt.plot(plot_x,rfr_avg)
+plt.subplot(2,3,3)
+plt.plot(plot_x,lasso_avg)
+plt.subplot(2,3,4)
+plt.plot(plot_x,enet_avg)
+plt.subplot(2,3,5)
+plt.plot(plot_x,gboost_avg)
+plt.subplot(2,3,6)
+plt.plot(plot_x,bag_avg)
+plt.savefig('Mg with different compress rate.png')
+plt.clf()
 
 Mn_x = selectFeature('Mn')
-elementTest('Mn',Mn_x,Mn_y,1)
+svr_avg = []
+rfr_avg = []
+lasso_avg = []
+enet_avg = []
+gboost_avg = []
+bag_avg =[]
+for i in range(1,11):
+
+    SVR_MSE,RFR_MSE,LASSO_MSE,ENet_MSE,GBoost_MSE,bagging_MSE,stacking_MSE = elementTest('Mn',Mn_x,Mn_y,1,i)
+    svr_avg.append(np.average(SVR_MSE))
+    rfr_avg.append( np.average(RFR_MSE))
+    lasso_avg.append(np.average(LASSO_MSE))
+    enet_avg.append(np.average(ENet_MSE))
+    gboost_avg.append(np.average(GBoost_MSE))
+    bag_avg.append(np.average(bagging_MSE))
+
+plot_x = np.linspace(1,10,10)
+plt.subplot(2,3,1)
+plt.plot(plot_x,svr_avg)
+plt.subplot(2,3,2)
+plt.plot(plot_x,rfr_avg)
+plt.subplot(2,3,3)
+plt.plot(plot_x,lasso_avg)
+plt.subplot(2,3,4)
+plt.plot(plot_x,enet_avg)
+plt.subplot(2,3,5)
+plt.plot(plot_x,gboost_avg)
+plt.subplot(2,3,6)
+plt.plot(plot_x,bag_avg)
+plt.savefig('Mn with different compress rate.png')
+plt.clf()
 
 Na_x = selectFeature('Na')
-elementTest('Na',Na_x,Na_y,1)
+svr_avg = []
+rfr_avg = []
+lasso_avg = []
+enet_avg = []
+gboost_avg = []
+bag_avg =[]
+for i in range(1,11):
+
+
+    SVR_MSE,RFR_MSE,LASSO_MSE,ENet_MSE,GBoost_MSE,bagging_MSE,stacking_MSE = elementTest('Na',Na_x,Na_y,1,i)
+    svr_avg.append(np.average(SVR_MSE))
+    rfr_avg.append( np.average(RFR_MSE))
+    lasso_avg.append(np.average(LASSO_MSE))
+    enet_avg.append(np.average(ENet_MSE))
+    gboost_avg.append(np.average(GBoost_MSE))
+    bag_avg.append(np.average(bagging_MSE))
+
+plot_x = np.linspace(1,10,10)
+plt.subplot(2,3,1)
+plt.plot(plot_x,svr_avg)
+plt.subplot(2,3,2)
+plt.plot(plot_x,rfr_avg)
+plt.subplot(2,3,3)
+plt.plot(plot_x,lasso_avg)
+plt.subplot(2,3,4)
+plt.plot(plot_x,enet_avg)
+plt.subplot(2,3,5)
+plt.plot(plot_x,gboost_avg)
+plt.subplot(2,3,6)
+plt.plot(plot_x,bag_avg)
+plt.savefig('Na with different compress rate.png')
+plt.clf()
 
 Si_x = selectFeature('Si')
-elementTest('Si',Si_x,Si_y,1)
+svr_avg = []
+rfr_avg = []
+lasso_avg = []
+enet_avg = []
+gboost_avg = []
+bag_avg =[]
+for i in range(1,11):
+
+    SVR_MSE,RFR_MSE,LASSO_MSE,ENet_MSE,GBoost_MSE,bagging_MSE,stacking_MSE = elementTest('Si',Si_x,Si_y,1,i)
+    svr_avg.append(np.average(SVR_MSE))
+    rfr_avg.append( np.average(RFR_MSE))
+    lasso_avg.append(np.average(LASSO_MSE))
+    enet_avg.append(np.average(ENet_MSE))
+    gboost_avg.append(np.average(GBoost_MSE))
+    bag_avg.append(np.average(bagging_MSE))
+
+plot_x = np.linspace(1,10,10)
+plt.subplot(2,3,1)
+plt.plot(plot_x,svr_avg)
+plt.subplot(2,3,2)
+plt.plot(plot_x,rfr_avg)
+plt.subplot(2,3,3)
+plt.plot(plot_x,lasso_avg)
+plt.subplot(2,3,4)
+plt.plot(plot_x,enet_avg)
+plt.subplot(2,3,5)
+plt.plot(plot_x,gboost_avg)
+plt.subplot(2,3,6)
+plt.plot(plot_x,bag_avg)
+plt.savefig('Si with different compress rate.png')
+plt.clf()
 
 Ti_x = selectFeature('Ti')
-elementTest('Ti',Ti_x,Ti_y,1)
+svr_avg = []
+rfr_avg = []
+lasso_avg = []
+enet_avg = []
+gboost_avg = []
+bag_avg =[]
+for i in range(1,11):
 
-P_x = selectFeature('P')
-elementTest('P',P_x,P_y,1)
+
+    SVR_MSE,RFR_MSE,LASSO_MSE,ENet_MSE,GBoost_MSE,bagging_MSE,stacking_MSE = elementTest('Ti',Ti_x,Ti_y,1,i)
+    svr_avg.append(np.average(SVR_MSE))
+    rfr_avg.append( np.average(RFR_MSE))
+    lasso_avg.append(np.average(LASSO_MSE))
+    enet_avg.append(np.average(ENet_MSE))
+    gboost_avg.append(np.average(GBoost_MSE))
+    bag_avg.append(np.average(bagging_MSE))
+
+plot_x = np.linspace(1,10,10)
+plt.subplot(2,3,1)
+plt.plot(plot_x,svr_avg)
+plt.subplot(2,3,2)
+plt.plot(plot_x,rfr_avg)
+plt.subplot(2,3,3)
+plt.plot(plot_x,lasso_avg)
+plt.subplot(2,3,4)
+plt.plot(plot_x,enet_avg)
+plt.subplot(2,3,5)
+plt.plot(plot_x,gboost_avg)
+plt.subplot(2,3,6)
+plt.plot(plot_x,bag_avg)
+plt.savefig('Ti with different compress rate.png')
+plt.clf()
+
+
+
+
+
+
+
+
 
 

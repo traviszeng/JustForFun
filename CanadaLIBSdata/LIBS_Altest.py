@@ -416,11 +416,18 @@ def elementTest(element,x,y,flag,featureCompressRate,times = 10):
         # 根据importance大小排序
         indices = np.argsort(importance)[::-1]
         #print(indices)
-        # 打印前十的importance
-        for i in range(0, 10):
-            print("importance is " + str(importance[indices[i]]))
-            if flag:
-                print("对应的特征峰和importance为 "+str(extract_element_dict[element][indices[i]]))
+        if len(x[0])<10:
+            # 打印前十的importance
+            for i in range(0, len(x[0])):
+                print("importance is " + str(importance[indices[i]]))
+                if flag:
+                    print("对应的特征峰和importance为 " + str(extract_element_dict[element][indices[i]]))
+        else:
+            # 打印前十的importance
+            for i in range(0, 10):
+                print("importance is " + str(importance[indices[i]]))
+                if flag:
+                    print("对应的特征峰和importance为 "+str(extract_element_dict[element][indices[i]]))
 
         print()
         print('Part 3 LASSO experiment ---------------------------------')
