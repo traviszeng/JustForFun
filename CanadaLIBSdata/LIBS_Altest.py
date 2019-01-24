@@ -27,14 +27,12 @@ from sklearn.model_selection import KFold, cross_val_score, train_test_split
 import warnings
 warnings.filterwarnings("ignore")
 
-"""
-Todo:
-1.ch
-"""
-
-concentrate_data = pd.read_csv("E:\\JustForFun\\CanadaLIBSdata\\LIBS OpenData csv\\Sample_Composition_Data.csv")
-#前81行为数据
-concentrate_data = concentrate_data.loc[0:81]
+def loadConcentrateFile():
+    print("Loading concentrate file.....")
+    concentrate_data = pd.read_csv("E:\\JustForFun\\CanadaLIBSdata\\LIBS OpenData csv\\Sample_Composition_Data.csv")
+    #前81行为数据
+    concentrate_data = concentrate_data.loc[0:81]
+    return concentrate_data
 
 print('Data preprocessing begins.')
 """
@@ -43,25 +41,27 @@ print('Data preprocessing begins.')
 2.处理异常值，Nan value处理
 3.str转float
 """
-#数据清洗
-for indexs in concentrate_data.index:
-    for i in range(1,12):
-        if concentrate_data.loc[indexs].values[i]=='-':
-            concentrate_data.loc[indexs].values[i] = 0.0
+def dataPreprocessing(concentrate_data):
+    #数据清洗
+    for indexs in concentrate_data.index:
+        for i in range(1,12):
+            if concentrate_data.loc[indexs].values[i]=='-':
+                concentrate_data.loc[indexs].values[i] = 0.0
 
-        else:
-            try:
-                concentrate_data.loc[indexs].values[i] = float(concentrate_data.loc[indexs].values[i])
-                if float(concentrate_data.loc[indexs].values[i])>1:
-                    concentrate_data.loc[indexs].values[i] = concentrate_data.loc[indexs].values[i]/100
-            except ValueError:
-                concentrate_data.loc[indexs].values[i] = float(concentrate_data.loc[indexs].values[i][1:])
-                if float(concentrate_data.loc[indexs].values[i])>1:
-                    concentrate_data.loc[indexs].values[i] = concentrate_data.loc[indexs].values[i]/100
+            else:
+                try:
+                    concentrate_data.loc[indexs].values[i] = float(concentrate_data.loc[indexs].values[i])
+                    if float(concentrate_data.loc[indexs].values[i])>1:
+                        concentrate_data.loc[indexs].values[i] = concentrate_data.loc[indexs].values[i]/100
+                except ValueError:
+                    concentrate_data.loc[indexs].values[i] = float(concentrate_data.loc[indexs].values[i][1:])
+                    if float(concentrate_data.loc[indexs].values[i])>1:
+                        concentrate_data.loc[indexs].values[i] = concentrate_data.loc[indexs].values[i]/100
 
-#检查是否将所有非数字处理好
-for column in concentrate_data.columns:
-	print(concentrate_data[column].isna().value_counts())
+    #检查是否将所有非数字处理好
+    for column in concentrate_data.columns:
+        print(concentrate_data[column].isna().value_counts())
+    return concentrate_data
 
 
 route_200_AVG = "E:\\JustForFun\\CanadaLIBSdata\\LIBS OpenData csv\\csv Material Large Set 200pulseaverage"
@@ -73,72 +73,83 @@ postfix_1000AVG = "_1000AVG.csv"
 """
 加载训练样本
 """
-
 data_set_200AVG = {}
 concentrate_set_200AVG = {}
-#加载200AVG的样本，并将其存到data_set_200AVG中
-os.chdir(route_200_AVG)
-num = 0
-for indexs in concentrate_data.index:
-    if os.path.exists(concentrate_data.loc[indexs].values[0]+postfix_200AVG):
-        num+=1
-        print("Get data file:"+concentrate_data.loc[indexs].values[0]+postfix_200AVG)
-        data = pd.read_csv(concentrate_data.loc[indexs].values[0]+postfix_200AVG,header = None,names = ['WaveLength','Intensity'])
-        #data中强度<0的统统变为0
-        data.loc[data.Intensity < 0, 'Intensity'] = 0
-        data_set_200AVG[concentrate_data.loc[indexs].values[0]+"_200AVG"] = data
-        concentrate_set_200AVG[concentrate_data.loc[indexs].values[0]+"_200AVG"] = concentrate_data.loc[indexs].values[1:]
-    #处理hand sample类型的样本
-    if re.match('hand sample*',concentrate_data.loc[indexs].values[0]):
+def load200AVGTrainingFiles(concentrate_data):
 
-        f_list = concentrate_data.loc[indexs].values[0].split()
-        filename = f_list[0]+" "+f_list[1]+postfix_200AVG
-        if os.path.exists(filename):
+    #加载200AVG的样本，并将其存到data_set_200AVG中
+    os.chdir(route_200_AVG)
+    num = 0
+    for indexs in concentrate_data.index:
+        if os.path.exists(concentrate_data.loc[indexs].values[0]+postfix_200AVG):
             num+=1
-            print("Get data file:"+filename)
-            data = pd.read_csv(filename,header = None,names = ['WaveLength','Intensity'])
-            # data中强度<0的统统变为0
+            print("Get data file:"+concentrate_data.loc[indexs].values[0]+postfix_200AVG)
+            data = pd.read_csv(concentrate_data.loc[indexs].values[0]+postfix_200AVG,header = None,names = ['WaveLength','Intensity'])
+            #data中强度<0的统统变为0
             data.loc[data.Intensity < 0, 'Intensity'] = 0
             data_set_200AVG[concentrate_data.loc[indexs].values[0]+"_200AVG"] = data
             concentrate_set_200AVG[concentrate_data.loc[indexs].values[0]+"_200AVG"] = concentrate_data.loc[indexs].values[1:]
+        #处理hand sample类型的样本
+        if re.match('hand sample*',concentrate_data.loc[indexs].values[0]):
+
+            f_list = concentrate_data.loc[indexs].values[0].split()
+            filename = f_list[0]+" "+f_list[1]+postfix_200AVG
+            if os.path.exists(filename):
+                num+=1
+                print("Get data file:"+filename)
+                data = pd.read_csv(filename,header = None,names = ['WaveLength','Intensity'])
+                # data中强度<0的统统变为0
+                data.loc[data.Intensity < 0, 'Intensity'] = 0
+                data_set_200AVG[concentrate_data.loc[indexs].values[0]+"_200AVG"] = data
+                concentrate_set_200AVG[concentrate_data.loc[indexs].values[0]+"_200AVG"] = concentrate_data.loc[indexs].values[1:]
 
 
-print("Get "+str(num)+" 200_AVG files.")
-print()
+    print("Get "+str(num)+" 200_AVG files.")
+    print()
 
 data_set_1000AVG = {}
 concentrate_set_1000AVG = {}
-num = 0
-#加载1000AVG的样本，并将其存到data_set_1000AVG中
-os.chdir(route_1000_AVG)
-for indexs in concentrate_data.index:
-    if os.path.exists(concentrate_data.loc[indexs].values[0]+postfix_1000AVG):
-        num+=1
-        print("Get data file:"+concentrate_data.loc[indexs].values[0]+postfix_1000AVG)
-        data = pd.read_csv(concentrate_data.loc[indexs].values[0]+postfix_1000AVG,header = None,names = ['WaveLength','Intensity'])
-        # data中强度<0的统统变为0
-        data.loc[data.Intensity < 0, 'Intensity'] = 0
-        data_set_1000AVG[concentrate_data.loc[indexs].values[0]+"_1000AVG"] = data
-        concentrate_set_1000AVG[concentrate_data.loc[indexs].values[0]+"_1000AVG"] = concentrate_data.loc[indexs].values[1:]
-    #处理hand sample类型的样本
-    if re.match('hand sample*',concentrate_data.loc[indexs].values[0]):
-
-        f_list = concentrate_data.loc[indexs].values[0].split()
-        filename = f_list[0]+" "+f_list[1]+postfix_1000AVG
-        if os.path.exists(filename):
+def load1000AVGtrainingFiles(concentrate_data):
+    num = 0
+    #加载1000AVG的样本，并将其存到data_set_1000AVG中
+    os.chdir(route_1000_AVG)
+    for indexs in concentrate_data.index:
+        if os.path.exists(concentrate_data.loc[indexs].values[0]+postfix_1000AVG):
             num+=1
-            print("Get data file:"+filename)
-            data = pd.read_csv(filename,header = None,names = ['WaveLength','Intensity'])
+            print("Get data file:"+concentrate_data.loc[indexs].values[0]+postfix_1000AVG)
+            data = pd.read_csv(concentrate_data.loc[indexs].values[0]+postfix_1000AVG,header = None,names = ['WaveLength','Intensity'])
             # data中强度<0的统统变为0
             data.loc[data.Intensity < 0, 'Intensity'] = 0
             data_set_1000AVG[concentrate_data.loc[indexs].values[0]+"_1000AVG"] = data
             concentrate_set_1000AVG[concentrate_data.loc[indexs].values[0]+"_1000AVG"] = concentrate_data.loc[indexs].values[1:]
+        #处理hand sample类型的样本
+        if re.match('hand sample*',concentrate_data.loc[indexs].values[0]):
 
-print("Get "+str(num)+" 1000_AVG files.")
+            f_list = concentrate_data.loc[indexs].values[0].split()
+            filename = f_list[0]+" "+f_list[1]+postfix_1000AVG
+            if os.path.exists(filename):
+                num+=1
+                print("Get data file:"+filename)
+                data = pd.read_csv(filename,header = None,names = ['WaveLength','Intensity'])
+                # data中强度<0的统统变为0
+                data.loc[data.Intensity < 0, 'Intensity'] = 0
+                data_set_1000AVG[concentrate_data.loc[indexs].values[0]+"_1000AVG"] = data
+                concentrate_set_1000AVG[concentrate_data.loc[indexs].values[0]+"_1000AVG"] = concentrate_data.loc[indexs].values[1:]
 
-#去掉hand sample34的记录（全为0）
-del concentrate_set_200AVG['hand sample37 barite_200AVG']
-del data_set_200AVG['hand sample37 barite_200AVG']
+    print("Get "+str(num)+" 1000_AVG files.")
+
+def prepareData():
+    concentrate_data = loadConcentrateFile()
+    concentrate_data = dataPreprocessing(concentrate_data)
+    load200AVGTrainingFiles(concentrate_data)
+    load1000AVGtrainingFiles(concentrate_data)
+    # 去掉hand sample34的记录（全为0）
+    del concentrate_set_200AVG['hand sample37 barite_200AVG']
+    del data_set_200AVG['hand sample37 barite_200AVG']
+
+
+
+
 
 #画一个折线图尝试看看
 """
@@ -150,22 +161,23 @@ wavelength = np.array(wavelength)
 plt.plot(wavelength,intensity)
 plt.show()
 """
-
-print("准备NIST库相关数据")
-nist = pd.read_csv("E:\\JustForFun\\CanadaLIBSdata\\andor.nist",header = None,names = ['WaveLength','Element','Type','Unknown','Importance'])
-nist = nist.loc[1:]
-#删除未知列
-del nist['Unknown']
-#筛选在样本精度范围的nist线
-nist = nist.loc[nist.WaveLength>=198.066]
-nist = nist.loc[nist.WaveLength<=970.142]
 element_dict = {}
-for indexs in nist.index:
-    if nist.loc[indexs].Element in element_dict:
-        if [nist.loc[indexs].WaveLength,nist.loc[indexs].Importance] not in element_dict[nist.loc[indexs].Element]:
-            element_dict[nist.loc[indexs].Element].append([nist.loc[indexs].WaveLength,nist.loc[indexs].Importance])
-    else:
-        element_dict[nist.loc[indexs].Element] = [[nist.loc[indexs].WaveLength,nist.loc[indexs].Importance]]
+def prepareNIST():
+    print("准备NIST库相关数据")
+    nist = pd.read_csv("E:\\JustForFun\\CanadaLIBSdata\\andor.nist",header = None,names = ['WaveLength','Element','Type','Unknown','Importance'])
+    nist = nist.loc[1:]
+    #删除未知列
+    del nist['Unknown']
+    #筛选在样本精度范围的nist线
+    nist = nist.loc[nist.WaveLength>=198.066]
+    nist = nist.loc[nist.WaveLength<=970.142]
+
+    for indexs in nist.index:
+        if nist.loc[indexs].Element in element_dict:
+            if [nist.loc[indexs].WaveLength,nist.loc[indexs].Importance] not in element_dict[nist.loc[indexs].Element]:
+                element_dict[nist.loc[indexs].Element].append([nist.loc[indexs].WaveLength,nist.loc[indexs].Importance])
+        else:
+            element_dict[nist.loc[indexs].Element] = [[nist.loc[indexs].WaveLength,nist.loc[indexs].Importance]]
 
 """
     Ensemble bagging method
@@ -240,54 +252,38 @@ class StackingAveragedModels(BaseEstimator, RegressorMixin, TransformerMixin):
 X = []
 #波长
 waveLength = []
-#AL的相关浓度信息
-Al_y = []
-#Fe
-Fe_y = []
-#Ca
-Ca_y = []
-#K
-K_y = []
-#Mg
-Mg_y = []
-#Na
-Na_y = []
-#Si
-Si_y = []
-#Ti
-Ti_y = []
-#P
-P_y = []
-#Mn
-Mn_y = []
+#相关浓度信息
+#元素顺序Al Ca Fe K Mg Mn Na Si Ti P
+y = [[],[],[],[],[],[],[],[],[],[]]
+#准备训练数据
+def prepareTrainingXY():
+    for samplename,concentrate in concentrate_set_200AVG.items():
+        X.append(np.array(data_set_200AVG[samplename].Intensity))
+        waveLength.append(np.array(data_set_200AVG[samplename].WaveLength))
+        y[0].append(concentrate[0]*100)
+        y[1].append(concentrate[1]*100)
+        y[2].append(concentrate[2]*100)
+        y[3].append(concentrate[3]*100)
+        y[4].append(concentrate[4]*100)
+        y[5].append(concentrate[5]*100)
+        y[6].append(concentrate[6]*100)
+        y[7].append(concentrate[7]*100)
+        y[8].append(concentrate[8]*100)
+        y[9].append(concentrate[9]*100)
 
-for samplename,concentrate in concentrate_set_200AVG.items():
-    X.append(np.array(data_set_200AVG[samplename].Intensity))
-    waveLength.append(np.array(data_set_200AVG[samplename].WaveLength))
-    Al_y.append(concentrate[0]*100)
-    Ca_y.append(concentrate[1]*100)
-    Fe_y.append(concentrate[2]*100)
-    K_y.append(concentrate[3]*100)
-    Mg_y.append(concentrate[4]*100)
-    Mn_y.append(concentrate[5]*100)
-    Na_y.append(concentrate[6]*100)
-    Si_y.append(concentrate[7]*100)
-    Ti_y.append(concentrate[8]*100)
-    P_y.append(concentrate[9]*100)
-
-for samplename,concentrate in concentrate_set_1000AVG.items():
-    X.append(np.array(data_set_1000AVG[samplename].Intensity))
-    waveLength.append(np.array(data_set_1000AVG[samplename].WaveLength))
-    Al_y.append(concentrate[0]*100)
-    Ca_y.append(concentrate[1]*100)
-    Fe_y.append(concentrate[2]*100)
-    K_y.append(concentrate[3]*100)
-    Mg_y.append(concentrate[4]*100)
-    Mn_y.append(concentrate[5]*100)
-    Na_y.append(concentrate[6]*100)
-    Si_y.append(concentrate[7]*100)
-    Ti_y.append(concentrate[8]*100)
-    P_y.append(concentrate[9]*100)
+    for samplename,concentrate in concentrate_set_1000AVG.items():
+        X.append(np.array(data_set_1000AVG[samplename].Intensity))
+        waveLength.append(np.array(data_set_1000AVG[samplename].WaveLength))
+        y[0].append(concentrate[0] * 100)
+        y[1].append(concentrate[1] * 100)
+        y[2].append(concentrate[2] * 100)
+        y[3].append(concentrate[3] * 100)
+        y[4].append(concentrate[4] * 100)
+        y[5].append(concentrate[5] * 100)
+        y[6].append(concentrate[6] * 100)
+        y[7].append(concentrate[7] * 100)
+        y[8].append(concentrate[8] * 100)
+        y[9].append(concentrate[9] * 100)
 
 #寻找对应元素特征峰作为特征
 """
@@ -382,7 +378,7 @@ def elementTest(element,x,y,flag,featureCompressRate,times = 10):
     stacking_MSE = []
     bagging_MSE =[]
     
-    x,y = compressFeature('Al',x,y,featureCompressRate)
+    x,y = compressFeature(element,x,y,featureCompressRate)
 
     for i in range(0,10):
         print()
@@ -574,35 +570,47 @@ elementTest('Ti',X,Ti_y,0)
 elementTest('P',X,P_y,0)
 """
 print('2.根据NIST库筛选特征-------------------------')
-
-Al_x = selectFeature('Al')
-for i in range(1,11):
-
+def main(element,index):
+    x = selectFeature(element)
     svr_avg = []
     rfr_avg = []
     lasso_avg = []
     enet_avg = []
     gboost_avg = []
-    bag_avg =[]
-    SVR_MSE,RFR_MSE,LASSO_MSE,ENet_MSE,GBoost_MSE,bagging_MSE,stacking_MSE = elementTest('Al',Al_x,Al_y,1,i)
-    svr_avg.append(np.average(SVR_MSE))
-    rfr_avg.append( np.average(RFR_MSE))
-    lasso_avg.append(np.average(LASSO_MSE))
-    enet_avg.append(np.average(ENet_MSE))
-    gboost_avg.append(np.average(GBoost_MSE))
-    bag_avg.append(np.average(bagging_MSE))
+    bag_avg = []
 
-plot_x = np.linspace(1,10,10)
-plt.subplot(2,3,1)
-plt.plot(plot_x,svr_avg)
-plt.subplot(2,3,2)
-plt.plot(plot_x,rfr_avg)
-plt.subplot(2,3,3)
-plt.plot(plot_x,lasso_avg)
-plt.subplot(2,3,4)
-plt.plot(plot_x,enet_avg)
-plt.subplot(2,3,5)
-plt.plot(plot_x,gboost_avg)
-plt.subplot(2,3,6)
-plt.plot(plot_x,bag_avg)
+
+    for i in range(1, 11):
+        SVR_MSE, RFR_MSE, LASSO_MSE, ENet_MSE, GBoost_MSE, bagging_MSE, stacking_MSE = elementTest(element, x, y[index], 1,
+                                                                                                   i)
+        svr_avg.append(np.average(SVR_MSE))
+        rfr_avg.append(np.average(RFR_MSE))
+        lasso_avg.append(np.average(LASSO_MSE))
+        enet_avg.append(np.average(ENet_MSE))
+        gboost_avg.append(np.average(GBoost_MSE))
+        bag_avg.append(np.average(bagging_MSE))
+
+    plot_x = np.linspace(1, 10, 10)
+    plt.subplot(2, 3, 1)
+    plt.plot(plot_x, svr_avg)
+    plt.subplot(2, 3, 2)
+    plt.plot(plot_x, rfr_avg)
+    plt.subplot(2, 3, 3)
+    plt.plot(plot_x, lasso_avg)
+    plt.subplot(2, 3, 4)
+    plt.plot(plot_x, enet_avg)
+    plt.subplot(2, 3, 5)
+    plt.plot(plot_x, gboost_avg)
+    plt.subplot(2, 3, 6)
+    plt.plot(plot_x, bag_avg)
+    plt.savefig(element+' with different compress rate.png')
+    plt.clf()
+
+
+if __name__=='__main__':
+    prepareData()
+    prepareNIST()
+    prepareTrainingXY()
+
+    main('Al',0)
 
