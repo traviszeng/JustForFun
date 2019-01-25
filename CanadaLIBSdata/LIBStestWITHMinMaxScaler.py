@@ -14,6 +14,7 @@ from sklearn.base import BaseEstimator, TransformerMixin, RegressorMixin, clone
 from sklearn.feature_selection import f_regression, SelectPercentile
 import matplotlib.pyplot as plt
 from pandas.core.frame import DataFrame
+from sklearn.preprocessing import StandardScaler
 
 from sklearn.ensemble import RandomForestRegressor
 import xgboost as xgb
@@ -314,7 +315,9 @@ def prepareTrainingXY():
 
 寻峰范围为0.5，即寻找左右0.2的max值作为特征峰
 """
-
+"""
+添加特征缩放进行实验
+"""
 
 def selectFeature(element):
     # 取得element_dict里的波长和importance 元祖
@@ -343,6 +346,11 @@ def selectFeature(element):
     featurelist = DataFrame(featurelist)
     featurelist = featurelist.fillna(0)
     featurelist = featurelist.values.tolist()
+
+    #标准化
+    ss = StandardScaler()
+    ss.fit(featurelist)
+    featurelist = ss.transform(featurelist)
     return featurelist
 
 
@@ -639,7 +647,7 @@ if __name__ == '__main__':
     prepareData()
     prepareNIST()
     prepareTrainingXY()
-
+    os.chdir('E:\\JustForFun\\CanadaLIBSdata\\testWithStandardScaler')
     elementList = ['Al', 'Ca', 'Fe', 'K', 'Mg', 'Mn', 'Na', 'Si', 'Ti']
     for i in range(0, len(elementList)):
         main(elementList[i], i)
