@@ -62,11 +62,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="LIBStest.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="LIBStest.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/LIBStest.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="352">
-              <caret line="571" column="47" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="619" selection-end-column="0" />
+            <state relative-caret-position="1084">
+              <caret line="668" column="19" lean-forward="false" selection-start-line="668" selection-start-column="19" selection-end-line="668" selection-end-column="19" />
               <folding>
                 <element signature="e#36#45#0" expanded="true" />
               </folding>
@@ -74,15 +74,15 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="LIBStestWITHMinMaxScaler.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="LIBStestWITHMinMaxScaler.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/LIBStestWITHMinMaxScaler.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="342">
-              <caret line="651" column="40" lean-forward="true" selection-start-line="651" selection-start-column="40" selection-end-line="651" selection-end-column="40" />
+            <state relative-caret-position="330">
+              <caret line="639" column="87" lean-forward="true" selection-start-line="404" selection-start-column="0" selection-end-line="639" selection-end-column="87" />
               <folding>
                 <element signature="e#36#45#0" expanded="true" />
-                <element signature="e#13642#14458#0" expanded="false" />
-                <element signature="e#14732#23569#0" expanded="false" />
+                <element signature="e#13642#14459#0" expanded="false" />
+                <element signature="e#14733#26581#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -165,6 +165,7 @@
       <find>.7</find>
       <find>KRR</find>
       <find>Al</find>
+      <find>print</find>
     </findStrings>
     <replaceStrings>
       <replace>.6</replace>
@@ -199,8 +200,8 @@
         <option value="$PROJECT_DIR$/LIBS_Natest.py" />
         <option value="$PROJECT_DIR$/LIBS_Sitest.py" />
         <option value="$PROJECT_DIR$/LIBS_Titest.py" />
-        <option value="$PROJECT_DIR$/LIBStest.py" />
         <option value="$PROJECT_DIR$/LIBStestWITHMinMaxScaler.py" />
+        <option value="$PROJECT_DIR$/LIBStest.py" />
       </list>
     </option>
   </component>
@@ -546,24 +547,24 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/LIBStest.py">
+    <entry file="file://$PROJECT_DIR$/LIBStestWITHMinMaxScaler.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="352">
-          <caret line="571" column="47" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="619" selection-end-column="0" />
+        <state relative-caret-position="330">
+          <caret line="639" column="87" lean-forward="true" selection-start-line="404" selection-start-column="0" selection-end-line="639" selection-end-column="87" />
           <folding>
             <element signature="e#36#45#0" expanded="true" />
+            <element signature="e#13642#14459#0" expanded="false" />
+            <element signature="e#14733#26581#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/LIBStestWITHMinMaxScaler.py">
+    <entry file="file://$PROJECT_DIR$/LIBStest.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="342">
-          <caret line="651" column="40" lean-forward="true" selection-start-line="651" selection-start-column="40" selection-end-line="651" selection-end-column="40" />
+        <state relative-caret-position="1084">
+          <caret line="668" column="19" lean-forward="false" selection-start-line="668" selection-start-column="19" selection-end-line="668" selection-end-column="19" />
           <folding>
             <element signature="e#36#45#0" expanded="true" />
-            <element signature="e#13642#14458#0" expanded="false" />
-            <element signature="e#14732#23569#0" expanded="false" />
           </folding>
         </state>
       </provider>
