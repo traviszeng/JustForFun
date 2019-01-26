@@ -377,7 +377,7 @@ def elementTest(element, x, y, flag, featureCompressRate, times=10):
     # KRR_MSE = []
     stacking_MSE = []
     bagging_MSE = []
-
+    y = np.reshape(y, (-1, 1))
     x, y = compressFeature(element, x, y, featureCompressRate)
 
     for i in range(0, 10):
@@ -578,30 +578,30 @@ def elementTest(element, x, y, flag, featureCompressRate, times=10):
     print(str(np.average(GBoost_MSE)))
     print(str(np.average(bagging_MSE)))
     file.write("SVR MSE:")
-    file.write(SVR_MSE)
-    file.write()
+    file.write(str(SVR_MSE))
+    file.write(" ")
     file.write("RFR MSE:")
-    file.write(RFR_MSE)
-    file.write()
+    file.write(str(RFR_MSE))
+    file.write(" ")
     file.write("LASSO MSE")
-    file.write(LASSO_MSE)
-    file.write()
+    file.write(str(LASSO_MSE))
+    file.write(" ")
     file.write("ENET MSE:")
-    file.write(ENet_MSE)
-    file.write()
+    file.write(str(ENet_MSE))
+    file.write(" ")
     file.write("GBoost MSE")
-    file.write(GBoost_MSE)
-    file.write()
+    file.write(str(GBoost_MSE))
+    file.write(" ")
     file.write("bagging_MSE:")
-    file.write(bagging_MSE)
-    file.write()
+    file.write(str(bagging_MSE))
+    file.write(" ")
     file.write("stacking_MSE")
-    file.write(stacking_MSE[0::6])
-    file.write(stacking_MSE[1::6])
-    file.write(stacking_MSE[2::6])
-    file.write(stacking_MSE[3::6])
-    file.write(stacking_MSE[4::6])
-    file.write(stacking_MSE[5::6])
+    file.write(str(stacking_MSE[0::6]))
+    file.write(str(stacking_MSE[1::6]))
+    file.write(str(stacking_MSE[2::6]))
+    file.write(str(stacking_MSE[3::6]))
+    file.write(str(stacking_MSE[4::6]))
+    file.write(str(stacking_MSE[5::6]))
 
     return SVR_MSE, RFR_MSE, LASSO_MSE, ENet_MSE, GBoost_MSE, bagging_MSE, stacking_MSE
 

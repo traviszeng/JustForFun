@@ -347,10 +347,7 @@ def selectFeature(element):
     featurelist = featurelist.fillna(0)
     featurelist = featurelist.values.tolist()
 
-    #标准化
-    ss = StandardScaler()
-    ss.fit(featurelist)
-    featurelist = ss.transform(featurelist)
+
     return featurelist
 
 
@@ -391,6 +388,17 @@ def compressFeature(element, x, y, compressRate=10):
     return x, y
 
 
+
+def standardScaler(x,y):
+    stdX = StandardScaler()
+    stdX.fit(x)
+    x = stdX.transform(x)
+    """
+    stdY = StandardScaler()
+    stdY.fit(y)
+    y = stdY.transform(y)"""
+    return x,y,stdX
+
 """
 :param element 需要训练的元素名称 str
 :param X 训练使用的X
@@ -411,7 +419,8 @@ def elementTest(element, x, y, flag, featureCompressRate, times=10):
     # KRR_MSE = []
     stacking_MSE = []
     bagging_MSE = []
-
+    y = np.reshape(y, (-1, 1))
+    x,y,stdX=standardScaler(x,y)
     x, y = compressFeature(element, x, y, featureCompressRate)
 
     for i in range(0, 10):
@@ -612,30 +621,30 @@ def elementTest(element, x, y, flag, featureCompressRate, times=10):
     print(str(np.average(GBoost_MSE)))
     print(str(np.average(bagging_MSE)))
     file.write("SVR MSE:")
-    file.write(SVR_MSE)
-    file.write()
+    file.write(str(SVR_MSE))
+    file.write(" ")
     file.write("RFR MSE:")
-    file.write(RFR_MSE)
-    file.write()
+    file.write(str(RFR_MSE))
+    file.write(" ")
     file.write("LASSO MSE")
-    file.write(LASSO_MSE)
-    file.write()
+    file.write(str(LASSO_MSE))
+    file.write(" ")
     file.write("ENET MSE:")
-    file.write(ENet_MSE)
-    file.write()
+    file.write(str(ENet_MSE))
+    file.write(" ")
     file.write("GBoost MSE")
-    file.write(GBoost_MSE)
-    file.write()
+    file.write(str(GBoost_MSE))
+    file.write(" ")
     file.write("bagging_MSE:")
-    file.write(bagging_MSE)
-    file.write()
+    file.write(str(bagging_MSE))
+    file.write(" ")
     file.write("stacking_MSE")
-    file.write(stacking_MSE[0::6])
-    file.write(stacking_MSE[1::6])
-    file.write(stacking_MSE[2::6])
-    file.write(stacking_MSE[3::6])
-    file.write(stacking_MSE[4::6])
-    file.write(stacking_MSE[5::6])
+    file.write(str(stacking_MSE[0::6]))
+    file.write(str(stacking_MSE[1::6]))
+    file.write(str(stacking_MSE[2::6]))
+    file.write(str(stacking_MSE[3::6]))
+    file.write(str(stacking_MSE[4::6]))
+    file.write(str(stacking_MSE[5::6]))
 
     return SVR_MSE, RFR_MSE, LASSO_MSE, ENet_MSE, GBoost_MSE, bagging_MSE, stacking_MSE
 
