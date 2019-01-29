@@ -122,8 +122,8 @@ def readMD5File(filename):
 
 
 
-
-libs2_add = "http://pds-geosciences.wustl.edu/msl/msl-m-chemcam-libs-2-edr-v1/mslccm_0xxx/calib/"
+"""
+libs2_add = "http://pds-geosciences.wustl.edu/msl/msl-m-chemcam-libs-2-edr-v1/"
 dir_list = []
 hash_dict = {}
 readMD5File('mslccm_0xxx_181207.md5')
@@ -134,7 +134,9 @@ traverseFolder(libs2_add)
 while len(dir_list) >0:
     traverseFolder(dir_list[0])
     del dir_list[0]
+print("finish getting..")
 
+"""
 libs2_add = "http://pds-geosciences.wustl.edu/msl/msl-m-chemcam-libs-4_5-rdr-v1/"
 dir_list = []
 hash_dict = {}
@@ -146,4 +148,6 @@ traverseFolder(libs2_add)
 while len(dir_list) >0:
     traverseFolder(dir_list[0])
     del dir_list[0]
+
+print("finish getting..")
 
