@@ -28,7 +28,7 @@ import warnings
 warnings.filterwarnings("ignore")
 
 def loadConcentrateFile():
-    print("Loading concentrate file.....")
+    print("Loading concentrate file.....\n")
     concentrate_data = pd.read_csv("E:\\JustForFun\\CanadaLIBSdata\\LIBS OpenData csv\\Sample_Composition_Data.csv")
     #前81行为数据
     concentrate_data = concentrate_data.loc[0:81]
@@ -104,7 +104,7 @@ def load200AVGTrainingFiles(concentrate_data):
                 concentrate_set_200AVG[concentrate_data.loc[indexs].values[0]+"_200AVG"] = concentrate_data.loc[indexs].values[1:]
 
 
-    print("Get "+str(num)+" 200_AVG files.")
+    print("Get "+str(num)+" 200_AVG files.\n")
     print()
 
 data_set_1000AVG = {}
@@ -136,7 +136,7 @@ def load1000AVGtrainingFiles(concentrate_data):
                 data_set_1000AVG[concentrate_data.loc[indexs].values[0]+"_1000AVG"] = data
                 concentrate_set_1000AVG[concentrate_data.loc[indexs].values[0]+"_1000AVG"] = concentrate_data.loc[indexs].values[1:]
 
-    print("Get "+str(num)+" 1000_AVG files.")
+    print("Get "+str(num)+" 1000_AVG files.\n")
 
 def prepareData():
     concentrate_data = loadConcentrateFile()
@@ -163,7 +163,7 @@ plt.show()
 """
 element_dict = {}
 def prepareNIST():
-    print("准备NIST库相关数据")
+    print("准备NIST库相关数据\n")
     nist = pd.read_csv("E:\\JustForFun\\CanadaLIBSdata\\andor.nist",header = None,names = ['WaveLength','Element','Type','Unknown','Importance'])
     nist = nist.loc[1:]
     #删除未知列
@@ -382,23 +382,23 @@ def elementTest(element, x, y, flag, featureCompressRate, times=10):
 
     for i in range(0, 10):
         print()
-        print("第" + str(i + 1) + "次" + str(element) + "的实验----------------------")
-        file.write("第" + str(i + 1) + "次" + str(element) + "的实验----------------------")
+        print("第" + str(i + 1) + "次" + str(element) + "的实验----------------------\n")
+        file.write("第" + str(i + 1) + "次" + str(element) + "的实验----------------------\n")
         # 特征选择，先选取前10%的特征进行训练
 
 
         X_train, X_test, y_train, y_test = train_test_split(x,
                                                             y,
                                                             test_size=0.20)
-        print("Part 1 Experiment with Support Vector Machine Regression-------------")
-        file.write("Part 1 Experiment with Support Vector Machine Regression-------------")
+        print("Part 1 Experiment with Support Vector Machine Regression-------------\n")
+        file.write("Part 1 Experiment with Support Vector Machine Regression-------------\n")
         svr = SVR(C=1.0, epsilon=0.2)
         svr.fit(X_train, y_train)
 
         y_pred = svr.predict(X_test)
         SVR_MSE.append(mean_squared_error(y_test, y_pred))
-        print('SVR Mean squared error is ' + str(mean_squared_error(y_test, y_pred)))
-        file.write('SVR Mean squared error is ' + str(mean_squared_error(y_test, y_pred)))
+        print('SVR Mean squared error is ' + str(mean_squared_error(y_test, y_pred))+"\n")
+        file.write('SVR Mean squared error is ' + str(mean_squared_error(y_test, y_pred))+"\n")
 
         print()
         print('Part 2 Experiment with Random forest regression---------------------------------')
@@ -409,8 +409,8 @@ def elementTest(element, x, y, flag, featureCompressRate, times=10):
 
         y_pred = rfr.predict(X_test)
         RFR_MSE.append(mean_squared_error(y_test, y_pred))
-        print('RFR Mean squared error is ' + str(mean_squared_error(y_test, y_pred)))
-        file.write('RFR Mean squared error is ' + str(mean_squared_error(y_test, y_pred)))
+        print('RFR Mean squared error is ' + str(mean_squared_error(y_test, y_pred))+"\n")
+        file.write('RFR Mean squared error is ' + str(mean_squared_error(y_test, y_pred))+"\n")
         # 各特征的importance
         importance = rfr.feature_importances_
         # print(importance)
@@ -442,29 +442,29 @@ def elementTest(element, x, y, flag, featureCompressRate, times=10):
         lasso.fit(X_train, y_train)
 
         y_pred = lasso.predict(X_test)
-        print('LASSO  Mean squared error is ' + str(mean_squared_error(y_test, y_pred)))
-        file.write('LASSO  Mean squared error is ' + str(mean_squared_error(y_test, y_pred)))
+        print('LASSO  Mean squared error is ' + str(mean_squared_error(y_test, y_pred))+"\n")
+        file.write('LASSO  Mean squared error is ' + str(mean_squared_error(y_test, y_pred))+"\n")
         LASSO_MSE.append(mean_squared_error(y_test, y_pred))
-        print("Part 4 KRR TEST----------------------------------")
-        file.write("Part 4 KRR TEST----------------------------------")
+        print("Part 4 KRR TEST----------------------------------\n")
+        file.write("Part 4 KRR TEST----------------------------------\n")
         """
         krr = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
         krr.fit(X_train, y_train)
         y_pred = krr.predict(X_test)
         KRR_MSE.append(mean_squared_error(y_test, y_pred))
 
-        print('KRR Mean squared error is ' + str(mean_squared_error(y_test, y_pred)))
+        print('KRR Mean squared error is ' + str(mean_squared_error(y_test, y_pred))+"\n")
         """
-        print("Part 5 Elastic Net TEST----------------------------------")
-        file.write("Part 5 Elastic Net TEST----------------------------------")
+        print("Part 5 Elastic Net TEST----------------------------------\n")
+        file.write("Part 5 Elastic Net TEST----------------------------------\n")
         ENet = ElasticNet(alpha=0.05, l1_ratio=.9, random_state=3)
         ENet.fit(X_train, y_train)
         y_pred = ENet.predict(X_test)
-        print('Elastic Net Mean squared error is ' + str(mean_squared_error(y_test, y_pred)))
-        file.write('Elastic Net Mean squared error is ' + str(mean_squared_error(y_test, y_pred)))
+        print('Elastic Net Mean squared error is ' + str(mean_squared_error(y_test, y_pred))+"\n")
+        file.write('Elastic Net Mean squared error is ' + str(mean_squared_error(y_test, y_pred))+"\n")
         ENet_MSE.append(mean_squared_error(y_test, y_pred))
-        print("Part 6 Gradient Boosting TEST----------------------------------")
-        file.write("Part 6 Gradient Boosting TEST----------------------------------")
+        print("Part 6 Gradient Boosting TEST----------------------------------\n")
+        file.write("Part 6 Gradient Boosting TEST----------------------------------\n")
         GBoost = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
                                            max_depth=4, max_features='sqrt',
                                            min_samples_leaf=15, min_samples_split=10,
@@ -472,68 +472,68 @@ def elementTest(element, x, y, flag, featureCompressRate, times=10):
         GBoost.fit(X_train, y_train)
         y_pred = GBoost.predict(X_test)
         GBoost_MSE.append(mean_squared_error(y_test, y_pred))
-        print('GBoost squared error is ' + str(mean_squared_error(y_test, y_pred)))
-        file.write('GBoost squared error is ' + str(mean_squared_error(y_test, y_pred)))
+        print('GBoost squared error is ' + str(mean_squared_error(y_test, y_pred))+"\n")
+        file.write('GBoost squared error is ' + str(mean_squared_error(y_test, y_pred))+"\n")
 
-        print("Part 7 Bagging Experiment---------------------")
-        file.write("Part 7 Bagging Experiment---------------------")
+        print("Part 7 Bagging Experiment---------------------\n")
+        file.write("Part 7 Bagging Experiment---------------------\n")
 
         baggingModel = baggingAveragingModels(models=(rfr, svr, GBoost, ENet, lasso))
         baggingModel.fit(X_train, y_train)
         y_pred = baggingModel.predict(X_test)
         bagging_MSE.append(mean_squared_error(y_test, y_pred))
 
-        print('Bagging squared error is ' + str(mean_squared_error(y_test, y_pred)))
-        file.write('Bagging squared error is ' + str(mean_squared_error(y_test, y_pred)))
+        print('Bagging squared error is ' + str(mean_squared_error(y_test, y_pred))+"\n")
+        file.write('Bagging squared error is ' + str(mean_squared_error(y_test, y_pred))+"\n")
 
-        print("Part 8 Stacking Experiment------------------------------")
-        file.write("Part 8 Stacking Experiment------------------------------")
+        print("Part 8 Stacking Experiment------------------------------\n")
+        file.write("Part 8 Stacking Experiment------------------------------\n")
         stacked_averaged_models = StackingAveragedModels(base_models=(ENet, GBoost, svr, rfr),
                                                          meta_model=lasso)
         stacked_averaged_models.fit(X_train, y_train)
         y_pred = stacked_averaged_models.predict(X_test)
-        print('Stacking with metamodel is lasso squared error is ' + str(mean_squared_error(y_test, y_pred)))
-        file.write('Stacking with metamodel is lasso squared error is ' + str(mean_squared_error(y_test, y_pred)))
+        print('Stacking with metamodel is lasso squared error is ' + str(mean_squared_error(y_test, y_pred))+"\n")
+        file.write('Stacking with metamodel is lasso squared error is ' + str(mean_squared_error(y_test, y_pred))+"\n")
         stacking_MSE.append(mean_squared_error(y_test, y_pred))
 
         stacked_averaged_models = StackingAveragedModels(base_models=(lasso, GBoost, svr, rfr),
                                                          meta_model=ENet)
         stacked_averaged_models.fit(X_train, y_train)
         y_pred = stacked_averaged_models.predict(X_test)
-        print('Stacking with metamodel is ENet squared error is ' + str(mean_squared_error(y_test, y_pred)))
-        file.write('Stacking with metamodel is ENet squared error is ' + str(mean_squared_error(y_test, y_pred)))
+        print('Stacking with metamodel is ENet squared error is ' + str(mean_squared_error(y_test, y_pred))+"\n")
+        file.write('Stacking with metamodel is ENet squared error is ' + str(mean_squared_error(y_test, y_pred))+"\n")
         stacking_MSE.append(mean_squared_error(y_test, y_pred))
 
         stacked_averaged_models = StackingAveragedModels(base_models=(ENet, lasso, svr, rfr),
                                                          meta_model=GBoost)
         stacked_averaged_models.fit(X_train, y_train)
         y_pred = stacked_averaged_models.predict(X_test)
-        print('Stacking with metamodel is GBoost squared error is ' + str(mean_squared_error(y_test, y_pred)))
-        file.write('Stacking with metamodel is GBoost squared error is ' + str(mean_squared_error(y_test, y_pred)))
+        print('Stacking with metamodel is GBoost squared error is ' + str(mean_squared_error(y_test, y_pred))+"\n")
+        file.write('Stacking with metamodel is GBoost squared error is ' + str(mean_squared_error(y_test, y_pred))+"\n")
         stacking_MSE.append(mean_squared_error(y_test, y_pred))
         krr = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
         stacked_averaged_models = StackingAveragedModels(base_models=(ENet, GBoost, lasso, svr, rfr),
                                                          meta_model=krr)
         stacked_averaged_models.fit(X_train, y_train)
         y_pred = stacked_averaged_models.predict(X_test)
-        print('Stacking with metamodel is krr squared error is ' + str(mean_squared_error(y_test, y_pred)))
-        file.write('Stacking with metamodel is krr squared error is ' + str(mean_squared_error(y_test, y_pred)))
+        print('Stacking with metamodel is krr squared error is ' + str(mean_squared_error(y_test, y_pred))+"\n")
+        file.write('Stacking with metamodel is krr squared error is ' + str(mean_squared_error(y_test, y_pred))+"\n")
         stacking_MSE.append(mean_squared_error(y_test, y_pred))
 
         stacked_averaged_models = StackingAveragedModels(base_models=(ENet, GBoost, lasso, rfr),
                                                          meta_model=svr)
         stacked_averaged_models.fit(X_train, y_train)
         y_pred = stacked_averaged_models.predict(X_test)
-        print('Stacking with metamodel is svr squared error is ' + str(mean_squared_error(y_test, y_pred)))
-        file.write('Stacking with metamodel is svr squared error is ' + str(mean_squared_error(y_test, y_pred)))
+        print('Stacking with metamodel is svr squared error is ' + str(mean_squared_error(y_test, y_pred))+"\n")
+        file.write('Stacking with metamodel is svr squared error is ' + str(mean_squared_error(y_test, y_pred))+"\n")
         stacking_MSE.append(mean_squared_error(y_test, y_pred))
 
         stacked_averaged_models = StackingAveragedModels(base_models=(ENet, GBoost, svr, lasso),
                                                          meta_model=rfr)
         stacked_averaged_models.fit(X_train, y_train)
         y_pred = stacked_averaged_models.predict(X_test)
-        print('Stacking with metamodel is rfr squared error is ' + str(mean_squared_error(y_test, y_pred)))
-        file.write('Stacking with metamodel is rfr squared error is ' + str(mean_squared_error(y_test, y_pred)))
+        print('Stacking with metamodel is rfr squared error is ' + str(mean_squared_error(y_test, y_pred))+"\n")
+        file.write('Stacking with metamodel is rfr squared error is ' + str(mean_squared_error(y_test, y_pred))+"\n")
         stacking_MSE.append(mean_squared_error(y_test, y_pred))
 
     plot_x = np.linspace(1, 10, 10)
@@ -577,25 +577,25 @@ def elementTest(element, x, y, flag, featureCompressRate, times=10):
     print(str(np.average(ENet_MSE)))
     print(str(np.average(GBoost_MSE)))
     print(str(np.average(bagging_MSE)))
-    file.write("SVR MSE:")
+    file.write("SVR MSE:\n")
     file.write(str(SVR_MSE))
-    file.write(" ")
-    file.write("RFR MSE:")
+    file.write(" \n")
+    file.write("RFR MSE:\n")
     file.write(str(RFR_MSE))
-    file.write(" ")
-    file.write("LASSO MSE")
+    file.write(" \n")
+    file.write("LASSO MSE\n")
     file.write(str(LASSO_MSE))
-    file.write(" ")
-    file.write("ENET MSE:")
+    file.write(" \n")
+    file.write("ENET MSE:\n")
     file.write(str(ENet_MSE))
-    file.write(" ")
-    file.write("GBoost MSE")
+    file.write(" \n")
+    file.write("GBoost MSE\n")
     file.write(str(GBoost_MSE))
-    file.write(" ")
-    file.write("bagging_MSE:")
+    file.write(" \n")
+    file.write("bagging_MSE:\n")
     file.write(str(bagging_MSE))
-    file.write(" ")
-    file.write("stacking_MSE")
+    file.write(" \n")
+    file.write("stacking_MSE\n")
     file.write(str(stacking_MSE[0::6]))
     file.write(str(stacking_MSE[1::6]))
     file.write(str(stacking_MSE[2::6]))
