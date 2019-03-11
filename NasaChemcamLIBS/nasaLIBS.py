@@ -13,13 +13,17 @@ def loadConcentrationData():
     #print(con)
     return con
 
+#标准化
+def normalize(data):
+    norm = (data - data.mean()) / (data.max() - data.min())
+    return norm
+
 #处理初始数据文件的一些问题
 def processRawData(data):
     data = data.loc[1:6144]
     #处理一下columns的问题
-    for n in data.columns:
-        n.replace('#',' ')
-        n.strip()
+    data.columns = data.columns.str.replace('#',' ')
+    data.columns = data.columns.str.strip()
     return data
 
 
@@ -32,7 +36,7 @@ def loadTrainingSamples():
                     #print(os.path.join(root, name))
                     if file.endswith(".csv"):
                         print("Reading files in "+os.path.join(root, file))
-                        data = pd.read_csv(os.path.join(root, file),skiprows=16)
+                        data = pd.read_csv(os.path.join(root, file),skiprows=14)
                         data = processRawData(data)
                         if name not in trainingData.keys():
                             trainingData[name] = []
@@ -41,6 +45,18 @@ def loadTrainingSamples():
                             trainingData[name].append(data)
                         #print(data)
 
+#获取每个样本的mean
+def getMean():
+    for key,item in trainingData.items():
+        print(key)
+        sum = 0
+        data = pd.DataFrame(trainingData[key][0]['wave'])
+        #data['wave']  = trainingData['wave']
+        for df in item:
+            data['avg'+str(sum+1)] = df['mean']
+            sum+=1
+
+        meanTrainingData[key] = data
 
 
 
@@ -50,3 +66,6 @@ if __name__=='__main__':
     con = loadConcentrationData()
     trainingData = {}
     loadTrainingSamples()
+    meanTrainingData = {}
+    getMean()
+    print(meanTrainingData)
