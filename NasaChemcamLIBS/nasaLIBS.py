@@ -1,9 +1,28 @@
-import pandas as pd
 import os
+import sys
+import pandas as pd
+import re
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.linear_model import ElasticNet, Lasso,  BayesianRidge, LassoLarsIC
+from sklearn.kernel_ridge import KernelRidge
+from sklearn.ensemble import RandomForestRegressor,  GradientBoostingRegressor
 from sklearn.base import BaseEstimator, TransformerMixin, RegressorMixin, clone
+from sklearn.feature_selection import f_regression,SelectPercentile
+import matplotlib.pyplot as plt
+from pandas.core.frame import DataFrame
+
+from sklearn.ensemble import RandomForestRegressor
+import xgboost as xgb
+import lightgbm as lgb
+import copy
+from sklearn.model_selection import train_test_split
+from sklearn.pipeline import make_pipeline
+from sklearn.metrics import mean_squared_error
+from sklearn.svm import SVR
 from sklearn.model_selection import KFold, cross_val_score, train_test_split
+import warnings
+warnings.filterwarnings("ignore")
 
 DATA_base_add = "E:\\NasaChemcamLIBSDataset\\"
 DATA_folder_add = "E:\\NasaChemcamLIBSDataset\\Derived\\ica\\"
@@ -155,6 +174,134 @@ def prepareNIST():
     f.close()
     return element_dict
 
+def useXYtrain(x,y):
+    X_train, X_test, y_train, y_test = train_test_split(x,
+                                                        y,
+                                                        test_size=0.20)
+
+    svr = SVR(C=1.0, epsilon=0.2)
+    svr.fit(X_train, y_train)
+
+    y_pred = svr.predict(X_test)
+    #SVR_MSE.append(mean_squared_error(y_test, y_pred))
+    print('SVR Mean squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
+
+    rfr = RandomForestRegressor(n_estimators=200, random_state=0)
+    rfr.fit(X_train, y_train)
+
+    y_pred = rfr.predict(X_test)
+    #RFR_MSE.append(mean_squared_error(y_test, y_pred))
+    print('RFR Mean squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
+
+    lasso = Lasso(alpha=0.05, random_state=1)
+    lasso.fit(X_train, y_train)
+
+    y_pred = lasso.predict(X_test)
+    print('LASSO  Mean squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
+    #file.write('LASSO  Mean squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
+
+    ENet = ElasticNet(alpha=0.05, l1_ratio=.9, random_state=3)
+    ENet.fit(X_train, y_train)
+    y_pred = ENet.predict(X_test)
+    print('Elastic Net Mean squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
+
+    GBoost = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
+                                       max_depth=4, max_features='sqrt',
+                                       min_samples_leaf=15, min_samples_split=10,
+                                       loss='huber', random_state=5)
+    GBoost.fit(X_train, y_train)
+    y_pred = GBoost.predict(X_test)
+    #GBoost_MSE.append(mean_squared_error(y_test, y_pred))
+    print('GBoost squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
+
+    baggingModel = baggingAveragingModels(models=(rfr, svr, GBoost, ENet, lasso))
+    baggingModel.fit(X_train, y_train)
+    y_pred = baggingModel.predict(X_test)
+
+    print('Bagging squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
+
+    stacked_averaged_models = StackingAveragedModels(base_models=(ENet, GBoost, svr, rfr),
+                                                     meta_model=lasso)
+    stacked_averaged_models.fit(X_train, y_train)
+    y_pred = stacked_averaged_models.predict(X_test)
+    print('Stacking with metamodel is lasso squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
+    #file.write('Stacking with metamodel is lasso squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
+    #stacking_MSE.append(mean_squared_error(y_test, y_pred))
+
+    stacked_averaged_models = StackingAveragedModels(base_models=(lasso, GBoost, svr, rfr),
+                                                     meta_model=ENet)
+    stacked_averaged_models.fit(X_train, y_train)
+    y_pred = stacked_averaged_models.predict(X_test)
+    print('Stacking with metamodel is ENet squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
+    #file.write('Stacking with metamodel is ENet squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
+    #stacking_MSE.append(mean_squared_error(y_test, y_pred))
+
+    stacked_averaged_models = StackingAveragedModels(base_models=(ENet, lasso, svr, rfr),
+                                                     meta_model=GBoost)
+    stacked_averaged_models.fit(X_train, y_train)
+    y_pred = stacked_averaged_models.predict(X_test)
+    print('Stacking with metamodel is GBoost squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
+    #file.write('Stacking with metamodel is GBoost squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
+    #stacking_MSE.append(mean_squared_error(y_test, y_pred))
+    krr = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
+    stacked_averaged_models = StackingAveragedModels(base_models=(ENet, GBoost, lasso, svr, rfr),
+                                                     meta_model=krr)
+    stacked_averaged_models.fit(X_train, y_train)
+    y_pred = stacked_averaged_models.predict(X_test)
+    print('Stacking with metamodel is krr squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
+    #file.write('Stacking with metamodel is krr squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
+    #stacking_MSE.append(mean_squared_error(y_test, y_pred))
+
+    stacked_averaged_models = StackingAveragedModels(base_models=(ENet, GBoost, lasso, rfr),
+                                                     meta_model=svr)
+    stacked_averaged_models.fit(X_train, y_train)
+    y_pred = stacked_averaged_models.predict(X_test)
+    print('Stacking with metamodel is svr squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
+    #file.write('Stacking with metamodel is svr squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
+    #stacking_MSE.append(mean_squared_error(y_test, y_pred))
+
+    stacked_averaged_models = StackingAveragedModels(base_models=(ENet, GBoost, svr, lasso),
+                                                     meta_model=rfr)
+    stacked_averaged_models.fit(X_train, y_train)
+    y_pred = stacked_averaged_models.predict(X_test)
+    print('Stacking with metamodel is rfr squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
+    #file.write('Stacking with metamodel is rfr squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
+    #stacking_MSE.append(mean_squared_error(y_test, y_pred))
+
+
+
+
+def test(element):
+    trainingCase = {}
+    element_info = element_dict[element]
+
+    for info in element_info:
+        print('Using wave='+str(info[0])+" importance="+str(info[1])+" for testing...")
+
+        aim = info[0]
+        if aim<240.86501 or aim>905.57349 or aim-0.25<240.86501 or aim+0.25>905.57349:
+            continue
+
+        for key, item in meanTrainingData.items():
+            for name in meanTrainingData[key].columns:
+                if not name == 'wave':
+                    meanTrainingData[key][name] = normalize(meanTrainingData[key][name])
+
+            trainingCase[key] = getROI(aim, key)
+
+
+
+        x = []
+        y = []
+        for key, item in trainingCase.items():
+            # print(key)
+            for name in trainingCase[key].columns:
+                # print(name)
+                if not name == 'wave':
+                    x.append(list(trainingCase[key][name]))
+                    y.append(con.loc[con.Name == key].Cu.values[0])
+        if len(x)==len(y) and len(x)!=0 and len(x[0])!=0:
+            useXYtrain(x,y)
 
 
 
@@ -167,3 +314,6 @@ if __name__=='__main__':
     getMean()
     print(meanTrainingData)
     element_dict = prepareNIST()
+    element = 'Cu'
+    test(element)
+
