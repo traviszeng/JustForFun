@@ -24,9 +24,6 @@ from sklearn.model_selection import KFold, cross_val_score, train_test_split
 import warnings
 warnings.filterwarnings("ignore")
 
-pd.set_option('display.max_rows', 50)
-pd.set_option('display.max_columns', 50)
-
 DATA_base_add = "E:\\NasaChemcamLIBSDataset\\"
 DATA_folder_add = "E:\\NasaChemcamLIBSDataset\\Derived\\ica\\"
 
@@ -302,7 +299,7 @@ def test(element):
                 # print(name)
                 if not name == 'wave':
                     x.append(list(trainingCase[key][name]))
-                    y.append(con.loc[con.Name == key].Cu.values[0])
+                    y.append(con.loc[con.Name == key].Zn.values[0])
         if len(x)==len(y) and len(x)!=0 and len(x[0])!=0:
             useXYtrain(x,y)
 
@@ -317,6 +314,6 @@ if __name__=='__main__':
     getMean()
     print(meanTrainingData)
     element_dict = prepareNIST()
-    element = 'Cu'
-    #test(element)
+    element = 'Zn'
+    test(element)
 
