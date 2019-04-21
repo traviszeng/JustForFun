@@ -14,7 +14,6 @@ from pandas.core.frame import DataFrame
 
 from sklearn.ensemble import RandomForestRegressor
 import xgboost as xgb
-import lightgbm as lgb
 import copy
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import make_pipeline
@@ -130,7 +129,7 @@ def loadTrainingSamples():
                         data = processRawData(data)
                         if name not in trainingData.keys():
                             trainingData[name] = []
-                            trainingData[name].append(data)
+                            trainingData[name].append(data) 
                         else:
                             trainingData[name].append(data)
                         #print(data)
