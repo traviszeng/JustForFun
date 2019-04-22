@@ -71,8 +71,8 @@
       <file leaf-file-name="nasaLIBSv4.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/nasaLIBSv4.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="359">
-              <caret line="563" column="38" lean-forward="false" selection-start-line="563" selection-start-column="38" selection-end-line="563" selection-end-column="38" />
+            <state relative-caret-position="559">
+              <caret line="423" column="0" lean-forward="true" selection-start-line="423" selection-start-column="0" selection-end-line="423" selection-end-column="0" />
               <folding>
                 <element signature="e#63#72#0" expanded="true" />
                 <element signature="e#1467#2033#0" expanded="false" />
@@ -237,7 +237,17 @@
     </navigator>
     <panes>
       <pane id="Scratches" />
-      <pane id="Scope" />
+      <pane id="Scope">
+        <subPane subId="Project Files">
+          <expand>
+            <path>
+              <item name="Root" type="cbb8eebc:String" user="Root" />
+              <item name="NasaChemcamLIBS" type="cbb8eebc:String" user="NasaChemcamLIBS" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -1056,8 +1066,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/nasaLIBSv4.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="359">
-          <caret line="563" column="38" lean-forward="false" selection-start-line="563" selection-start-column="38" selection-end-line="563" selection-end-column="38" />
+        <state relative-caret-position="559">
+          <caret line="423" column="0" lean-forward="true" selection-start-line="423" selection-start-column="0" selection-end-line="423" selection-end-column="0" />
           <folding>
             <element signature="e#63#72#0" expanded="true" />
             <element signature="e#1467#2033#0" expanded="false" />
