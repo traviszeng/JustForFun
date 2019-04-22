@@ -334,15 +334,15 @@ def useXYtrain(x,y):
             stacking_MSE[k].append(mean_squared_error(y_test, y_pred))
 
         stacked_averaged_models = StackingAveragedModels(base_models=tuple(learnerList),
-                                                         meta_model=baggingAveragingModels)
+                                                         meta_model=baggingModel)
         singleTrain(stacked_averaged_models, X_train, y_train, X_test, y_test, 'stacking with Bagging models'  , i)
         stacked_averaged_models = StackingAveragedModels(base_models=tuple(learnerList),
-                                                         meta_model=baggingAveragingModels)
+                                                         meta_model=baggingModel)
         stacked_averaged_models.fit(X_train, y_train)
         y_pred = stacked_averaged_models.predict(X_test)
         print('Stacking with metamodel is bagging models squared error is ' + str(
             mean_squared_error(y_test, y_pred)) + "\n")
-        # file.write('Stacking with metamodel is lasso squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
+        # file.write('Stacking with metamodel is lasso squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")"""
         stacking_MSE[5].append(mean_squared_error(y_test, y_pred))
 
 
