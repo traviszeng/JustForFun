@@ -188,14 +188,14 @@ def prepareNIST():
     f.close()
     return element_dict
 
-def singleTrain(clf,X_train,y_train,X_test,y_test,name,time):
+def drawTrain(y_pred,y_test,name,time):
 
-    clf.fit(X_train,y_train)
-    y_pred = clf.predict(X_test)
+    #clf.fit(X_train,y_train)
+    #y_pred = clf.predict(X_test)
     # RFR_MSE.append(mean_squared_error(y_test, y_pred))
     #print('Mean squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
 
-    y_pred = clf.predict(X_test)
+    #y_pred = clf.predict(X_test)
     plt.plot(y_test, y_pred, '.')
 
     xx = [1,2,3,100]
@@ -226,11 +226,12 @@ def useXYtrain(x,y):
                                                             test_size=0.20)
         svr = SVR(C=1.0, epsilon=0.2)
         if 'SVR' in Selected_learnerCode:
-            singleTrain(svr, X_train, y_train,X_test,y_test, 'SVR', i)
-            svr = SVR(C=1.0, epsilon=0.2)
+
+
             svr.fit(X_train, y_train)
 
             y_pred = svr.predict(X_test)
+            drawTrain(y_pred, y_test, 'SVR', i)
             #SVR_MSE.append(mean_squared_error(y_test, y_pred))
             print('SVR Mean squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
             Learners.append(svr)
@@ -250,11 +251,12 @@ def useXYtrain(x,y):
         rfr = RandomForestRegressor(n_estimators=200, random_state=0)
         if 'RFR' in Selected_learnerCode:
 
-            singleTrain(rfr, X_train, y_train,X_test,y_test, 'RFR', i)
-            rfr = RandomForestRegressor(n_estimators=200, random_state=0)
+            #drawTrain(rfr, X_train, y_train,X_test,y_test, 'RFR', i)
+            #rfr = RandomForestRegressor(n_estimators=200, random_state=0)
             rfr.fit(X_train, y_train)
 
             y_pred = rfr.predict(X_test)
+            drawTrain(y_pred, y_test, 'RFR', i)
             #RFR_MSE.append(mean_squared_error(y_test, y_pred))
             print('RFR Mean squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
             Learners.append(rfr)
@@ -264,10 +266,11 @@ def useXYtrain(x,y):
         lasso = Lasso(alpha=0.05, random_state=1)
         if 'LASSO' in Selected_learnerCode:
 
-            singleTrain(lasso, X_train, y_train,X_test,y_test, 'LASSO', i)
+            #drawTrain(lasso, X_train, y_train,X_test,y_test, 'LASSO', i)
             lasso.fit(X_train, y_train)
 
             y_pred = lasso.predict(X_test)
+            drawTrain(y_pred, y_test, 'LASSO', i)
             print('LASSO  Mean squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
             #file.write('LASSO  Mean squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
             Learners.append(lasso)
@@ -277,10 +280,11 @@ def useXYtrain(x,y):
         ENet = ElasticNet(alpha=0.05, l1_ratio=.9, random_state=3)
         if 'ENET' in Selected_learnerCode:
 
-            singleTrain(ENet, X_train, y_train,X_test,y_test, 'Elastic NET', i)
+            #drawTrain(ENet, X_train, y_train,X_test,y_test, 'Elastic NET', i)
             ENet = ElasticNet(alpha=0.05, l1_ratio=.9, random_state=3)
             ENet.fit(X_train, y_train)
             y_pred = ENet.predict(X_test)
+            drawTrain(y_pred, y_test, 'Elastic Net', i)
             print('Elastic Net Mean squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
             Learners.append(ENet)
 
@@ -292,14 +296,15 @@ def useXYtrain(x,y):
                                            loss='huber', random_state=5)
         if 'GBOOST' in Selected_learnerCode:
 
-            singleTrain(GBoost, X_train, y_train,X_test,y_test, 'Gradient Boosting', i)
-            GBoost = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
+            #drawTrain(GBoost, X_train, y_train,X_test,y_test, 'Gradient Boosting', i)
+            """GBoost = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
                                                max_depth=4, max_features='sqrt',
                                                min_samples_leaf=15, min_samples_split=10,
-                                               loss='huber', random_state=5)
+                                               loss='huber', random_state=5)"""
             GBoost.fit(X_train, y_train)
             y_pred = GBoost.predict(X_test)
             #GBoost_MSE.append(mean_squared_error(y_test, y_pred))
+            drawTrain(y_pred, y_test, 'GBoost', i)
             print('GBoost squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
             Learners.append(GBoost)
 
@@ -307,11 +312,12 @@ def useXYtrain(x,y):
 
         #BAGGING
         baggingModel = baggingAveragingModels(models=tuple(Learners))
-        singleTrain(baggingModel, X_train, y_train,X_test,y_test, 'Bagging', i)
-        baggingModel = baggingAveragingModels(models=tuple(Learners))
+        #drawTrain(baggingModel, X_train, y_train,X_test,y_test, 'Bagging', i)
+        #baggingModel = baggingAveragingModels(models=tuple(Learners))
 
         baggingModel.fit(X_train, y_train)
         y_pred = baggingModel.predict(X_test)
+        drawTrain(y_pred, y_test, 'Bagging', i)
 
         print('Bagging squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
 
@@ -322,24 +328,26 @@ def useXYtrain(x,y):
             for kk in range(0,len(Selected_learnerCode)):
                 if Selected_learnerCode[kk]!='' and kk!=k:
                     learnerList.append(Learners_map[Selected_learnerCode[kk]])
-            stacked_averaged_models = StackingAveragedModels(base_models=tuple(learnerList),
+            """stacked_averaged_models = StackingAveragedModels(base_models=tuple(learnerList),
                                                              meta_model=Learners_map[All_learner[k]])
-            singleTrain(stacked_averaged_models, X_train, y_train,X_test,y_test, 'stacking with '+All_learner[k], i)
+            drawTrain(stacked_averaged_models, X_train, y_train,X_test,y_test, 'stacking with '+All_learner[k], i)"""
             stacked_averaged_models = StackingAveragedModels(base_models=tuple(learnerList),
                                                              meta_model=Learners_map[All_learner[k]])
             stacked_averaged_models.fit(X_train, y_train)
             y_pred = stacked_averaged_models.predict(X_test)
+            drawTrain(y_pred, y_test, 'stacking with '+All_learner[k], i)
             print('Stacking with metamodel is '+All_learner[k]+' squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
             # file.write('Stacking with metamodel is lasso squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
             stacking_MSE[k].append(mean_squared_error(y_test, y_pred))
 
-        stacked_averaged_models = StackingAveragedModels(base_models=tuple(learnerList),
+        """stacked_averaged_models = StackingAveragedModels(base_models=tuple(learnerList),
                                                          meta_model=baggingModel)
-        singleTrain(stacked_averaged_models, X_train, y_train, X_test, y_test, 'stacking with Bagging models'  , i)
+        drawTrain(stacked_averaged_models, X_train, y_train, X_test, y_test, 'stacking with Bagging models'  , i)"""
         stacked_averaged_models = StackingAveragedModels(base_models=tuple(learnerList),
                                                          meta_model=baggingModel)
         stacked_averaged_models.fit(X_train, y_train)
         y_pred = stacked_averaged_models.predict(X_test)
+        drawTrain(y_pred, y_test, 'stacking with bagging' , i)
         print('Stacking with metamodel is bagging models squared error is ' + str(
             mean_squared_error(y_test, y_pred)) + "\n")
         # file.write('Stacking with metamodel is lasso squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
@@ -349,29 +357,28 @@ def useXYtrain(x,y):
 
 
     plot_x = np.linspace(1, 10, 10)
-    if len(stacking_MSE[1])>0:
-        plt.plot(plot_x,stacking_MSE[1],'b')
+    if len(stacking_MSE[0])>0:
+        plt.plot(plot_x,stacking_MSE[0],'b')
+    if len(stacking_MSE[1]) > 0:
+        plt.plot(plot_x, stacking_MSE[1], 'r')
     if len(stacking_MSE[2]) > 0:
-        plt.plot(plot_x, stacking_MSE[2], 'r')
+        plt.plot(plot_x, stacking_MSE[2], 'y')
     if len(stacking_MSE[3]) > 0:
-        plt.plot(plot_x, stacking_MSE[3], 'y')
+        plt.plot(plot_x, stacking_MSE[3], 'k')
     if len(stacking_MSE[4]) > 0:
-        plt.plot(plot_x, stacking_MSE[4], 'k')
+        plt.plot(plot_x, stacking_MSE[4], 'g')
     if len(stacking_MSE[5]) > 0:
-        plt.plot(plot_x, stacking_MSE[5], 'g')
-    if len(stacking_MSE[0]) > 0:
-        plt.plot(plot_x, stacking_MSE[0], 'm')
-    plt.legend(('Lasso avg='+str(np.mean(stacking_MSE[1])),
-                'Enet avg='+str(np.mean(stacking_MSE[2])),
-                'Gboost avg = '+str(np.mean(stacking_MSE[3])),
-                'KRR avg = '+str(np.mean(stacking_MSE[4])),
-                'SVR avg = '+str(np.mean(stacking_MSE[5])),
-                'RFR avg = '+str(np.mean(stacking_MSE[0]))), loc='upper right')
+        plt.plot(plot_x, stacking_MSE[5], 'm')
+    plt.legend(( 'SVR avg = '+str(np.mean(stacking_MSE[0])),
+                'RFR avg = '+str(np.mean(stacking_MSE[1])),
+                'Lasso avg=' + str(np.mean(stacking_MSE[2])),
+                 'Enet avg=' + str(np.mean(stacking_MSE[3])),
+                 'Gboost avg = ' + str(np.mean(stacking_MSE[4])),
+                 'Bagging avg = ' + str(np.mean(stacking_MSE[5]))
+                ), loc='upper right')
     plt.title('Different meta-learning machine')
     plt.savefig('DifferentLearner.png')
     plt.clf()
-
-
     plt.plot()
 
 
@@ -436,7 +443,7 @@ def processingRatios():
     #处理异常值
     xy = xy.loc[xy.feature4 > 0]
     xy = xy.loc[xy.feature4 < 4]
-    xy = xy.loc[xy.Target<100]
+    xy = xy.loc[xy.Target < 100]
     xy_0 = xy[xy.Target <= 0]
     xy = xy[xy.Target>0]
     xy.append(xy_0.mean(), ignore_index=True)
@@ -472,7 +479,7 @@ def selectLearner(x,y):
                                                             test_size=0.20)
 
         #svr = SVR(C=1.0, epsilon=0.2)
-        #singleTrain(svr, x, y, 'SVR', i)
+        #drawTrain(svr, x, y, 'SVR', i)
         svr = SVR(C=1.0, epsilon=0.2)
         svr.fit(X_train, y_train)
 
@@ -492,7 +499,7 @@ def selectLearner(x,y):
 
 
         rfr = RandomForestRegressor(n_estimators=200, random_state=0)
-        #singleTrain(rfr, x, y, 'RFR', i)
+        #drawTrain(rfr, x, y, 'RFR', i)
         #rfr = RandomForestRegressor(n_estimators=200, random_state=0)
         rfr.fit(X_train, y_train)
 
@@ -501,7 +508,7 @@ def selectLearner(x,y):
         print('RFR Mean squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
 
         lasso = Lasso(alpha=0.05, random_state=1)
-        #singleTrain(lasso, x, y, 'LASSO', i)
+        #drawTrain(lasso, x, y, 'LASSO', i)
         lasso.fit(X_train, y_train)
 
         y_pred = lasso.predict(X_test)
@@ -510,7 +517,7 @@ def selectLearner(x,y):
         #file.write('LASSO  Mean squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
 
         #ENet = ElasticNet(alpha=0.05, l1_ratio=.9, random_state=3)
-        #singleTrain(ENet, x, y, 'Elastic NET', i)
+        #drawTrain(ENet, x, y, 'Elastic NET', i)
         ENet = ElasticNet(alpha=0.05, l1_ratio=.9, random_state=3)
         ENet.fit(X_train, y_train)
         y_pred = ENet.predict(X_test)
@@ -521,7 +528,7 @@ def selectLearner(x,y):
                                            max_depth=4, max_features='sqrt',
                                            min_samples_leaf=15, min_samples_split=10,
                                            loss='huber', random_state=5)
-        singleTrain(GBoost, x, y, 'Gradient Boosting', i)"""
+        drawTrain(GBoost, x, y, 'Gradient Boosting', i)"""
         GBoost = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
                                            max_depth=4, max_features='sqrt',
                                            min_samples_leaf=15, min_samples_split=10,

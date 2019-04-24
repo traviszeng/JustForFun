@@ -436,7 +436,7 @@ def processingRatios():
     #处理异常值
     xy = xy.loc[xy.feature4 > 0]
     xy = xy.loc[xy.feature4 < 4]
-    xy = xy.loc[xy.Target<100]
+    xy = xy.loc[xy.Target<00]
     xy_0 = xy[xy.Target <= 0]
     xy = xy[xy.Target>0]
     xy.append(xy_0.mean(), ignore_index=True)
