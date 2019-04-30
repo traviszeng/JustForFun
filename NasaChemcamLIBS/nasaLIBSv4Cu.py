@@ -12,7 +12,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.linear_model import ElasticNet, Lasso,  BayesianRidge, LassoLarsIC
 from sklearn.kernel_ridge import KernelRidge
-from sklearn.ensemble import RandomForestRegressor,  GradientBoostingRegressor
+from sklearn.ensemble import RandomForestRegressor,  GradientBoostingRegressor,AdaBoostRegressor
 from sklearn.base import BaseEstimator, TransformerMixin, RegressorMixin, clone
 from sklearn.feature_selection import f_regression,SelectPercentile
 import matplotlib.pyplot as plt
@@ -217,6 +217,8 @@ def useXYtrain(x,y):
         return
     stacking_MSE = [[],[],[],[],[],[]]
 
+    Ada_MSE = []
+
     for i in range(0,10):
         print('第'+str(i+1)+'次试验：\n')
         Learners_map = {}
@@ -310,6 +312,15 @@ def useXYtrain(x,y):
 
         Learners_map['GBOOST'] = GBoost
 
+
+        #Adaboost
+        Adaboost = AdaBoostRegressor(base_estimator=SVR(C=1.0, epsilon=0.2))
+        Adaboost.fit(X_train,y_train)
+        y_pred = Adaboost.predict(X_test)
+        drawTrain(y_pred,y_test,'Adaboost',i)
+        print('Adaboost with SVR squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
+        Ada_MSE.append(mean_squared_error(y_test, y_pred))
+
         #BAGGING
         baggingModel = baggingAveragingModels(models=tuple(Learners))
         #drawTrain(baggingModel, X_train, y_train,X_test,y_test, 'Bagging', i)
@@ -355,6 +366,7 @@ def useXYtrain(x,y):
 
 
 
+    print("Adaboost mean is "+str(np.mean(Ada_MSE)))
 
     plot_x = np.linspace(1, 10, 10)
     if len(stacking_MSE[0])>0:
@@ -376,7 +388,7 @@ def useXYtrain(x,y):
                  'Gboost avg = ' + str(np.mean(stacking_MSE[4])),
                  'Bagging avg = ' + str(np.mean(stacking_MSE[5]))
                 ), loc='upper right')
-    plt.title('Different meta-learning machine')
+    plt.title('Different meta-learning machine(Adaboost avg MSE='+str(np.mean(Ada_MSE))+')')
     plt.savefig('DifferentLearner.png')
     plt.clf()
     plt.plot()
@@ -576,7 +588,7 @@ if __name__=='__main__':
     # element_dict = prepareNIST()
     element = 'Cu'
     x, y = newMain(element)
-    os.chdir("E:\\LIBS_experiment\\" + element+'v4')
+
     y_df = pd.DataFrame(y, columns=['Target'])
     x_df = pd.DataFrame(x, columns=['feature1', 'feature2', 'feature3', 'feature4', 'feature5', 'feature6', 'feature7',
                                     'feature8'])
@@ -584,6 +596,8 @@ if __name__=='__main__':
     # test(element)
     newx, newy = processingRatios()
     selectLearner(newx,newy)
-
-    useXYtrain(newx, newy)
+    for i in range(0, 10):
+        os.mkdir("E:\\LIBS_experiment\\" + element + 'v4_versionsvr' + str(i + 1))
+        os.chdir("E:\\LIBS_experiment\\" + element + 'v4_versionsvr' + str(i + 1))
+        useXYtrain(newx, newy)
 
