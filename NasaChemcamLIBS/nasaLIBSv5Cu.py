@@ -224,7 +224,7 @@ def useXYtrain(x,y):
 
     Ada_MSE = []
 
-    for i in range(0,10):
+    for i in range(0,100):
         print('第'+str(i+1)+'次试验：\n')
         Learners_map = {}
         Learners = []
@@ -232,14 +232,17 @@ def useXYtrain(x,y):
                                                             y,
                                                             test_size=0.20)
         svr = SVR(C=1.0, epsilon=0.2)
+        svr.fit(X_train, y_train)
+
+        y_pred = svr.predict(X_test)
+        #drawTrain(y_pred, y_test, 'SVR', i)
+        #SVR_MSE.append(mean_squared_error(y_test, y_pred))
+
+        yy = svr.predict(x)
+        drawTrain(y, yy, 'SVR MSE = '+str(mean_squared_error(y_test, y_pred)), i)
+
+
         if 'SVR' in Selected_learnerCode:
-
-
-            svr.fit(X_train, y_train)
-
-            y_pred = svr.predict(X_test)
-            drawTrain(y_pred, y_test, 'SVR', i)
-            #SVR_MSE.append(mean_squared_error(y_test, y_pred))
             print('SVR Mean squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
             Learners.append(svr)
 
@@ -256,28 +259,33 @@ def useXYtrain(x,y):
         print('ANN Mean squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")"""
 
         rfr = RandomForestRegressor(n_estimators=200, random_state=0)
+
+
+        #drawTrain(rfr, X_train, y_train,X_test,y_test, 'RFR', i)
+        #rfr = RandomForestRegressor(n_estimators=200, random_state=0)
+        rfr.fit(X_train, y_train)
+
+        y_pred = rfr.predict(X_test)
+        yy = rfr.predict(x)
+        drawTrain(y, yy, 'RFR MSE = '+str(mean_squared_error(y_test, y_pred)), i)
+        #RFR_MSE.append(mean_squared_error(y_test, y_pred))
+
+
         if 'RFR' in Selected_learnerCode:
-
-            #drawTrain(rfr, X_train, y_train,X_test,y_test, 'RFR', i)
-            #rfr = RandomForestRegressor(n_estimators=200, random_state=0)
-            rfr.fit(X_train, y_train)
-
-            y_pred = rfr.predict(X_test)
-            drawTrain(y_pred, y_test, 'RFR', i)
-            #RFR_MSE.append(mean_squared_error(y_test, y_pred))
             print('RFR Mean squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
             Learners.append(rfr)
 
         Learners_map['RFR'] = rfr
 
         lasso = Lasso(alpha=0.05, random_state=1)
+        #drawTrain(lasso, X_train, y_train,X_test,y_test, 'LASSO', i)
+        lasso.fit(X_train, y_train)
+        yy = lasso.predict(x)
+        y_pred = lasso.predict(X_test)
+        drawTrain(y, yy, 'LASSO MSE = '+str(mean_squared_error(y_test, y_pred)), i)
+
+
         if 'LASSO' in Selected_learnerCode:
-
-            #drawTrain(lasso, X_train, y_train,X_test,y_test, 'LASSO', i)
-            lasso.fit(X_train, y_train)
-
-            y_pred = lasso.predict(X_test)
-            drawTrain(y_pred, y_test, 'LASSO', i)
             print('LASSO  Mean squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
             #file.write('LASSO  Mean squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
             Learners.append(lasso)
@@ -285,13 +293,15 @@ def useXYtrain(x,y):
         Learners_map['LASSO'] =lasso
 
         ENet = ElasticNet(alpha=0.05, l1_ratio=.9, random_state=3)
-        if 'ENET' in Selected_learnerCode:
 
-            #drawTrain(ENet, X_train, y_train,X_test,y_test, 'Elastic NET', i)
-            ENet = ElasticNet(alpha=0.05, l1_ratio=.9, random_state=3)
-            ENet.fit(X_train, y_train)
-            y_pred = ENet.predict(X_test)
-            drawTrain(y_pred, y_test, 'Elastic Net', i)
+
+        #drawTrain(ENet, X_train, y_train,X_test,y_test, 'Elastic NET', i)
+        ENet = ElasticNet(alpha=0.05, l1_ratio=.9, random_state=3)
+        ENet.fit(X_train, y_train)
+        yy = ENet.predict(x)
+        y_pred = ENet.predict(X_test)
+        drawTrain(y, yy, 'Elastic Net MSE = '+str(mean_squared_error(y_test, y_pred)), i)
+        if 'ENET' in Selected_learnerCode:
             print('Elastic Net Mean squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
             Learners.append(ENet)
 
@@ -301,17 +311,19 @@ def useXYtrain(x,y):
                                            max_depth=4, max_features='sqrt',
                                            min_samples_leaf=15, min_samples_split=10,
                                            loss='huber', random_state=5)
-        if 'GBOOST' in Selected_learnerCode:
 
-            #drawTrain(GBoost, X_train, y_train,X_test,y_test, 'Gradient Boosting', i)
-            """GBoost = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
-                                               max_depth=4, max_features='sqrt',
-                                               min_samples_leaf=15, min_samples_split=10,
-                                               loss='huber', random_state=5)"""
-            GBoost.fit(X_train, y_train)
-            y_pred = GBoost.predict(X_test)
-            #GBoost_MSE.append(mean_squared_error(y_test, y_pred))
-            drawTrain(y_pred, y_test, 'GBoost', i)
+
+        #drawTrain(GBoost, X_train, y_train,X_test,y_test, 'Gradient Boosting', i)
+        """GBoost = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
+                                           max_depth=4, max_features='sqrt',
+                                           min_samples_leaf=15, min_samples_split=10,
+                                           loss='huber', random_state=5)"""
+        GBoost.fit(X_train, y_train)
+        yy = GBoost.predict(x)
+        y_pred = GBoost.predict(X_test)
+        #GBoost_MSE.append(mean_squared_error(y_test, y_pred))
+        drawTrain(y, yy, 'GBoost MSE = '+str(mean_squared_error(y_test, y_pred)), i)
+        if 'GBOOST' in Selected_learnerCode:
             print('GBoost squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
             Learners.append(GBoost)
 
@@ -319,23 +331,33 @@ def useXYtrain(x,y):
 
 
         #Adaboost
-        Adaboost = AdaBoostRegressor(base_estimator=SVR(C=1.0, epsilon=0.2))
+        #Adaboost = AdaBoostRegressor(base_estimator=SVR(C=1.0, epsilon=0.2))
+        Adaboost = AdaBoostRegressor()
         Adaboost.fit(X_train,y_train)
         y_pred = Adaboost.predict(X_test)
-        drawTrain(y_pred,y_test,'Adaboost',i)
+        yy = Adaboost.predict(x)
+        drawTrain(y,yy,'Adaboost MSE = '+ str(mean_squared_error(y_test, y_pred)),i)
         print('Adaboost with SVR squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
         Ada_MSE.append(mean_squared_error(y_test, y_pred))
 
         #BAGGING
+        baggingModel = baggingAveragingModels(models=(svr,rfr,ENet,GBoost,lasso))
+        baggingModel.fit(X_train, y_train)
+        y_pred = baggingModel.predict(X_test)
+        yy = baggingModel.predict(x)
+        drawTrain(y, yy, 'Bagging before selected MSE = '+str(mean_squared_error(y_test, y_pred)), i)
+        print('Bagging before selected squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
+
         baggingModel = baggingAveragingModels(models=tuple(Learners))
         #drawTrain(baggingModel, X_train, y_train,X_test,y_test, 'Bagging', i)
         #baggingModel = baggingAveragingModels(models=tuple(Learners))
 
         baggingModel.fit(X_train, y_train)
         y_pred = baggingModel.predict(X_test)
-        drawTrain(y_pred, y_test, 'Bagging', i)
+        yy = baggingModel.predict(x)
+        drawTrain(y, yy, 'Bagging after selected selected MSE = '+str(mean_squared_error(y_test, y_pred)), i)
 
-        print('Bagging squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
+        print('Bagging after selected squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
 
         All_learner = ['SVR','RFR','LASSO','ENET','GBOOST']
         for k in range(0,len(Selected_learnerCode)):
@@ -351,7 +373,8 @@ def useXYtrain(x,y):
                                                         meta_regressor=Learners_map[All_learner[k]])
             stacked_averaged_models.fit(X_train, y_train)
             y_pred = stacked_averaged_models.predict(X_test)
-            drawTrain(y_pred, y_test, 'stacking with '+All_learner[k], i)
+            yy = stacked_averaged_models.predict(x)
+            drawTrain(y, yy, 'stacking with '+All_learner[k]+' MSE = '+str(mean_squared_error(y_test, y_pred)), i)
             print('Stacking with metamodel is '+All_learner[k]+' squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
             # file.write('Stacking with metamodel is lasso squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
             stacking_MSE[k].append(mean_squared_error(y_test, y_pred))
@@ -363,9 +386,9 @@ def useXYtrain(x,y):
                                                     meta_regressor=baggingModel)
         stacked_averaged_models.fit(X_train, y_train)
         y_pred = stacked_averaged_models.predict(X_test)
-        drawTrain(y_pred, y_test, 'stacking with bagging' , i)
-        print('Stacking with metamodel is bagging models squared error is ' + str(
-            mean_squared_error(y_test, y_pred)) + "\n")
+        yy = stacked_averaged_models.predict(x)
+        drawTrain(y, yy, 'stacking with bagging MSE = '+str(mean_squared_error(y_test, y_pred)) , i)
+        print('Stacking with metamodel is bagging models squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
         # file.write('Stacking with metamodel is lasso squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
         stacking_MSE[5].append(mean_squared_error(y_test, y_pred))
 
@@ -373,7 +396,7 @@ def useXYtrain(x,y):
 
     print("Adaboost mean is "+str(np.mean(Ada_MSE)))
 
-    plot_x = np.linspace(1, 10, 10)
+    plot_x = np.linspace(1, 100, 100)
     if len(stacking_MSE[0])>0:
         plt.plot(plot_x,stacking_MSE[0],'b')
     if len(stacking_MSE[1]) > 0:
@@ -589,7 +612,9 @@ if __name__=='__main__':
     loadTrainingSamples()
     meanTrainingData = {}
     getMean()
-    print(meanTrainingData)
+    #print(meanTrainingData)
+    #plt.plot(meanTrainingData['BK2']['wave'],meanTrainingData['BK2']['avg1'])
+    #plt.show()
     # element_dict = prepareNIST()
     element = 'Cu'
     x, y = newMain(element)
@@ -601,8 +626,8 @@ if __name__=='__main__':
     # test(element)
     newx, newy = processingRatios()
     selectLearner(newx,newy)
-    for i in range(0, 10):
-        os.mkdir("E:\\LIBS_experiment\\" + element + 'v5_versionsvr' + str(i + 1))
-        os.chdir("E:\\LIBS_experiment\\" + element + 'v5_versionsvr' + str(i + 1))
-        useXYtrain(newx, newy)
+
+    os.mkdir("E:\\LIBS_experiment\\" + element + 'v5_version100')
+    os.chdir("E:\\LIBS_experiment\\" + element + 'v5_version100')
+    useXYtrain(newx, newy)
 
