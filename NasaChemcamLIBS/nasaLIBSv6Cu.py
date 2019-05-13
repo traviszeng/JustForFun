@@ -335,8 +335,8 @@ def useXYtrain(x,y):
 
 
         #Adaboost
-        Adaboost = AdaBoostRegressor(base_estimator=SVR(C=1.0, epsilon=0.2))
-        #Adaboost = AdaBoostRegressor()
+        #Adaboost = AdaBoostRegressor(base_estimator=SVR(C=1.0, epsilon=0.2))
+        Adaboost = AdaBoostRegressor()
         Adaboost.fit(X_train,y_train)
         y_pred = Adaboost.predict(X_test)
         yy = Adaboost.predict(x)
@@ -375,6 +375,8 @@ def useXYtrain(x,y):
             """stacked_averaged_models = StackingAveragedModels(base_models=tuple(learnerList),
                                                              meta_model=Learners_map[All_learner[k]])
             drawTrain(stacked_averaged_models, X_train, y_train,X_test,y_test, 'stacking with '+All_learner[k], i)"""
+            #stacked_averaged_models = StackingAveragedModels(base_models=tuple(learnerList),
+            #                                                 meta_model=Learners_map[All_learner[k]])
             stacked_averaged_models = StackingRegressor(regressors=learnerList,
                                                         meta_regressor=Learners_map[All_learner[k]])
             stacked_averaged_models.fit(X_train, y_train)
@@ -385,9 +387,11 @@ def useXYtrain(x,y):
             # file.write('Stacking with metamodel is lasso squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
             stacking_MSE[k].append(mean_squared_error(y_test, y_pred))
 
-        """stacked_averaged_models = StackingAveragedModels(base_models=tuple(learnerList),
-                                                         meta_model=baggingModel)
-        drawTrain(stacked_averaged_models, X_train, y_train, X_test, y_test, 'stacking with Bagging models'  , i)"""
+        #stacked_averaged_models = StackingAveragedModels(base_models=tuple(learnerList),
+        #                                                 meta_model=baggingModel)
+        #drawTrain(stacked_averaged_models, X_train, y_train, X_test, y_test, 'stacking with Bagging models'  , i)
+        stacked_averaged_models = StackingAveragedModels(base_models=tuple(learnerList),
+                                                         meta_model=Learners_map[All_learner[k]])
         stacked_averaged_models = StackingRegressor(regressors=learnerList,
                                                     meta_regressor=baggingModel)
         stacked_averaged_models.fit(X_train, y_train)
@@ -401,6 +405,14 @@ def useXYtrain(x,y):
 
 
     print("Adaboost mean is "+str(np.mean(Ada_MSE)))
+
+    min_stacking_MSE = []
+    for i in range(0, 100):
+        minMSE = stacking_MSE[0][i]
+        for j in range(1, 6):
+            if stacking_MSE[j][i] < minMSE:
+                minMSE = stacking_MSE[j][i]
+        min_stacking_MSE.append(minMSE)
 
     plot_x = np.linspace(1, 100, 100)
     if len(MSE[0])>0:
@@ -416,19 +428,36 @@ def useXYtrain(x,y):
     if len(MSE[5]) > 0:
         plt.plot(plot_x, MSE[5], 'm')
     if len(MSE[6]) > 0:
-        plt.plot(plot_x, MSE[6], color=' coral ', linestyle=':', marker='|')
+        plt.plot(plot_x, MSE[6], color='coral', linestyle=':', marker='|')
+    plt.plot(plot_x,min_stacking_MSE,color = 'cyan')
     plt.legend(( 'SVR avg = '+str(np.mean(MSE[0])),
                 'RFR avg = '+str(np.mean(MSE[1])),
                 'Lasso avg=' + str(np.mean(MSE[2])),
                  'Enet avg=' + str(np.mean(MSE[3])),
                  'Gboost avg = ' + str(np.mean(MSE[4])),
                  'Bagging before avg = ' + str(np.mean(MSE[5])),
-                'Bagging after avg = ' + str(np.mean(MSE[6]))
+                'Bagging after avg = ' + str(np.mean(MSE[6])),
+                 'BS-LIBS avg = '+str(np.mean(min_stacking_MSE))
                 ), loc='upper right')
     plt.title('Different learning machine')
     plt.savefig('DifferentLearner.png')
     plt.clf()
     plt.plot()
+
+    plot_x = np.linspace(1, 100, 100)
+    plt.plot(plot_x,Ada_MSE,'b')
+    plt.plot(plot_x,MSE[6],'r')
+    plt.plot(plot_x,min_stacking_MSE,'g')
+    plt.legend(('Adaboost avg = '+str(np.mean(Ada_MSE)),
+        'Bagging after avg = ' + str(np.mean(MSE[6])),
+                'BS-LIBS avg = ' + str(np.mean(min_stacking_MSE))
+                ), loc='upper right')
+    plt.title('Bagging VS BS-LIBS VS Adaboost')
+    plt.savefig('Bagging VS BS-LIBS&Adaboost.png')
+    plt.clf()
+    plt.plot()
+
+
 
     plot_x = np.linspace(1, 100, 100)
     if len(stacking_MSE[0]) > 0:
@@ -647,8 +676,12 @@ if __name__=='__main__':
     meanTrainingData = {}
     getMean()
     #print(meanTrainingData)
-    #plt.plot(meanTrainingData['BK2']['wave'],meanTrainingData['BK2']['avg1'])
-    #plt.show()
+    """plt.plot(meanTrainingData['BK2']['wave'],meanTrainingData['BK2']['avg1'])
+    plt.title('BK2 sample LIBS spectrogram')
+    plt.ylabel('Relative Intensity(a.u)')
+    plt.xlabel('Wave Length(nm)')
+
+    plt.show()"""
     # element_dict = prepareNIST()
     element = 'Cu'
     x, y = newMain(element)
@@ -661,7 +694,7 @@ if __name__=='__main__':
     newx, newy = processingRatios()
     selectLearner(newx,newy)
 
-    os.mkdir("E:\\LIBS_experiment\\" + element + 'v6_version100SVR')
-    os.chdir("E:\\LIBS_experiment\\" + element + 'v6_version100SVR')
+    os.mkdir("E:\\LIBS_experiment\\" + element + 'v6_version0513')
+    os.chdir("E:\\LIBS_experiment\\" + element + 'v6_version0513')
     useXYtrain(newx, newy)
 
