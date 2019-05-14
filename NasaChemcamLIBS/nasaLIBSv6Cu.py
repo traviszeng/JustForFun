@@ -202,8 +202,10 @@ def drawTrain(y_pred,y_test,name,time):
 
     #y_pred = clf.predict(X_test)
     plt.plot(y_test, y_pred, '.')
-
-    xx = [1,2,3,10]
+    maxx = y_test.max()
+    if y_pred.max()>maxx:
+        maxx = y_pred.max()
+    xx = [1,2,3,maxx]
     plt.plot(xx,xx)
     plt.xlabel('Reference Value(ppm)')
     plt.ylabel('Predict Value(ppm)')
@@ -335,8 +337,8 @@ def useXYtrain(x,y,times):
 
 
         #Adaboost
-        #Adaboost = AdaBoostRegressor(base_estimator=SVR(C=1.0, epsilon=0.2))
-        Adaboost = AdaBoostRegressor()
+        Adaboost = AdaBoostRegressor(base_estimator=SVR(C=1.0, epsilon=0.2))
+        #Adaboost = AdaBoostRegressor()
         Adaboost.fit(X_train,y_train)
         y_pred = Adaboost.predict(X_test)
         yy = Adaboost.predict(x)
@@ -430,6 +432,8 @@ def useXYtrain(x,y,times):
     if len(MSE[6]) > 0:
         plt.plot(plot_x, MSE[6], color='coral', linestyle=':', marker='|')
     plt.plot(plot_x,min_stacking_MSE,color = 'cyan')
+    plt.xlabel('Repeat times')
+    plt.ylabel('MSE')
     plt.legend(( 'SVR avg = '+str(np.mean(MSE[0])),
                 'RFR avg = '+str(np.mean(MSE[1])),
                 'Lasso avg=' + str(np.mean(MSE[2])),
@@ -453,6 +457,8 @@ def useXYtrain(x,y,times):
                 'BS-LIBS avg = ' + str(np.mean(min_stacking_MSE))
                 ), loc='upper right')
     plt.title('Bagging VS BS-LIBS VS Adaboost')
+    plt.xlabel('Repeat times')
+    plt.ylabel('MSE')
     plt.savefig('Bagging VS BS-LIBS&Adaboost.png')
     plt.clf()
     plt.plot()
@@ -480,6 +486,8 @@ def useXYtrain(x,y,times):
                 'Bagging avg = ' + str(np.mean(stacking_MSE[5]))
                 ), loc='upper right')
     plt.title('Different meta-learning machine(Adaboost avg MSE=' + str(np.mean(Ada_MSE)) + ')')
+    plt.xlabel('Repeat times')
+    plt.ylabel('MSE')
     plt.savefig('DifferentMetaLearner.png')
     plt.clf()
     plt.plot()
@@ -694,8 +702,8 @@ if __name__=='__main__':
     newx, newy = processingRatios()
     selectLearner(newx,newy)
 
-    REPEAT_TIMES = 10
-    os.mkdir("E:\\LIBS_experiment\\" + element + 'v6_version0514_10times')
-    os.chdir("E:\\LIBS_experiment\\" + element + 'v6_version0514_10times')
+    REPEAT_TIMES = 100
+    os.mkdir("E:\\LIBS_experiment\\" + element + 'v6_version0514svr')
+    os.chdir("E:\\LIBS_experiment\\" + element + 'v6_version0514svr')
     useXYtrain(newx, newy,REPEAT_TIMES)
 
