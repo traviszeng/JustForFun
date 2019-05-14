@@ -202,9 +202,9 @@ def drawTrain(y_pred,y_test,name,time):
 
     #y_pred = clf.predict(X_test)
     plt.plot(y_test, y_pred, '.')
-    maxx = y_test.max()
-    if y_pred.max()>maxx:
-        maxx = y_pred.max()
+    maxx = max(y_test)
+    if max(y_pred)>maxx:
+        maxx = max(y_pred)
     xx = [1,2,3,maxx]
     plt.plot(xx,xx)
     plt.xlabel('Reference Value(ppm)')
@@ -337,8 +337,8 @@ def useXYtrain(x,y,times):
 
 
         #Adaboost
-        Adaboost = AdaBoostRegressor(base_estimator=SVR(C=1.0, epsilon=0.2))
-        #Adaboost = AdaBoostRegressor()
+        #Adaboost = AdaBoostRegressor(base_estimator=SVR(C=1.0, epsilon=0.2))
+        Adaboost = AdaBoostRegressor()
         Adaboost.fit(X_train,y_train)
         y_pred = Adaboost.predict(X_test)
         yy = Adaboost.predict(x)
@@ -703,7 +703,8 @@ if __name__=='__main__':
     selectLearner(newx,newy)
 
     REPEAT_TIMES = 100
-    os.mkdir("E:\\LIBS_experiment\\" + element + 'v6_version0514svr')
-    os.chdir("E:\\LIBS_experiment\\" + element + 'v6_version0514svr')
+    if not os.path.exists("E:\\LIBS_experiment\\" + element + 'v6_version0514'):
+        os.mkdir("E:\\LIBS_experiment\\" + element + 'v6_version0514')
+    os.chdir("E:\\LIBS_experiment\\" + element + 'v6_version0514')
     useXYtrain(newx, newy,REPEAT_TIMES)
 
