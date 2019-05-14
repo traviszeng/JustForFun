@@ -203,7 +203,7 @@ def drawTrain(y_pred,y_test,name,time):
     #y_pred = clf.predict(X_test)
     plt.plot(y_test, y_pred, '.')
 
-    xx = [1,2,3,100]
+    xx = [1,2,3,10]
     plt.plot(xx,xx)
     plt.xlabel('Reference Value(ppm)')
     plt.ylabel('Predict Value(ppm)')
@@ -212,7 +212,7 @@ def drawTrain(y_pred,y_test,name,time):
     plt.clf()
 
 
-def useXYtrain(x,y):
+def useXYtrain(x,y,times):
     flag = 0
     for  i in range(0,len(Selected_learnerCode)):
         if Selected_learnerCode[i]!='':
@@ -225,7 +225,7 @@ def useXYtrain(x,y):
 
     Ada_MSE = []
 
-    for i in range(0,100):
+    for i in range(0,times):
         print('第'+str(i+1)+'次试验：\n')
         Learners_map = {}
         Learners = []
@@ -407,14 +407,14 @@ def useXYtrain(x,y):
     print("Adaboost mean is "+str(np.mean(Ada_MSE)))
 
     min_stacking_MSE = []
-    for i in range(0, 100):
+    for i in range(0, times):
         minMSE = stacking_MSE[0][i]
         for j in range(1, 6):
             if stacking_MSE[j][i] < minMSE:
                 minMSE = stacking_MSE[j][i]
         min_stacking_MSE.append(minMSE)
 
-    plot_x = np.linspace(1, 100, 100)
+    plot_x = np.linspace(1, times, times)
     if len(MSE[0])>0:
         plt.plot(plot_x,MSE[0],'b')
     if len(MSE[1]) > 0:
@@ -444,7 +444,7 @@ def useXYtrain(x,y):
     plt.clf()
     plt.plot()
 
-    plot_x = np.linspace(1, 100, 100)
+    plot_x = np.linspace(1, times, times)
     plt.plot(plot_x,Ada_MSE,'b')
     plt.plot(plot_x,MSE[6],'r')
     plt.plot(plot_x,min_stacking_MSE,'g')
@@ -459,7 +459,7 @@ def useXYtrain(x,y):
 
 
 
-    plot_x = np.linspace(1, 100, 100)
+    plot_x = np.linspace(1, times, times)
     if len(stacking_MSE[0]) > 0:
         plt.plot(plot_x, stacking_MSE[0], 'b')
     if len(stacking_MSE[1]) > 0:
@@ -694,7 +694,8 @@ if __name__=='__main__':
     newx, newy = processingRatios()
     selectLearner(newx,newy)
 
-    os.mkdir("E:\\LIBS_experiment\\" + element + 'v6_version0513')
-    os.chdir("E:\\LIBS_experiment\\" + element + 'v6_version0513')
-    useXYtrain(newx, newy)
+    REPEAT_TIMES = 10
+    os.mkdir("E:\\LIBS_experiment\\" + element + 'v6_version0514_10times')
+    os.chdir("E:\\LIBS_experiment\\" + element + 'v6_version0514_10times')
+    useXYtrain(newx, newy,REPEAT_TIMES)
 
