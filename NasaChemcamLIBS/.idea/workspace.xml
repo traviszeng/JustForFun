@@ -18,120 +18,41 @@
     <SUITE FILE_PATH="coverage/NasaChemcamLIBS$nasaLIBSV3Fe.coverage" NAME="nasaLIBSV3Fe Coverage Results" MODIFIED="1552918944097" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/NasaChemcamLIBS$nasaLIBSLi.coverage" NAME="nasaLIBSLi Coverage Results" MODIFIED="1552831001085" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/NasaChemcamLIBS$nasaLIBSv4Cu.coverage" NAME="nasaLIBSv4Cu Coverage Results" MODIFIED="1556553739995" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/NasaChemcamLIBS$nasaLIBSv7Al.coverage" NAME="nasaLIBSv7Al Coverage Results" MODIFIED="1559271657993" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/NasaChemcamLIBS$nasaLIBSv6Cu.coverage" NAME="nasaLIBSv6Cu Coverage Results" MODIFIED="1557818002521" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/NasaChemcamLIBS$nasaLIBSBa.coverage" NAME="nasaLIBSBa Coverage Results" MODIFIED="1553522373601" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/NasaChemcamLIBS$nasaLIBSV3Zn.coverage" NAME="nasaLIBSV3Zn Coverage Results" MODIFIED="1555898448189" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/NasaChemcamLIBS$nasaLIBSV3Ba.coverage" NAME="nasaLIBSV3Ba Coverage Results" MODIFIED="1553562097161" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/NasaChemcamLIBS$nasaLIBSZn.coverage" NAME="nasaLIBSZn Coverage Results" MODIFIED="1552878407619" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/NasaChemcamLIBS$nasaLIBSv7Cu.coverage" NAME="nasaLIBSv7Cu Coverage Results" MODIFIED="1558361587126" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/NasaChemcamLIBS$nasaLIBSv7Cu.coverage" NAME="nasaLIBSv7Cu Coverage Results" MODIFIED="1559100253942" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/NasaChemcamLIBS$nasaLIBSV3.coverage" NAME="nasaLIBSV3 Coverage Results" MODIFIED="1553514467799" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/NasaChemcamLIBS$nasaLIBSv5Cu.coverage" NAME="nasaLIBSv5Cu Coverage Results" MODIFIED="1557146199432" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/NasaChemcamLIBS$asda.coverage" NAME="asda Coverage Results" MODIFIED="1558352989361" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="nasaLIBSv5Cu.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/nasaLIBSv5Cu.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="8450">
-              <caret line="372" column="12" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="633" selection-end-column="0" />
-              <folding>
-                <element signature="e#124#133#0" expanded="true" />
-                <element signature="e#2299#3829#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="nasaLIBSv6Cu.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/nasaLIBSv6Cu.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="4775">
-              <caret line="225" column="22" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="710" selection-end-column="0" />
-              <folding>
-                <element signature="e#124#133#0" expanded="true" />
-                <element signature="e#2299#3829#0" expanded="false" />
-                <element signature="e#21679#25621#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="nasaLIBSv7Cu.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="nasaLIBSv7Cu.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/nasaLIBSv7Cu.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="418">
-              <caret line="794" column="39" lean-forward="true" selection-start-line="794" selection-start-column="39" selection-end-line="794" selection-end-column="39" />
+            <state relative-caret-position="125">
+              <caret line="41" column="0" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="798" selection-end-column="0" />
+              <folding>
+                <element signature="e#152#161#0" expanded="true" />
+                <element signature="e#6100#6637#0" expanded="false" />
+                <element signature="e#25096#30445#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="nasaLIBSv7Al.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/nasaLIBSv7Al.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="184">
+              <caret line="793" column="0" lean-forward="true" selection-start-line="793" selection-start-column="0" selection-end-line="793" selection-end-column="0" />
               <folding>
                 <element signature="e#152#161#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="asda.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/asda.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="200">
-              <caret line="15" column="8" lean-forward="true" selection-start-line="15" selection-start-column="8" selection-end-line="15" selection-end-column="8" />
-              <folding>
-                <element signature="e#0#49#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="nasaLIBSallIntensity.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/nasaLIBSallIntensity.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="400">
-              <caret line="58" column="3" lean-forward="false" selection-start-line="58" selection-start-column="3" selection-end-line="58" selection-end-column="3" />
-              <folding>
-                <element signature="e#1183#1749#0" expanded="false" />
-                <element signature="e#1888#3418#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="nasaLIBS.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/nasaLIBS.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="500">
-              <caret line="20" column="46" lean-forward="false" selection-start-line="20" selection-start-column="46" selection-end-line="20" selection-end-column="46" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="nasaLIBSv4Ba.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/nasaLIBSv4Ba.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="5425">
-              <caret line="241" column="46" lean-forward="false" selection-start-line="241" selection-start-column="46" selection-end-line="241" selection-end-column="46" />
-              <folding>
-                <element signature="e#63#72#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="frame.py" pinned="false" current-in-tab="false">
-        <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python37/Lib/site-packages/pandas/core/frame.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="81500">
-              <caret line="3353" column="0" lean-forward="false" selection-start-line="3353" selection-start-column="0" selection-end-line="3353" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="series.py" pinned="false" current-in-tab="false">
-        <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python37/Lib/site-packages/pandas/core/series.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="5450">
-              <caret line="265" column="0" lean-forward="false" selection-start-line="265" selection-start-column="0" selection-end-line="265" selection-end-column="0" />
-              <folding />
             </state>
           </provider>
         </entry>
@@ -183,6 +104,7 @@
         <option value="$PROJECT_DIR$/nasaLIBSv6Cu.py" />
         <option value="$PROJECT_DIR$/asda.py" />
         <option value="$PROJECT_DIR$/nasaLIBSv7Cu.py" />
+        <option value="$PROJECT_DIR$/nasaLIBSv7Al.py" />
       </list>
     </option>
   </component>
@@ -193,10 +115,10 @@
     <sorting>DEFINITION_ORDER</sorting>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="1960" />
-    <option name="y" value="104" />
-    <option name="width" value="1036" />
-    <option name="height" value="867" />
+    <option name="x" value="1912" />
+    <option name="y" value="80" />
+    <option name="width" value="1456" />
+    <option name="height" value="876" />
   </component>
   <component name="ProjectView">
     <navigator currentView="ProjectPane" proportions="" version="1">
@@ -224,6 +146,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scratches" />
       <pane id="Scope">
         <subPane subId="Project Files">
           <expand>
@@ -235,13 +158,12 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="settings.editor.selected.configurable" value="editor.preferences.fonts.default" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../CanadaLIBSdata" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -255,7 +177,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.nasaLIBSv7Cu">
+  <component name="RunManager" selected="Python.nasaLIBSv7Al">
     <configuration name="asda" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -270,24 +192,6 @@
       <module name="NasaChemcamLIBS" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/asda.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-    </configuration>
-    <configuration name="nasaLIBSv4Cu" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="NasaChemcamLIBS" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/nasaLIBSv4Cu.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -328,6 +232,24 @@
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
     </configuration>
+    <configuration name="nasaLIBSv7Al" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="NasaChemcamLIBS" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/nasaLIBSv7Al.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+    </configuration>
     <configuration name="nasaLIBSv7Cu" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -347,19 +269,19 @@
       <option name="EMULATE_TERMINAL" value="false" />
     </configuration>
     <list size="5">
-      <item index="0" class="java.lang.String" itemvalue="Python.nasaLIBSv4Cu" />
-      <item index="1" class="java.lang.String" itemvalue="Python.nasaLIBSv5Cu" />
-      <item index="2" class="java.lang.String" itemvalue="Python.nasaLIBSv6Cu" />
-      <item index="3" class="java.lang.String" itemvalue="Python.nasaLIBSv7Cu" />
-      <item index="4" class="java.lang.String" itemvalue="Python.asda" />
+      <item index="0" class="java.lang.String" itemvalue="Python.nasaLIBSv5Cu" />
+      <item index="1" class="java.lang.String" itemvalue="Python.nasaLIBSv6Cu" />
+      <item index="2" class="java.lang.String" itemvalue="Python.nasaLIBSv7Cu" />
+      <item index="3" class="java.lang.String" itemvalue="Python.asda" />
+      <item index="4" class="java.lang.String" itemvalue="Python.nasaLIBSv7Al" />
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="Python.nasaLIBSv7Cu" />
-        <item index="1" class="java.lang.String" itemvalue="Python.asda" />
-        <item index="2" class="java.lang.String" itemvalue="Python.nasaLIBSv6Cu" />
-        <item index="3" class="java.lang.String" itemvalue="Python.nasaLIBSv5Cu" />
-        <item index="4" class="java.lang.String" itemvalue="Python.nasaLIBSv4Cu" />
+        <item index="0" class="java.lang.String" itemvalue="Python.nasaLIBSv7Al" />
+        <item index="1" class="java.lang.String" itemvalue="Python.nasaLIBSv7Cu" />
+        <item index="2" class="java.lang.String" itemvalue="Python.asda" />
+        <item index="3" class="java.lang.String" itemvalue="Python.nasaLIBSv6Cu" />
+        <item index="4" class="java.lang.String" itemvalue="Python.nasaLIBSv5Cu" />
       </list>
     </recent_temporary>
   </component>
@@ -382,11 +304,11 @@
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.13819444" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3027523" sideWeight="0.33194444" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.46395805" sideWeight="0.34791666" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3027523" sideWeight="0.66805553" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.46395805" sideWeight="0.65208334" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
@@ -430,18 +352,11 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="10" />
+      <option name="time" value="11" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/nasaLIBSSr.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2356">
-          <caret line="195" column="0" lean-forward="false" selection-start-line="195" selection-start-column="0" selection-end-line="195" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/nasaLIBSZn.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="4180">
@@ -481,10 +396,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="5460">
           <caret line="313" column="0" lean-forward="false" selection-start-line="313" selection-start-column="0" selection-end-line="313" selection-end-column="0" />
-          <folding>
-            <element signature="e#1183#1749#0" expanded="false" />
-            <element signature="e#1888#3418#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -534,10 +445,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="5460">
           <caret line="313" column="0" lean-forward="false" selection-start-line="313" selection-start-column="0" selection-end-line="313" selection-end-column="0" />
-          <folding>
-            <element signature="e#1183#1749#0" expanded="false" />
-            <element signature="e#1888#3418#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -668,7 +575,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="75300">
           <caret line="3061" column="0" lean-forward="false" selection-start-line="3061" selection-start-column="0" selection-end-line="3061" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -690,7 +596,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="81500">
           <caret line="3353" column="0" lean-forward="false" selection-start-line="3353" selection-start-column="0" selection-end-line="3353" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -698,7 +603,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="5450">
           <caret line="265" column="0" lean-forward="false" selection-start-line="265" selection-start-column="0" selection-end-line="265" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -706,9 +610,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="5425">
           <caret line="241" column="46" lean-forward="false" selection-start-line="241" selection-start-column="46" selection-end-line="241" selection-end-column="46" />
-          <folding>
-            <element signature="e#63#72#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -716,7 +617,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="500">
           <caret line="20" column="46" lean-forward="false" selection-start-line="20" selection-start-column="46" selection-end-line="20" selection-end-column="46" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -724,10 +624,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="400">
           <caret line="58" column="3" lean-forward="false" selection-start-line="58" selection-start-column="3" selection-end-line="58" selection-end-column="3" />
-          <folding>
-            <element signature="e#1183#1749#0" expanded="false" />
-            <element signature="e#1888#3418#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -735,10 +631,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="8450">
           <caret line="372" column="12" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="633" selection-end-column="0" />
-          <folding>
-            <element signature="e#124#133#0" expanded="true" />
-            <element signature="e#2299#3829#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -753,11 +645,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="4775">
           <caret line="225" column="22" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="710" selection-end-column="0" />
-          <folding>
-            <element signature="e#124#133#0" expanded="true" />
-            <element signature="e#2299#3829#0" expanded="false" />
-            <element signature="e#21679#25621#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -772,7 +659,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-193">
           <caret line="190" column="14" lean-forward="true" selection-start-line="190" selection-start-column="14" selection-end-line="190" selection-end-column="14" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -780,7 +666,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="453">
           <caret line="86" column="8" lean-forward="false" selection-start-line="86" selection-start-column="8" selection-end-line="86" selection-end-column="8" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -788,16 +673,25 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="200">
           <caret line="15" column="8" lean-forward="true" selection-start-line="15" selection-start-column="8" selection-end-line="15" selection-end-column="8" />
-          <folding>
-            <element signature="e#0#49#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/nasaLIBSv7Cu.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="418">
-          <caret line="794" column="39" lean-forward="true" selection-start-line="794" selection-start-column="39" selection-end-line="794" selection-end-column="39" />
+        <state relative-caret-position="125">
+          <caret line="41" column="0" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="798" selection-end-column="0" />
+          <folding>
+            <element signature="e#152#161#0" expanded="true" />
+            <element signature="e#6100#6637#0" expanded="false" />
+            <element signature="e#25096#30445#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/nasaLIBSv7Al.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="184">
+          <caret line="793" column="0" lean-forward="true" selection-start-line="793" selection-start-column="0" selection-end-line="793" selection-end-column="0" />
           <folding>
             <element signature="e#152#161#0" expanded="true" />
           </folding>
