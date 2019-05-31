@@ -58,8 +58,8 @@ def drawTrain(y_pred,y_test,name,time):
         maxx = max(y_pred)
     xx = [1,2,3,maxx]
     plt.plot(xx,xx)
-    plt.xlabel('Reference Value(ppm)')
-    plt.ylabel('Predict Value(ppm)')
+    plt.xlabel('Reference Value(%)')
+    plt.ylabel('Predict Value(%)')
     plt.title(name)
     plt.savefig(str(time)+name+'.png')
     plt.clf()
@@ -267,30 +267,30 @@ def newMain():
     y = []
     for samplename, concentrate in concentrate_set_200AVG.items():
         xtemp = []
-        for culine in test_al_line:
-            for feline in test_fe_line:
-                try:
-                    #print(max(getROI(data_set_200AVG,samplename,culine)['WaveLength']))
-                    #print(max(getROI(data_set_200AVG,samplename,feline)['WaveLength']))
-                    xtemp.append(max(getROI(data_set_200AVG,samplename,culine)['Intensity'])/max(data_set_200AVG[samplename]['Intensity']))
-                except ValueError:
-                    print('No line in '+str(culine))
-                    pass
+        for line in test_al_line:
+
+            try:
+                #print(max(getROI(data_set_200AVG,samplename,culine)['WaveLength']))
+                #print(max(getROI(data_set_200AVG,samplename,feline)['WaveLength']))
+                xtemp.append(max(getROI(data_set_200AVG,samplename,line)['Intensity'])/max(data_set_200AVG[samplename]['Intensity']))
+            except ValueError:
+                print('No line in '+str(line))
+                pass
 
         x.append(xtemp)
         y.append(concentrate[0]*100)
 
     for samplename, concentrate in concentrate_set_1000AVG.items():
         xtemp = []
-        for culine in test_al_line:
-            for feline in test_fe_line:
-                try:
-                    #print(max(getROI(data_set_200AVG, samplename, culine)['WaveLength']))
-                    #print(max(getROI(data_set_200AVG, samplename, feline)['WaveLength']))
-                    xtemp.append(max(getROI(data_set_1000AVG, samplename, culine)['Intensity']) / max(data_set_1000AVG[samplename]['Intensity']))
-                except ValueError:
-                    print('No line in ' + str(culine))
-                    pass
+        for line in test_al_line:
+
+            try:
+                #print(max(getROI(data_set_200AVG, samplename, culine)['WaveLength']))
+                #print(max(getROI(data_set_200AVG, samplename, feline)['WaveLength']))
+                xtemp.append(max(getROI(data_set_1000AVG, samplename, line)['Intensity']) / max(data_set_1000AVG[samplename]['Intensity']))
+            except ValueError:
+                print('No line in ' + str(line))
+                pass
 
         x.append(xtemp)
         y.append(concentrate[0] * 100)
@@ -794,17 +794,21 @@ if __name__=='__main__':
     x, y = newMain()
 
     y_df = pd.DataFrame(y, columns=['Target'])
-    x_df = pd.DataFrame(x, columns=['feature1', 'feature2', 'feature3', 'feature4', 'feature5', 'feature6', 'feature7',
+    """x_df = pd.DataFrame(x, columns=['feature1', 'feature2', 'feature3', 'feature4', 'feature5', 'feature6', 'feature7',
                                     'feature8','feature9','feature10','feature11','feature12','feature13','feature14','feature15','feature16'
-                                    ,'feature17','feature18','feature19','feature20'])
+                                    ,'feature17','feature18','feature19','feature20'])"""
+
+    x_df = pd.DataFrame(x, columns=['feature1', 'feature2', 'feature3', 'feature4', 'feature5'])
 
     newx, newy = processingRatios()
 
     selectLearner(newx, newy)
 
     element = 'Al'
-    REPEAT_TIMES = 200
-    if not os.path.exists("E:\\LIBS_experiment\\" + element + 'v7_version0528'):
-        os.mkdir("E:\\LIBS_experiment\\" + element + 'v7_version0528')
-    os.chdir("E:\\LIBS_experiment\\" + element + 'v7_version0528')
+    REPEAT_TIMES = 100
+    if not os.path.exists("E:\\LIBS_experiment\\" + element + 'v7_Canada'):
+        os.mkdir("E:\\LIBS_experiment\\" + element + 'v7_Canada')
+    os.chdir("E:\\LIBS_experiment\\" + element + 'v7_Canada')
     useXYtrain(newx, newy, REPEAT_TIMES)
+    
+
