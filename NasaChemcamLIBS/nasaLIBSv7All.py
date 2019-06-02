@@ -1,6 +1,16 @@
 """
-利用加拿大航天局的LIBS数据进行LIBS定量分析实验
+将目标元素的特征区间max/dominant matrix的特征区间max 将其中的ratio作为特征
 """
+"""
+用mlxtend作为stacking的库
+"""
+"""
+与adaboost默认base model 作比较
+"""
+"""
+使用GridSearchCV来进行调参
+"""
+
 import os
 import sys
 import pandas as pd
@@ -25,212 +35,23 @@ from sklearn.pipeline import make_pipeline
 from sklearn.metrics import mean_squared_error
 from sklearn.svm import SVR
 from sklearn.model_selection import KFold, cross_val_score, train_test_split, GridSearchCV
-
 import warnings
 
 warnings.filterwarnings("ignore")
 
-route_200_AVG = "E:\\JustForFun\\CanadaLIBSdata\\LIBS OpenData csv\\csv Material Large Set 200pulseaverage"
-route_1000_AVG = "E:\\JustForFun\\CanadaLIBSdata\\LIBS OpenData csv\\csv Certified Samples Subset 1000pulseaverage"
+pd.set_option('display.max_rows', 50)
+pd.set_option('display.max_columns', 50)
 
-postfix_200AVG = "_200AVG.csv"
-postfix_1000AVG = "_1000AVG.csv"
+DATA_base_add = "E:\\NasaChemcamLIBSDataset\\"
+DATA_folder_add = "E:\\NasaChemcamLIBSDataset\\Derived\\ica\\"
 
-test_line ={
-    'Al':[309.271,308.216,309.284,394.403,396.153],
-    'Ti':[364.268,319.990,363.546,365.350,399.864],
-    'Si':[251.612,250.690,251.433,252.412,252.852],
-    'Mn':[279.482,222.183,280.106,403.307,403.449],
-    'Mg':[385.213,279.553,202.580,230.270],
-    'Na':[588.995,330.232,330.299,589.592],
-    'Ca':[422.673,239.356,272.164,393.367],
-    'Fe':[248.327, 248.637, 252.285, 302.064]
-
-
-}
-
-
-def loadConcentrateFile():
-    print("Loading concentrate file.....\n")
-    concentrate_data = pd.read_csv("E:\\JustForFun\\CanadaLIBSdata\\LIBS OpenData csv\\Sample_Composition_Data.csv")
-    # 前81行为数据
-    concentrate_data = concentrate_data.loc[0:81]
-    return concentrate_data
-
-
-def drawTrain(y_pred, y_test, name, time):
-    # clf.fit(X_train,y_train)
-    # y_pred = clf.predict(X_test)
-    # RFR_MSE.append(mean_squared_error(y_test, y_pred))
-    # print('Mean squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
-
-    # y_pred = clf.predict(X_test)
-    plt.plot(y_test, y_pred, '.')
-    maxx = max(y_test)
-    if max(y_pred) > maxx:
-        maxx = max(y_pred)
-    xx = [1, 2, 3, maxx]
-    plt.plot(xx, xx)
-    plt.xlabel('Reference Value(%)')
-    plt.ylabel('Predict Value(%)')
-    plt.title(name)
-    plt.savefig(str(time) + name + '.png')
-    plt.clf()
-
-
+test_cu_line = [324.754, 327.396]
+test_fe_line = [248.327, 248.637, 252.285, 302.064]
+test_al_line = [309.271, 308.216, 309.284, 394.403, 396.153]
 """
-数据预处理流程：
-1.填补空白值
-2.处理异常值，Nan value处理
-3.str转float
+    Ensemble bagging method
+    using average
 """
-
-
-def dataPreprocessing(concentrate_data):
-    # 数据清洗
-    for indexs in concentrate_data.index:
-        for i in range(1, 12):
-            if concentrate_data.loc[indexs].values[i] == '-':
-                concentrate_data.loc[indexs].values[i] = 0.0
-
-            else:
-                try:
-                    concentrate_data.loc[indexs].values[i] = float(concentrate_data.loc[indexs].values[i])
-                    if float(concentrate_data.loc[indexs].values[i]) > 1:
-                        concentrate_data.loc[indexs].values[i] = concentrate_data.loc[indexs].values[i] / 100
-                except ValueError:
-                    concentrate_data.loc[indexs].values[i] = float(concentrate_data.loc[indexs].values[i][1:])
-                    if float(concentrate_data.loc[indexs].values[i]) > 1:
-                        concentrate_data.loc[indexs].values[i] = concentrate_data.loc[indexs].values[i] / 100
-
-    # 检查是否将所有非数字处理好
-    for column in concentrate_data.columns:
-        print(concentrate_data[column].isna().value_counts())
-    return concentrate_data
-
-
-"""
-加载训练样本
-"""
-data_set_200AVG = {}
-concentrate_set_200AVG = {}
-
-
-def load200AVGTrainingFiles(concentrate_data):
-    # 加载200AVG的样本，并将其存到data_set_200AVG中
-    os.chdir(route_200_AVG)
-    num = 0
-    for indexs in concentrate_data.index:
-        if os.path.exists(concentrate_data.loc[indexs].values[0] + postfix_200AVG):
-            num += 1
-            print("Get data file:" + concentrate_data.loc[indexs].values[0] + postfix_200AVG)
-            data = pd.read_csv(concentrate_data.loc[indexs].values[0] + postfix_200AVG, header=None,
-                               names=['WaveLength', 'Intensity'])
-            # data中强度<0的统统变为0
-            data.loc[data.Intensity < 0, 'Intensity'] = 0
-            data_set_200AVG[concentrate_data.loc[indexs].values[0] + "_200AVG"] = data
-            concentrate_set_200AVG[concentrate_data.loc[indexs].values[0] + "_200AVG"] = concentrate_data.loc[
-                                                                                             indexs].values[1:]
-        # 处理hand sample类型的样本
-        if re.match('hand sample*', concentrate_data.loc[indexs].values[0]):
-
-            f_list = concentrate_data.loc[indexs].values[0].split()
-            filename = f_list[0] + " " + f_list[1] + postfix_200AVG
-            if os.path.exists(filename):
-                num += 1
-                print("Get data file:" + filename)
-                data = pd.read_csv(filename, header=None, names=['WaveLength', 'Intensity'])
-                # data中强度<0的统统变为0
-                data.loc[data.Intensity < 0, 'Intensity'] = 0
-                data_set_200AVG[concentrate_data.loc[indexs].values[0] + "_200AVG"] = data
-                concentrate_set_200AVG[concentrate_data.loc[indexs].values[0] + "_200AVG"] = concentrate_data.loc[
-                                                                                                 indexs].values[1:]
-
-    print("Get " + str(num) + " 200_AVG files.\n")
-    print()
-
-
-data_set_1000AVG = {}
-concentrate_set_1000AVG = {}
-
-
-def load1000AVGtrainingFiles(concentrate_data):
-    num = 0
-    # 加载1000AVG的样本，并将其存到data_set_1000AVG中
-    os.chdir(route_1000_AVG)
-    for indexs in concentrate_data.index:
-        if os.path.exists(concentrate_data.loc[indexs].values[0] + postfix_1000AVG):
-            num += 1
-            print("Get data file:" + concentrate_data.loc[indexs].values[0] + postfix_1000AVG)
-            data = pd.read_csv(concentrate_data.loc[indexs].values[0] + postfix_1000AVG, header=None,
-                               names=['WaveLength', 'Intensity'])
-            # data中强度<0的统统变为0
-            data.loc[data.Intensity < 0, 'Intensity'] = 0
-            data_set_1000AVG[concentrate_data.loc[indexs].values[0] + "_1000AVG"] = data
-            concentrate_set_1000AVG[concentrate_data.loc[indexs].values[0] + "_1000AVG"] = concentrate_data.loc[
-                                                                                               indexs].values[1:]
-        # 处理hand sample类型的样本
-        if re.match('hand sample*', concentrate_data.loc[indexs].values[0]):
-
-            f_list = concentrate_data.loc[indexs].values[0].split()
-            filename = f_list[0] + " " + f_list[1] + postfix_1000AVG
-            if os.path.exists(filename):
-                num += 1
-                print("Get data file:" + filename)
-                data = pd.read_csv(filename, header=None, names=['WaveLength', 'Intensity'])
-                # data中强度<0的统统变为0
-                data.loc[data.Intensity < 0, 'Intensity'] = 0
-                data_set_1000AVG[concentrate_data.loc[indexs].values[0] + "_1000AVG"] = data
-                concentrate_set_1000AVG[concentrate_data.loc[indexs].values[0] + "_1000AVG"] = concentrate_data.loc[
-                                                                                                   indexs].values[1:]
-
-    print("Get " + str(num) + " 1000_AVG files.\n")
-
-
-"""
-准备concentration相关数据
-"""
-
-
-def prepareConcentrationData():
-    concentrate_data = loadConcentrateFile()
-    concentrate_data = dataPreprocessing(concentrate_data)
-    load200AVGTrainingFiles(concentrate_data)
-    load1000AVGtrainingFiles(concentrate_data)
-    # 去掉hand sample34的记录（全为0）
-    del concentrate_set_200AVG['hand sample37 barite_200AVG']
-    del data_set_200AVG['hand sample37 barite_200AVG']
-
-
-# 获得特征峰左右0.25的特征点
-def getROI(dataset, samplename, aim):
-    d = dataset[samplename]
-    d = d.loc[d['WaveLength'] > aim - 0.25]
-    d = d.loc[d['WaveLength'] < aim + 0.25]
-    return d
-
-
-"""
-准备NIST库的元素特征峰信息
-放在element_dict中 key为元素名称
-"""
-globals = {
-    'nan': 0
-}
-
-
-def prepareNIST():
-    print("准备NIST库相关数据\n")
-    # if os.path.exists("E:\\JustForFun\\CanadaLIBSdata\\element_dict.dat"):
-    print('读取NIST缓存')
-    f = open("E:\\JustForFun\\CanadaLIBSdata\\element_dict.dat", 'r')
-    a = f.read()
-    element_dict = eval(a, globals)
-    f.close()
-    return element_dict
-
-
-element_dict = prepareNIST()
 
 
 class baggingAveragingModels(BaseEstimator, RegressorMixin, TransformerMixin):
@@ -255,234 +76,152 @@ class baggingAveragingModels(BaseEstimator, RegressorMixin, TransformerMixin):
         return np.mean(predictions, axis=1)
 
 
-""""#准备训练数据，未作任何处理，将整个光谱输入
-X = []
-#波长
-waveLength = []
-#相关浓度信息
-#元素顺序Al Ca Fe K Mg Mn Na Si Ti P
-y = [[],[],[],[],[],[],[],[],[],[]]
-#准备训练数据
-def prepareTrainingXY():
-    for samplename,concentrate in concentrate_set_200AVG.items():
-        X.append(np.array(data_set_200AVG[samplename].Intensity))
-        waveLength.append(np.array(data_set_200AVG[samplename].WaveLength))
-        y[0].append(concentrate[0]*100)
-        y[1].append(concentrate[1]*100)
-        y[2].append(concentrate[2]*100)
-        y[3].append(concentrate[3]*100)
-        y[4].append(concentrate[4]*100)
-        y[5].append(concentrate[5]*100)
-        y[6].append(concentrate[6]*100)
-        y[7].append(concentrate[7]*100)
-        y[8].append(concentrate[8]*100)
-        y[9].append(concentrate[9]*100)
-
-    for samplename,concentrate in concentrate_set_1000AVG.items():
-        X.append(np.array(data_set_1000AVG[samplename].Intensity))
-        waveLength.append(np.array(data_set_1000AVG[samplename].WaveLength))
-        y[0].append(concentrate[0] * 100)
-        y[1].append(concentrate[1] * 100)
-        y[2].append(concentrate[2] * 100)
-        y[3].append(concentrate[3] * 100)
-        y[4].append(concentrate[4] * 100)
-        y[5].append(concentrate[5] * 100)
-        y[6].append(concentrate[6] * 100)
-        y[7].append(concentrate[7] * 100)
-        y[8].append(concentrate[8] * 100)
-        y[9].append(concentrate[9] * 100)
+"""
+    Ensemble stacking method
+    一层stacking
 """
 
 
+class StackingAveragedModels(BaseEstimator, RegressorMixin, TransformerMixin):
+    def __init__(self, base_models, meta_model, n_folds=5):
+        self.base_models = base_models
+        self.meta_model = meta_model
+        self.n_folds = n_folds
+
+    # 在原有模型的拷贝上再次训练
+    def fit(self, X, y):
+        self.base_models_ = [list() for x in self.base_models]
+        self.meta_model_ = clone(self.meta_model)
+        kfold = KFold(n_splits=self.n_folds, shuffle=True, random_state=156)
+
+        # 在拷贝的基本模型上进行out-of-fold预测，并用预测得到的作为meta model的feature
+        out_of_fold_predictions = np.zeros((len(X), len(self.base_models)))
+        for i, model in enumerate(self.base_models):
+            for train_index, holdout_index in kfold.split(X, y):
+                # print(train_index)
+                instance = clone(model)
+                self.base_models_[i].append(instance)
+                instance.fit(np.array(X)[train_index], np.array(y)[train_index])
+                y_pred = instance.predict(np.array(X)[holdout_index])
+                out_of_fold_predictions[holdout_index, i] = y_pred
+
+        # 用out-of-foldfeature训练meta-model
+        # print(type(out_of_fold_predictions))
+        # print(len(y))
+        self.meta_model_.fit(np.array(out_of_fold_predictions), y)
+        return self
+
+    # 使用基学习器预测测试数据，并将各基学习器预测值平均后作为meta-data feed给meta-model在做预测
+    def predict(self, X):
+        meta_features = np.column_stack([
+            np.column_stack([model.predict(X) for model in base_models]).mean(axis=1)
+            for base_models in self.base_models_])
+        return self.meta_model_.predict(meta_features)
 
 
-def newMain(element,index):
-    x = []
-    y = []
-    if index>3:
-        index = index +1 #中间有个元素不行
-    for samplename, concentrate in concentrate_set_200AVG.items():
-        xtemp = []
-        for line in test_line[element]:
-
-            try:
-                # print(max(getROI(data_set_200AVG,samplename,culine)['WaveLength']))
-                # print(max(getROI(data_set_200AVG,samplename,feline)['WaveLength']))
-                xtemp.append(max(getROI(data_set_200AVG, samplename, line)['Intensity']) / max(
-                    data_set_200AVG[samplename]['Intensity']))
-            except ValueError:
-                print('No line in ' + str(line))
-                pass
-
-        x.append(xtemp)
-        y.append(concentrate[index] * 100)
-
-    for samplename, concentrate in concentrate_set_1000AVG.items():
-        xtemp = []
-        for line in test_line[element]:
-
-            try:
-                # print(max(getROI(data_set_200AVG, samplename, culine)['WaveLength']))
-                # print(max(getROI(data_set_200AVG, samplename, feline)['WaveLength']))
-                xtemp.append(max(getROI(data_set_1000AVG, samplename, line)['Intensity']) / max(
-                    data_set_1000AVG[samplename]['Intensity']))
-            except ValueError:
-                print('No line in ' + str(line))
-                pass
-
-        x.append(xtemp)
-        y.append(concentrate[index] * 100)
-
-    # useXYtrain(x,y)
-    return x, y
+# 加载浓度信息
+def loadConcentrationData():
+    con = pd.read_csv(DATA_base_add + "Concentration.csv")
+    # print(con)
+    return con
 
 
-def processingRatios():
-    xy = x_df.join(y_df)
-    # 处理异常值
-    xy = xy.loc[xy.feature4 > 0]
-    xy = xy.loc[xy.feature4 < 4]
-    xy = xy.loc[xy.Target < 100]
-    xy_0 = xy[xy.Target <= 0]
-    xy = xy[xy.Target > 0]
-    xy.append(xy_0.mean(), ignore_index=True)
-
-    newx = []
-    newy = []
-
-    print("行数为" + str(xy.shape[0]))
-    for i in range(0, xy.shape[0]):
-        try:
-            newx.append(xy.loc[i].tolist()[:-1])
-            newy.append(xy.loc[i].tolist()[-1])
-        except KeyError:
-            pass
-
-    return newx, newy
+# 标准化
+def normalize(data):
+    norm = (data - data.mean()) / (data.max() - data.min())
+    return norm
 
 
-# 学习器选择 设定一个阈值 MSE低于该阈值的学习器认为适合
-MSE_bar = 50
-def selectLearner(x, y):
-    SVR_MSE = []
-    RFR_MSE = []
-    GBOOST_MSE = []
-    ENET_MSE = []
-    LASSO_MSE = []
+# 处理初始数据文件的一些问题
+def processRawData(data):
+    data = data.loc[1:6144]
+    # 处理一下columns的问题
+    data.columns = data.columns.str.replace('#', ' ')
+    data.columns = data.columns.str.strip()
+    return data
 
-    for i in range(0, 10):
-        print('第' + str(i + 1) + '次试验：\n')
-        X_train, X_test, y_train, y_test = train_test_split(x,
-                                                            y,
-                                                            test_size=0.20)
 
-        # svr = SVR(C=1.0, epsilon=0.2)
-        # drawTrain(svr, x, y, 'SVR', i)
-        svr = SVR(C=1.0, epsilon=0.1, kernel='rbf')
-        parameters = {'C': np.logspace(-3, 3, 7), 'gamma': np.logspace(-3, 3, 7)}
-        print("GridSearch starting...")
-        clf = GridSearchCV(svr, parameters, n_jobs=-1, scoring='neg_mean_squared_error')
-        clf.fit(X_train, y_train)
+def loadTrainingSamples():
+    for name in con.Name:
+        if os.path.exists(DATA_folder_add + name.lower()):
+            # print(name.lower())
+            for root, dirs, files in os.walk(DATA_folder_add + name.lower()):
+                for file in files:
+                    # print(os.path.join(root, name))
+                    if file.endswith(".csv"):
+                        print("Reading files in " + os.path.join(root, file))
+                        data = pd.read_csv(os.path.join(root, file), skiprows=14)
+                        data = processRawData(data)
+                        if name not in trainingData.keys():
+                            trainingData[name] = []
+                            trainingData[name].append(data)
+                        else:
+                            trainingData[name].append(data)
+                            # print(data)
 
-        print('The parameters of the best model are: ')
-        print(clf.best_params_)
-        y_pred = clf.best_estimator_.predict(X_test)
-        SVR_MSE.append(mean_squared_error(y_test, y_pred))
-        print('SVR Mean squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
-        del clf, svr
-        """ann = Regressor(layers = [Layer("Sigmoid", units=14),
-                                   Layer("Linear")],
-                         learning_rate = 0.02,
-                         random_state = 2018,
-                         n_iter = 10)
 
-        ann.fit(X_train,y_train)
-        y_pred = ann.predict(X_test)
-        print('ANN Mean squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")"""
+# 获取每个样本的meanmlxtend stacking 调参
+def getMean():
+    for key, item in trainingData.items():
+        # print(key)
+        sum = 0
+        data = pd.DataFrame(trainingData[key][0]['wave'])
+        # data['wave']  = trainingData['wave']
+        for df in item:
+            data['avg' + str(sum + 1)] = df['mean']
+            sum += 1
 
-        parameters = {'n_estimators': [10, 50, 100, 500, 1000]}
-        rfr = RandomForestRegressor(n_estimators=200, random_state=0)
-        # drawTrain(rfr, x, y, 'RFR', i)
-        # rfr = RandomForestRegressor(n_estimators=200, random_state=0)
-        clf = GridSearchCV(rfr, parameters, n_jobs=-1, scoring='neg_mean_squared_error')
-        clf.fit(X_train, y_train)
-        print('The parameters of the best model are: ')
-        print(clf.best_params_)
-        y_pred = clf.best_estimator_.predict(X_test)
-        RFR_MSE.append(mean_squared_error(y_test, y_pred))
-        print('RFR Mean squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
-        del clf, rfr
+        meanTrainingData[key] = data
 
-        parameters = {'alpha': np.logspace(-2, 2, 5)}
-        lasso = Lasso(alpha=0.05, random_state=1, max_iter=1000)
-        # drawTrain(lasso, x, y, 'LASSO', i)
-        clf = GridSearchCV(lasso, parameters, n_jobs=-1, scoring='neg_mean_squared_error')
-        clf.fit(X_train, y_train)
-        print('The parameters of the best model are: ')
-        print(clf.best_params_)
 
-        y_pred = clf.best_estimator_.predict(X_test)
-        LASSO_MSE.append(mean_squared_error(y_test, y_pred))
-        print('LASSO  Mean squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
-        # file.write('LASSO  Mean squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
-        del clf, lasso
+# 获取目标区间的ROI
+# aim为对应的特征峰
+# 以0.5为区间的话
+def getROI(aim, samplename):
+    d = meanTrainingData[samplename]
+    d = d.loc[d['wave'] > aim - 0.25]
+    d = d.loc[d['wave'] < aim + 0.25]
+    return d
 
-        parameters = {'alpha': np.logspace(-2, 2, 5)}
-        # ENet = ElasticNet(alpha=0.05, l1_ratio=.9, random_state=3)
-        # drawTrain(ENet, x, y, 'Elastic NET', i)
-        ENet = ElasticNet(alpha=0.05, l1_ratio=.9, random_state=3)
-        clf = GridSearchCV(ENet, parameters, n_jobs=-1, scoring='neg_mean_squared_error')
-        clf.fit(X_train, y_train)
-        print('The parameters of the best model are: ')
-        print(clf.best_params_)
-        y_pred = clf.best_estimator_.predict(X_test)
-        ENET_MSE.append(mean_squared_error(y_test, y_pred))
-        print('Elastic Net Mean squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
-        del clf, ENet
-        """GBoost = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
-                                           max_depth=4, max_features='sqrt',
-                                           min_samples_leaf=15, min_samples_split=10,
-                                           loss='huber', random_state=5)
-        drawTrain(GBoost, x, y, 'Gradient Boosting', i)"""
-        parameters = {'n_estimators': [100, 500, 1000, 2000, 3000, 5000]}
-        GBoost = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
-                                           max_depth=4, max_features='sqrt',
-                                           min_samples_leaf=15, min_samples_split=10,
-                                           loss='huber', random_state=5)
-        clf = GridSearchCV(GBoost, parameters, n_jobs=-1, scoring='neg_mean_squared_error')
-        clf.fit(X_train, y_train)
-        y_pred = clf.best_estimator_.predict(X_test)
-        print(clf.best_params_)
-        GBOOST_MSE.append(mean_squared_error(y_test, y_pred))
-        print('GBoost squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
-        del clf, GBoost
 
-    if sum(SVR_MSE) / 10 <= MSE_bar:
-        Selected_learnerCode.append('SVR')
-    else:
-        Selected_learnerCode.append('')
+"""
+准备NIST库的元素特征峰信息
+放在element_dict中 key为元素名称
+"""
+globals = {
+    'nan': 0
+}
 
-    if sum(RFR_MSE) / 10 <= MSE_bar:
-        Selected_learnerCode.append('RFR')
-    else:
-        Selected_learnerCode.append('')
 
-    if sum(ENET_MSE) / 10 <= MSE_bar:
-        Selected_learnerCode.append('ENET')
-    else:
-        Selected_learnerCode.append('')
+def prepareNIST():
+    print("准备NIST库相关数据\n")
+    # if os.path.exists("E:\\JustForFun\\CanadaLIBSdata\\element_dict.dat"):
+    print('读取NIST缓存')
+    f = open("E:\\JustForFun\\CanadaLIBSdata\\element_dict.dat", 'r')
+    a = f.read()
+    element_dict = eval(a, globals)
+    f.close()
+    return element_dict
 
-    if sum(LASSO_MSE) / 10 <= MSE_bar:
-        Selected_learnerCode.append('LASSO')
-    else:
-        Selected_learnerCode.append('')
 
-    if sum(GBOOST_MSE) / 10 <= MSE_bar:
-        Selected_learnerCode.append('GBOOST')
-    else:
-        Selected_learnerCode.append('')
+def drawTrain(y_pred, y_test, name, time):
+    # clf.fit(X_train,y_train)
+    # y_pred = clf.predict(X_test)
+    # RFR_MSE.append(mean_squared_error(y_test, y_pred))
+    # print('Mean squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
 
-    print(GBOOST_MSE)
+    # y_pred = clf.predict(X_test)
+    plt.plot(y_test, y_pred, '.')
+    maxx = max(y_test)
+    if max(y_pred) > maxx:
+        maxx = max(y_pred)
+    xx = [1, 2, 3, maxx]
+    plt.plot(xx, xx)
+    plt.xlabel('Reference Value(ppm)')
+    plt.ylabel('Predict Value(ppm)')
+    plt.title(name)
+    plt.savefig(str(time) + name + '.png')
+    plt.clf()
 
 
 def useXYtrain(x, y, times):
@@ -814,14 +553,243 @@ def useXYtrain(x, y, times):
     plt.plot()
 
 
+# def test(element):
+# trainingCase = {}
+# element_info = element_dict[element]
+"""
+    for info in element_info:
+        print('Using wave='+str(info[0])+" importance="+str(info[1])+" for testing...")
+
+        aim = info[0]
+        if aim<240.86501 or aim>905.57349 or aim-0.25<240.86501 or aim+0.25>905.57349:
+            continue
+
+        for key, item in meanTrainingData.items():
+            for name in meanTrainingData[key].columns:
+                if not name == 'wave':
+                    meanTrainingData[key][name] = normalize(meanTrainingData[key][name])
+
+            trainingCase[key] = getROI(aim, key)
+
+
+
+        x = []
+        y = []
+        for key, item in trainingCase.items():
+            # print(key)
+            for name in trainingCase[key].columns:
+                # print(name)
+                if not name == 'wave':
+                    x.append(list(trainingCase[key][name]))
+                    y.append(con.loc[con.Name == key].Cu.values[0])
+        if len(x)==len(y) and len(x)!=0 and len(x[0])!=0:
+            useXYtrain(x,y)
+"""
+test_ba_line = [553.548, 270.263, 307.158, 350.111, 388.933]
+test_line ={
+    'Al':[309.271,308.216,309.284,394.403,396.153],
+    'Ti':[364.268,319.990,363.546,365.350,399.864],
+    'Si':[251.612,250.690,251.433,252.412,252.852],
+    'Mn':[279.482,222.183,280.106,403.307,403.449],
+    'Mg':[385.213,279.553,202.580,230.270],
+    'Na':[588.995,330.232,330.299,589.592],
+    'Ca':[422.673,239.356,272.164,393.367],
+    'Fe':[248.327, 248.637, 252.285, 302.064]
+
+
+}
+
+def newMain(element,oxid):
+    x = []
+    y = []
+
+    for key, val in meanTrainingData.items():
+        for name in ['avg1', 'avg2', 'avg3', 'avg4', 'avg5']:
+            xtemp = []
+            for line in test_line[element]:
+                try:
+                    xtemp.append(max(getROI(line, key)[name]) / max(meanTrainingData[key][name]))
+                    # xtemp.append(max(getROI(culine,key)[name])/max(getROI(feline,key)[name]))
+                except ValueError:
+                    print('No line in ' + str(line))
+                    pass
+
+            x.append(xtemp)
+            y.append(con.loc[con.Name == key][oxid].values[0])
+
+    # useXYtrain(x,y)
+    return x, y
+
+
+def processingRatios():
+    xy = x_df.join(y_df)
+    # 处理异常值
+    """
+    xy = xy.loc[xy.feature4 > 0]
+    xy = xy.loc[xy.feature4 < 4]
+    xy = xy.loc[xy.Target < 100]
+    """
+    xy_0 = xy[xy.Target <= 0]
+    xy = xy[xy.Target > 0]
+    xy.append(xy_0.mean(), ignore_index=True)
+
+    newx = []
+    newy = []
+
+    for i in range(0, 320):
+        try:
+            newx.append(xy.loc[i].tolist()[:-1])
+            newy.append(xy.loc[i].tolist()[-1])
+        except KeyError:
+            pass
+
+    return newx, newy
+
+
+# 学习器选择 设定一个阈值 MSE低于该阈值的学习器认为适合
+MSE_bar = 50
+def selectLearner(x, y):
+    SVR_MSE = []
+    RFR_MSE = []
+    GBOOST_MSE = []
+    ENET_MSE = []
+    LASSO_MSE = []
+
+    for i in range(0, 10):
+        print('第' + str(i + 1) + '次试验：\n')
+        X_train, X_test, y_train, y_test = train_test_split(x,
+                                                            y,
+                                                            test_size=0.20)
+
+        # svr = SVR(C=1.0, epsilon=0.2)
+        # drawTrain(svr, x, y, 'SVR', i)
+        svr = SVR(C=1.0, epsilon=0.1, kernel='rbf')
+        parameters = {'C': np.logspace(-3, 3, 7), 'gamma': np.logspace(-3, 3, 7)}
+        print("GridSearch starting...")
+        clf = GridSearchCV(svr, parameters, n_jobs=-1, scoring='neg_mean_squared_error')
+        clf.fit(X_train, y_train)
+
+        print('The parameters of the best model are: ')
+        print(clf.best_params_)
+        y_pred = clf.best_estimator_.predict(X_test)
+        SVR_MSE.append(mean_squared_error(y_test, y_pred))
+        print('SVR Mean squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
+        del clf, svr
+        """ann = Regressor(layers = [Layer("Sigmoid", units=14),
+                                   Layer("Linear")],
+                         learning_rate = 0.02,
+                         random_state = 2018,
+                         n_iter = 10)
+
+        ann.fit(X_train,y_train)
+        y_pred = ann.predict(X_test)
+        print('ANN Mean squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")"""
+
+        parameters = {'n_estimators': [10, 50, 100, 500, 1000]}
+        rfr = RandomForestRegressor(n_estimators=200, random_state=0)
+        # drawTrain(rfr, x, y, 'RFR', i)
+        # rfr = RandomForestRegressor(n_estimators=200, random_state=0)
+        clf = GridSearchCV(rfr, parameters, n_jobs=-1, scoring='neg_mean_squared_error')
+        clf.fit(X_train, y_train)
+        print('The parameters of the best model are: ')
+        print(clf.best_params_)
+        y_pred = clf.best_estimator_.predict(X_test)
+        RFR_MSE.append(mean_squared_error(y_test, y_pred))
+        print('RFR Mean squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
+        del clf, rfr
+
+        parameters = {'alpha': np.logspace(-2, 2, 5)}
+        lasso = Lasso(alpha=0.05, random_state=1, max_iter=1000)
+        # drawTrain(lasso, x, y, 'LASSO', i)
+        clf = GridSearchCV(lasso, parameters, n_jobs=-1, scoring='neg_mean_squared_error')
+        clf.fit(X_train, y_train)
+        print('The parameters of the best model are: ')
+        print(clf.best_params_)
+
+        y_pred = clf.best_estimator_.predict(X_test)
+        LASSO_MSE.append(mean_squared_error(y_test, y_pred))
+        print('LASSO  Mean squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
+        # file.write('LASSO  Mean squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
+        del clf, lasso
+
+        parameters = {'alpha': np.logspace(-2, 2, 5)}
+        # ENet = ElasticNet(alpha=0.05, l1_ratio=.9, random_state=3)
+        # drawTrain(ENet, x, y, 'Elastic NET', i)
+        ENet = ElasticNet(alpha=0.05, l1_ratio=.9, random_state=3)
+        clf = GridSearchCV(ENet, parameters, n_jobs=-1, scoring='neg_mean_squared_error')
+        clf.fit(X_train, y_train)
+        print('The parameters of the best model are: ')
+        print(clf.best_params_)
+        y_pred = clf.best_estimator_.predict(X_test)
+        ENET_MSE.append(mean_squared_error(y_test, y_pred))
+        print('Elastic Net Mean squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
+        del clf, ENet
+        """GBoost = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
+                                           max_depth=4, max_features='sqrt',
+                                           min_samples_leaf=15, min_samples_split=10,
+                                           loss='huber', random_state=5)
+        drawTrain(GBoost, x, y, 'Gradient Boosting', i)"""
+        parameters = {'n_estimators': [100, 500, 1000, 2000, 3000, 5000]}
+        GBoost = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
+                                           max_depth=4, max_features='sqrt',
+                                           min_samples_leaf=15, min_samples_split=10,
+                                           loss='huber', random_state=5)
+        clf = GridSearchCV(GBoost, parameters, n_jobs=-1, scoring='neg_mean_squared_error')
+        clf.fit(X_train, y_train)
+        y_pred = clf.best_estimator_.predict(X_test)
+        print(clf.best_params_)
+        GBOOST_MSE.append(mean_squared_error(y_test, y_pred))
+        print('GBoost squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
+        del clf, GBoost
+
+    if sum(SVR_MSE) / 10 <= MSE_bar:
+        Selected_learnerCode.append('SVR')
+    else:
+        Selected_learnerCode.append('')
+
+    if sum(RFR_MSE) / 10 <= MSE_bar:
+        Selected_learnerCode.append('RFR')
+    else:
+        Selected_learnerCode.append('')
+
+    if sum(ENET_MSE) / 10 <= MSE_bar:
+        Selected_learnerCode.append('ENET')
+    else:
+        Selected_learnerCode.append('')
+
+    if sum(LASSO_MSE) / 10 <= MSE_bar:
+        Selected_learnerCode.append('LASSO')
+    else:
+        Selected_learnerCode.append('')
+
+    if sum(GBOOST_MSE) / 10 <= MSE_bar:
+        Selected_learnerCode.append('GBOOST')
+    else:
+        Selected_learnerCode.append('')
+
+    print(GBOOST_MSE)
+
+
 if __name__ == '__main__':
-    prepareConcentrationData()
-    elementList = ['Al','Ca', 'Fe', 'Mg', 'Mn', 'Na', 'Si', 'Ti']
-    #elementOList = ['CaO', 'Fe2O3T', 'MgO', 'MnO', 'Na2O', 'K2O', 'SiO2', 'TiO2']
-    for r in range(0, len(elementList)):
-        # element = 'Cu'
+    con = loadConcentrationData()
+    trainingData = {}
+    loadTrainingSamples()
+    meanTrainingData = {}
+    getMean()
+    # print(meanTrainingData)
+    """plt.plot(meanTrainingData['BK2']['wave'],meanTrainingData['BK2']['avg1'])
+    plt.title('BK2 sample LIBS spectrogram')
+    plt.ylabel('Relative Intensity(a.u)')
+    plt.xlabel('Wave Length(nm)')
+
+    plt.show()"""
+    # element_dict = prepareNIST()
+    elementList = ['Al','Ca','Fe','Mg','Mn','Na','Si','Ti']
+    elementOList = ['Al2O3','CaO','Fe2O3T','MgO','MnO','Na2O','K2O','SiO2','TiO2']
+    for r in range(0,len(elementList)):
+        #element = 'Cu'
         element = elementList[r]
-        x, y = newMain(element,r)
+        x, y = newMain(element,elementOList[r])
 
         y_df = pd.DataFrame(y, columns=['Target'])
         x_df = pd.DataFrame(x)
@@ -832,9 +800,7 @@ if __name__ == '__main__':
         selectLearner(newx, newy)
 
         REPEAT_TIMES = 100
-        if not os.path.exists("E:\\LIBS_experiment\\" + element + 'v8_Canada'):
-            os.mkdir("E:\\LIBS_experiment\\" + element + 'v8_Canada')
-        os.chdir("E:\\LIBS_experiment\\" + element + 'v8_Canada')
+        if not os.path.exists("E:\\LIBS_experiment\\" + element + 'v8_NASA'):
+            os.mkdir("E:\\LIBS_experiment\\" + element + 'v8_NASA')
+        os.chdir("E:\\LIBS_experiment\\" + element + 'v8_NASA')
         useXYtrain(newx, newy, REPEAT_TIMES)
-
-
