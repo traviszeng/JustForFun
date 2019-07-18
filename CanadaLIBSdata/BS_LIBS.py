@@ -303,27 +303,26 @@ def newMain():
 
 def processingRatios():
     xy = x_df.join(y_df)
-    #处理异常值
+    # 处理异常值
     xy = xy.loc[xy.feature4 > 0]
     xy = xy.loc[xy.feature4 < 4]
     xy = xy.loc[xy.Target < 100]
     xy_0 = xy[xy.Target <= 0]
-    xy = xy[xy.Target>0]
+    xy = xy[xy.Target > 0]
     xy.append(xy_0.mean(), ignore_index=True)
 
     newx = []
     newy = []
 
-
-
-    for i in range(0, 320):
+    print("行数为" + str(xy.shape[0]))
+    for i in range(0, xy.shape[0]):
         try:
             newx.append(xy.loc[i].tolist()[:-1])
             newy.append(xy.loc[i].tolist()[-1])
         except KeyError:
             pass
 
-    return newx,newy
+    return newx, newy
 
 
 # 学习器选择 设定一个阈值 MSE低于该阈值的学习器认为适合

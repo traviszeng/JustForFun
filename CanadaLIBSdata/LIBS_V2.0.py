@@ -151,6 +151,12 @@ def prepareConcentrationData():
     del data_set_200AVG['hand sample37 barite_200AVG']
 
 
+#获得特征峰左右0.25的特征点
+def getROI(samplename,aim):
+    d = data_set_200AVG[samplename]
+    d = d.loc[d['WaveLength'] > aim - 0.25]
+    d = d.loc[d['WaveLength'] < aim + 0.25]
+    return d
 
 """
 准备NIST库的元素特征峰信息
@@ -668,8 +674,10 @@ if __name__=='__main__':
     #prepareNIST()
     prepareTrainingXY()
     os.chdir("E:\\JustForFun\\CanadaLIBSdata\\exp result 20190225")
+    """
     elementList = ['Al', 'Ca', 'Fe', 'K', 'Mg', 'Mn', 'Na', 'Si', 'Ti']
     for i in range(0, len(elementList)):
         file = open('log.txt', 'a')
         main(elementList[i], i)
         file.close()
+"""

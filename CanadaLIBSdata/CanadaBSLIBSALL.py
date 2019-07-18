@@ -9,6 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.linear_model import ElasticNet, Lasso, BayesianRidge, LassoLarsIC
 from sklearn.kernel_ridge import KernelRidge
+from sklearn.metrics import r2_score
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor, AdaBoostRegressor
 from sklearn.base import BaseEstimator, TransformerMixin, RegressorMixin, clone
 from sklearn.feature_selection import f_regression, SelectPercentile
@@ -73,7 +74,7 @@ def drawTrain(y_pred, y_test, name, time):
     plt.plot(xx, xx)
     plt.xlabel('Reference Value(%)')
     plt.ylabel('Predict Value(%)')
-    plt.title(name)
+    plt.title(name + '\n$R^2$=' + str(r2_score(y_test, y_pred)))
     plt.savefig(str(time) + name + '.png')
     plt.clf()
 
@@ -340,10 +341,12 @@ def newMain(element,index):
 def processingRatios():
     xy = x_df.join(y_df)
     # 处理异常值
+    """
     xy = xy.loc[xy.feature4 > 0]
     xy = xy.loc[xy.feature4 < 4]
-    xy = xy.loc[xy.Target < 100]
+    xy = xy.loc[xy.Target < 100]"""
     xy_0 = xy[xy.Target <= 0]
+
     xy = xy[xy.Target > 0]
     xy.append(xy_0.mean(), ignore_index=True)
 
@@ -832,9 +835,9 @@ if __name__ == '__main__':
         selectLearner(newx, newy)
 
         REPEAT_TIMES = 100
-        if not os.path.exists("E:\\LIBS_experiment\\" + element + 'v8_Canada'):
-            os.mkdir("E:\\LIBS_experiment\\" + element + 'v8_Canada')
-        os.chdir("E:\\LIBS_experiment\\" + element + 'v8_Canada')
+        if not os.path.exists("E:\\LIBS_experiment\\" + element + 'v9_Canada'):
+            os.mkdir("E:\\LIBS_experiment\\" + element + 'v9_Canada')
+        os.chdir("E:\\LIBS_experiment\\" + element + 'v9_Canada')
         useXYtrain(newx, newy, REPEAT_TIMES)
 
 

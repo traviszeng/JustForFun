@@ -18,6 +18,7 @@ import re
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.linear_model import ElasticNet, Lasso, BayesianRidge, LassoLarsIC
+from sklearn.metrics import r2_score #R square
 from sklearn.kernel_ridge import KernelRidge
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor, AdaBoostRegressor
 from sklearn.base import BaseEstimator, TransformerMixin, RegressorMixin, clone
@@ -219,7 +220,7 @@ def drawTrain(y_pred, y_test, name, time):
     plt.plot(xx, xx)
     plt.xlabel('Reference Value(ppm)')
     plt.ylabel('Predict Value(ppm)')
-    plt.title(name)
+    plt.title(name + '\n$R^2$=' + str(r2_score(y_test, y_pred)))
     plt.savefig(str(time) + name + '.png')
     plt.clf()
 
@@ -800,7 +801,7 @@ if __name__ == '__main__':
         selectLearner(newx, newy)
 
         REPEAT_TIMES = 100
-        if not os.path.exists("E:\\LIBS_experiment\\" + element + 'v8_NASA'):
-            os.mkdir("E:\\LIBS_experiment\\" + element + 'v8_NASA')
-        os.chdir("E:\\LIBS_experiment\\" + element + 'v8_NASA')
+        if not os.path.exists("E:\\LIBS_experiment\\" + element + 'v9_NASA'):
+            os.mkdir("E:\\LIBS_experiment\\" + element + 'v9_NASA')
+        os.chdir("E:\\LIBS_experiment\\" + element + 'v9_NASA')
         useXYtrain(newx, newy, REPEAT_TIMES)
