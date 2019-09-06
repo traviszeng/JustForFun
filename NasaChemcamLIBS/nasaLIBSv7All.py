@@ -223,6 +223,7 @@ def drawTrain(y_pred, y_test, name, time):
     plt.title(name + '\n$R^2$=' + str(r2_score(y_test, y_pred)))
     plt.savefig(str(time) + name + '.png')
     plt.clf()
+    return r2_score(y_test, y_pred)
 
 
 def useXYtrain(x, y, times):
@@ -235,6 +236,7 @@ def useXYtrain(x, y, times):
         return
     stacking_MSE = [[], [], [], [], [], []]
     MSE = [[], [], [], [], [], [], []]
+    R_square = [[], [], [], [], [], [], [],[]]
 
     Ada_MSE = []
 
@@ -258,7 +260,7 @@ def useXYtrain(x, y, times):
         # SVR_MSE.append(mean_squared_error(y_test, y_pred))
 
         yy = clfsvr.best_estimator_.predict(x)
-        drawTrain(y, yy, 'SVR MSE = ' + str(mean_squared_error(y_test, y_pred)), i)
+        R_square[0].append(drawTrain(y, yy, 'SVR MSE = ' + str(mean_squared_error(y_test, y_pred)), i))
         MSE[0].append(mean_squared_error(y_test, y_pred))
 
         if 'SVR' in Selected_learnerCode:
@@ -288,7 +290,7 @@ def useXYtrain(x, y, times):
         y_pred = clfrfr.best_estimator_.predict(X_test)
         yy = clfrfr.best_estimator_.predict(x)
         MSE[1].append(mean_squared_error(y_test, y_pred))
-        drawTrain(y, yy, 'RFR MSE = ' + str(mean_squared_error(y_test, y_pred)), i)
+        R_square[1].append(drawTrain(y, yy, 'RFR MSE = ' + str(mean_squared_error(y_test, y_pred)), i))
         # RFR_MSE.append(mean_squared_error(y_test, y_pred))
 
 
@@ -307,7 +309,7 @@ def useXYtrain(x, y, times):
         print('The parameters of the best model are: ')
         print(clflasso.best_params_)
         y_pred = clflasso.best_estimator_.predict(X_test)
-        drawTrain(y, yy, 'LASSO MSE = ' + str(mean_squared_error(y_test, y_pred)), i)
+        R_square[2].append(drawTrain(y, yy, 'LASSO MSE = ' + str(mean_squared_error(y_test, y_pred)), i))
         MSE[2].append(mean_squared_error(y_test, y_pred))
 
         if 'LASSO' in Selected_learnerCode:
@@ -329,7 +331,7 @@ def useXYtrain(x, y, times):
         y_pred = clfENet.best_estimator_.predict(X_test)
         yy = clfENet.best_estimator_.predict(x)
         MSE[3].append(mean_squared_error(y_test, y_pred))
-        drawTrain(y, yy, 'Elastic Net MSE = ' + str(mean_squared_error(y_test, y_pred)), i)
+        R_square[3].append(drawTrain(y, yy, 'Elastic Net MSE = ' + str(mean_squared_error(y_test, y_pred)), i))
         if 'ENET' in Selected_learnerCode:
             print('Elastic Net Mean squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
             Learners.append(clfENet.best_estimator_)
@@ -349,7 +351,7 @@ def useXYtrain(x, y, times):
         yy = clfGBoost.best_estimator_.predict(x)
         MSE[4].append(mean_squared_error(y_test, y_pred))
         # GBoost_MSE.append(mean_squared_error(y_test, y_pred))
-        drawTrain(y, yy, 'GBoost MSE = ' + str(mean_squared_error(y_test, y_pred)), i)
+        R_square[4].append(drawTrain(y, yy, 'GBoost MSE = ' + str(mean_squared_error(y_test, y_pred)), i))
         if 'GBOOST' in Selected_learnerCode:
             print('GBoost squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
             Learners.append(clfGBoost.best_estimator_)
@@ -362,7 +364,7 @@ def useXYtrain(x, y, times):
         Adaboost.fit(X_train, y_train)
         y_pred = Adaboost.predict(X_test)
         yy = Adaboost.predict(x)
-        drawTrain(y, yy, 'Adaboost MSE = ' + str(mean_squared_error(y_test, y_pred)), i)
+        R_square[5].append(drawTrain(y, yy, 'Adaboost MSE = ' + str(mean_squared_error(y_test, y_pred)), i))
         print('Adaboost with SVR squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
         Ada_MSE.append(mean_squared_error(y_test, y_pred))
 
@@ -374,7 +376,7 @@ def useXYtrain(x, y, times):
         y_pred = baggingModel.predict(X_test)
         MSE[5].append(mean_squared_error(y_test, y_pred))
         yy = baggingModel.predict(x)
-        drawTrain(y, yy, 'Bagging before selected MSE = ' + str(mean_squared_error(y_test, y_pred)), i)
+        R_square[6].append(drawTrain(y, yy, 'Bagging before selected MSE = ' + str(mean_squared_error(y_test, y_pred)), i))
         print('Bagging before selected squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
 
         baggingModel = baggingAveragingModels(models=tuple(Learners))
@@ -385,10 +387,10 @@ def useXYtrain(x, y, times):
         y_pred = baggingModel.predict(X_test)
         MSE[6].append(mean_squared_error(y_test, y_pred))
         yy = baggingModel.predict(x)
-        drawTrain(y, yy, 'Bagging after selected selected MSE = ' + str(mean_squared_error(y_test, y_pred)), i)
+        R_square[7].append(drawTrain(y, yy, 'Bagging after selected selected MSE = ' + str(mean_squared_error(y_test, y_pred)), i))
 
         print('Bagging after selected squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
-
+        stacking_R_square = [[],[],[],[],[],[]]
         All_learner = ['SVR', 'RFR', 'LASSO', 'ENET', 'GBOOST']
         for k in range(0, len(Selected_learnerCode)):
 
@@ -444,7 +446,7 @@ def useXYtrain(x, y, times):
             grid.fit(X_train, y_train)
             y_pred = grid.best_estimator_.predict(X_test)
             yy = grid.best_estimator_.predict(x)
-            drawTrain(y, yy, 'stacking with ' + All_learner[k] + ' MSE = ' + str(mean_squared_error(y_test, y_pred)), i)
+            stacking_R_square[k].append(drawTrain(y, yy, 'stacking with ' + All_learner[k] + ' MSE = ' + str(mean_squared_error(y_test, y_pred)), i))
             print('Stacking with metamodel is ' + All_learner[k] + ' squared error is ' + str(
                 mean_squared_error(y_test, y_pred)) + "\n")
             # file.write('Stacking with metamodel is lasso squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
@@ -461,7 +463,7 @@ def useXYtrain(x, y, times):
         stacked_averaged_models.fit(X_train, y_train)
         y_pred = stacked_averaged_models.predict(X_test)
         yy = stacked_averaged_models.predict(x)
-        drawTrain(y, yy, 'stacking with bagging MSE = ' + str(mean_squared_error(y_test, y_pred)), i)
+        stacking_R_square[5].append(drawTrain(y, yy, 'stacking with bagging MSE = ' + str(mean_squared_error(y_test, y_pred)), i))
         print('Stacking with metamodel is bagging models squared error is ' + str(
             mean_squared_error(y_test, y_pred)) + "\n")
         # file.write('Stacking with metamodel is lasso squared error is ' + str(mean_squared_error(y_test, y_pred)) + "\n")
@@ -552,6 +554,24 @@ def useXYtrain(x, y, times):
     plt.savefig('DifferentMetaLearner.png')
     plt.clf()
     plt.plot()
+    index = ['SVR','RFR','LASSO','ENET','Gboost','BAGGING1','BAGGING2']
+    mse_file = pd.DataFrame(index=index,data=MSE)
+    mse_file.to_csv('MSE.csv', encoding='utf-8')
+
+    index = ['SVR', 'RFR', 'LASSO', 'ENET', 'Gboost', 'BAGGING']
+    mse_file = pd.DataFrame(index=index, data=stacking_MSE)
+    mse_file.to_csv('stacking_MSE.csv', encoding='utf-8')
+
+    mse_file = pd.DataFrame(data=min_stacking_MSE)
+    mse_file.to_csv('min_stacking_MSE.csv', encoding='utf-8')
+
+    index = ['SVR', 'RFR', 'LASSO', 'ENET', 'Gboost', 'Adaboost','BAGGING1', 'BAGGING2']
+    r_file = pd.DataFrame(index=index, data=R_square)
+    r_file.to_csv('R_square.csv', encoding='utf-8')
+
+    index = ['SVR', 'RFR', 'LASSO', 'ENET', 'Gboost', 'BAGGING']
+    mse_file = pd.DataFrame(index=index, data=stacking_R_square)
+    mse_file.to_csv('stacking_R_square.csv', encoding='utf-8')
 
 
 # def test(element):
@@ -596,7 +616,6 @@ test_line ={
     'Na':[588.995,330.232,330.299,589.592],
     'Ca':[422.673,239.356,272.164,393.367],
     'Fe':[248.327, 248.637, 252.285, 302.064]
-
 
 }
 
@@ -801,7 +820,7 @@ if __name__ == '__main__':
         selectLearner(newx, newy)
 
         REPEAT_TIMES = 100
-        if not os.path.exists("E:\\LIBS_experiment\\" + element + 'v9_NASA'):
-            os.mkdir("E:\\LIBS_experiment\\" + element + 'v9_NASA')
-        os.chdir("E:\\LIBS_experiment\\" + element + 'v9_NASA')
+        if not os.path.exists("E:\\LIBS_experiment\\" + element + 'v10_NASA'):
+            os.mkdir("E:\\LIBS_experiment\\" + element + 'v10_NASA')
+        os.chdir("E:\\LIBS_experiment\\" + element + 'v10_NASA')
         useXYtrain(newx, newy, REPEAT_TIMES)
