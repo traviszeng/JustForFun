@@ -806,7 +806,7 @@ if __name__ == '__main__':
     # element_dict = prepareNIST()
     elementList = ['Al','Ca','Fe','Mg','Mn','Na','Si','Ti']
     elementOList = ['Al2O3','CaO','Fe2O3T','MgO','MnO','Na2O','K2O','SiO2','TiO2']
-    for r in range(0,len(elementList)):
+    for r in range(0,1):
         #element = 'Cu'
         element = elementList[r]
         x, y = newMain(element,elementOList[r])
@@ -820,7 +820,7 @@ if __name__ == '__main__':
         selectLearner(newx, newy)
 
         REPEAT_TIMES = 100
-        if not os.path.exists("E:\\LIBS_experiment\\" + element + 'v10_NASA'):
-            os.mkdir("E:\\LIBS_experiment\\" + element + 'v10_NASA')
-        os.chdir("E:\\LIBS_experiment\\" + element + 'v10_NASA')
+        if not os.path.exists("E:\\LIBS_experiment\\" + element + 'v11_NASA'):
+            os.mkdir("E:\\LIBS_experiment\\" + element + 'v11_NASA')
+        os.chdir("E:\\LIBS_experiment\\" + element + 'v11_NASA')
         useXYtrain(newx, newy, REPEAT_TIMES)
