@@ -31,8 +31,8 @@ import warnings
 
 warnings.filterwarnings("ignore")
 
-route_200_AVG = "E:\\JustForFun\\CanadaLIBSdata\\LIBS OpenData csv\\csv Material Large Set 200pulseaverage"
-route_1000_AVG = "E:\\JustForFun\\CanadaLIBSdata\\LIBS OpenData csv\\csv Certified Samples Subset 1000pulseaverage"
+route_200_AVG = "E:\\JustForFun\\CSALIBS\\LIBS OpenData csv\\csv Material Large Set 200pulseaverage"
+route_1000_AVG = "E:\\JustForFun\\CSALIBS\\LIBS OpenData csv\\csv Certified Samples Subset 1000pulseaverage"
 
 postfix_200AVG = "_200AVG.csv"
 postfix_1000AVG = "_1000AVG.csv"
@@ -53,7 +53,7 @@ test_line ={
 
 def loadConcentrateFile():
     print("Loading concentrate file.....\n")
-    concentrate_data = pd.read_csv("E:\\JustForFun\\CanadaLIBSdata\\LIBS OpenData csv\\Sample_Composition_Data.csv")
+    concentrate_data = pd.read_csv("E:\\JustForFun\\CSALIBS\\LIBS OpenData csv\\Sample_Composition_Data.csv")
     # 前81行为数据
     concentrate_data = concentrate_data.loc[0:81]
     return concentrate_data
@@ -224,9 +224,9 @@ globals = {
 
 def prepareNIST():
     print("准备NIST库相关数据\n")
-    # if os.path.exists("E:\\JustForFun\\CanadaLIBSdata\\element_dict.dat"):
+    # if os.path.exists("E:\\JustForFun\\CSALIBS\\element_dict.dat"):
     print('读取NIST缓存')
-    f = open("E:\\JustForFun\\CanadaLIBSdata\\element_dict.dat", 'r')
+    f = open("E:\\JustForFun\\CSALIBS\\element_dict.dat", 'r')
     a = f.read()
     element_dict = eval(a, globals)
     f.close()
