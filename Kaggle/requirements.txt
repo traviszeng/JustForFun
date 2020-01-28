@@ -122,7 +122,7 @@ sklearn-pandas==1.7.0
 SQLAlchemy==1.1.11
 sqlitedict==1.5.0
 statsmodels==0.9.0
-tensorflow==1.4.0
+tensorflow==1.15.2
 tensorflow-tensorboard==0.4.0rc2
 terminado==0.8.1
 testpath==0.3.1
