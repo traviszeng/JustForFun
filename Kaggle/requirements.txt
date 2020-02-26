@@ -16,7 +16,7 @@ Cython==0.28.1
 decorator==4.2.1
 descartes==1.1.0
 Django==1.11.7
-ecdsa==0.13
+ecdsa==0.13.3
 entrypoints==0.2.3
 enum34==1.1.6
 et-xmlfile==1.0.1
