@@ -259,6 +259,86 @@ def delete_lost_repost(count = 1):
             break
     print('共清除失效转发' + str(delete_count) + '条.')
 
+# 删除所有收藏
+def delete_all_favourite(count = 2):
+    delete_count = 0
+    driver.get("https://weibo.cn/fav?page="+str(count))
+    # pat_n是用来匹配多少页数的
+    pat_n = re.compile(r'\d+/(\d+)[\u4e00-\u9fa5]</div>')
+
+    # pat1是直接无效的
+    pat1 = re.compile(r'.+?/celfav/(.+?)" class="cc">取消收藏')
+    # pat2是间接转发无效的
+    pat2 = re.compile(r'.+?/celfav/(.+?)" class="cc">取消收藏</a>?')
+
+    page_list = pat_n.findall(driver.page_source)
+
+    all_result = []
+    # 只有一页收藏的情况
+    if page_list == []:
+
+        url = "https://weibo.cn/fav?page=1"
+        driver.get(url)
+        result = pat1.findall(driver.page_source) + pat2.findall(driver.page_source)
+
+        if len(result) == 0:
+            return
+        else:
+            for url_str in result:
+                driver.get("https://weibo.cn/fav/celFavC/{0}".format(url_str))
+                delete_count += 1
+                page_num = int(pat_n.findall(driver.page_source)[0])
+                time.sleep(random.uniform(0.5, 1))
+            return
+
+    # 不止一页收藏的情况
+    else:
+        page_num = int(page_list[0])
+    while (1):
+        if int(count) <= page_num:
+            url = "https://weibo.cn/fav?page={0}".format(count)
+            print('正在清理'+url)
+            driver.get(url)
+
+            result = pat1.findall(driver.page_source) + pat2.findall(driver.page_source)
+            print('获取到收藏'+str(len(result))+'条')
+
+            count += 1
+            time.sleep(1.5)
+            for r in result:
+                all_result.append(r)
+            continue
+
+            try:
+                page_num = int(pat_n.findall(driver.page_source)[0])
+            except Exception as e:
+                print("页面刷新错误，正在重新刷新")
+                time.sleep(random.uniform(1.5,2))
+                url = "https://weibo.cn/fav?page={0}".format(count)
+                driver.get(url)
+                page_num = int(pat_n.findall(driver.page_source)[0])
+            time.sleep(random.uniform(1, 2))
+
+        print('开始删除')
+        # start to delete
+        for url_str in all_result:
+            delete_flag = False
+            print('正在删除：'+"https://weibo.cn/fav/celFavC/{0}".format(url_str))
+            try:
+
+                driver.get("https://weibo.cn/fav/celFavC/{0}".format(url_str))
+                driver.get("https://weibo.cn/fav/celFavC/{0}".format(url_str))
+
+            except Exception as e:
+                print("页面刷新错误，正在重新刷新")
+
+                delete_count += 1
+
+            time.sleep(random.uniform(0.5, 1))
+
+
+    print('共清除收藏'+str(delete_count)+'条.')
+
 def main():
     # 设置参数
     set_params()
@@ -274,11 +354,13 @@ def main():
 
     cmd = ''
     while cmd!='c':
-        cmd = str(input('清理失效收藏微博清按1\n清理失效转发微博清按2\n结束请按c\n'))
+        cmd = str(input('清理失效收藏微博清按1\n清理失效转发微博清按2\n清理所有微博收藏请按3\n结束请按c\n'))
         if cmd == '1':
             delete_lost_favourite()
         elif cmd == '2':
             delete_lost_repost()
+        elif cmd == '3':
+            delete_all_favourite()
 
 
 if __name__=='__main__':
